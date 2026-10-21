@@ -1,0 +1,11 @@
+# Archivos pesados o privados: se quedan en Google Drive
+pdfs/
+cache/
+.venv/
+.ipynb_checkpoints/
+cache_*.jsonl
+*.pdf
+!docs/*.pdf
+# claves: nunca al repositorio
+.env
+*secret*
