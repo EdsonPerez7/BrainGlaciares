@@ -1,0 +1,88 @@
+# Consultas SPARQL · Enterprise Brain Glaciares (G8)
+PREFIX eb: <https://w3id.org/g8-glaciares/ontologia#>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+# S1_P2_deduccion · P2 con deducción · Lagunas con riesgo muy alto en Áncash (el departamento puede deducirse subiendo por ubicadaEn+)
+SELECT DISTINCT ?laguna ?como ?documento ?pagina ?evidencia WHERE {
+  ?l a eb:Laguna ; rdfs:label ?laguna ; eb:tieneNivelRiesgo eb:nivel_muy_alto .
+  ?d a eb:Departamento ; rdfs:label ?dn . FILTER(STR(?dn) = "Áncash")
+  ?l eb:ubicadaEn+ ?d .
+  # si el texto ubica la laguna en OTRO departamento y nunca en este, se descarta
+  FILTER ( EXISTS { ?l eb:ubicadaEn ?d } || NOT EXISTS { ?l eb:ubicadaEn ?d2 . ?d2 a eb:Departamento } )
+  BIND ( IF(EXISTS { ?l eb:ubicadaEn ?d }, "dicho en el texto", "deducido por la jerarquía") AS ?como )
+  ?h a eb:Hecho ; rdf:subject ?l ; rdf:predicate eb:tieneNivelRiesgo ; rdf:object eb:nivel_muy_alto ;
+     prov:wasDerivedFrom ?doc .
+  OPTIONAL { ?h eb:pagina ?pagina } OPTIONAL { ?h eb:evidencia ?evidencia }
+  OPTIONAL { ?doc dcterms:identifier ?documento }
+} ORDER BY ?laguna
+
+# S2_deduccion_departamentos · Deducción · ¿Cuántas lagunas tienen departamento dicho en el texto y cuántas solo deducido (ubicadaEn es transitiva)?
+SELECT ?como (COUNT(DISTINCT ?l) AS ?lagunas) WHERE {
+  ?l a eb:Laguna .
+  { ?l eb:ubicadaEn ?d . ?d a eb:Departamento . BIND("dicho en el texto" AS ?como) }
+  UNION
+  { ?l eb:ubicadaEn/eb:ubicadaEn+ ?d . ?d a eb:Departamento .
+    FILTER NOT EXISTS { ?l eb:ubicadaEn ?d2 . ?d2 a eb:Departamento } BIND("solo deducido" AS ?como) }
+} GROUP BY ?como
+
+# S3_jerarquia · Jerarquía de clases · Elementos geográficos por clase (rdf:type/rdfs:subClassOf* geo:Feature)
+SELECT ?clase (COUNT(?x) AS ?n) WHERE {
+  ?x a ?c . ?c rdfs:subClassOf* geo:Feature . ?c rdfs:label ?clase .
+} GROUP BY ?clase ORDER BY DESC(?n)
+
+# S4_procedencia · Procedencia (PROV-O) · ¿De dónde sale que Palcacocha amenaza a Huaraz?
+SELECT ?documento ?titulo ?pagina ?evidencia ?confianza WHERE {
+  ?l rdfs:label ?ln . FILTER(STR(?ln) = "Palcacocha")
+  ?p rdfs:label ?pn . FILTER(STR(?pn) = "Huaraz")
+  ?h rdf:subject ?l ; rdf:predicate eb:amenazaA ; rdf:object ?p ; prov:wasDerivedFrom ?doc .
+  OPTIONAL { ?doc rdfs:label ?titulo } OPTIONAL { ?h eb:pagina ?pagina } OPTIONAL { ?h eb:evidencia ?evidencia }
+  OPTIONAL { ?h eb:confianza ?confianza } OPTIONAL { ?doc dcterms:identifier ?documento }
+} ORDER BY DESC(?confianza)
+
+# S5_negacion · Negación · Lagunas con riesgo muy alto sin obra de seguridad
+SELECT ?laguna WHERE {
+  ?l a eb:Laguna ; rdfs:label ?laguna ; eb:tieneNivelRiesgo eb:nivel_muy_alto .
+  FILTER NOT EXISTS { ?l eb:tieneObraSeguridad ?o }
+} ORDER BY ?laguna
+
+# S6_P4_eventos · P4 · Eventos en lagunas, glaciar de origen y poblados afectados
+SELECT ?evento ?anio ?laguna (GROUP_CONCAT(DISTINCT ?g2; separator=", ") AS ?glaciar_origen)
+       (GROUP_CONCAT(DISTINCT ?p2; separator=", ") AS ?afecto_a) WHERE {
+  ?e a eb:Evento ; rdfs:label ?evento ; eb:ocurrioEn ?l . ?l a eb:Laguna ; rdfs:label ?laguna .
+  OPTIONAL { ?e eb:anio ?anio }
+  OPTIONAL { ?l eb:alimentadaPor ?g . ?g rdfs:label ?gn }
+  OPTIONAL { ?e eb:afectoA ?p . ?p rdfs:label ?pn }
+  BIND ( COALESCE(STR(?gn), "") AS ?g2 )
+  BIND ( COALESCE(STR(?pn), "") AS ?p2 )
+} GROUP BY ?evento ?anio ?laguna ORDER BY ?anio
+
+# S7_P9_superficie · P9 · Superficie glaciar de la Cordillera Blanca por inventario (SOSA: Medicion = observación)
+SELECT ?inventario ?anio ?km2 ?documento ?pagina WHERE {
+  ?c a eb:Cordillera ; rdfs:label ?cn . FILTER(STR(?cn) = "Blanca")
+  ?i eb:inventarioDe ?c ; rdfs:label ?inventario ; eb:anio ?anio ; eb:tieneMedicion ?m .
+  ?m eb:propiedadMedida "registraSuperficieGlaciar" ; eb:valor ?km2 .
+  ?h rdf:object ?m ; prov:wasDerivedFrom ?doc .
+  OPTIONAL { ?doc dcterms:identifier ?documento } OPTIONAL { ?h eb:pagina ?pagina }
+} ORDER BY ?anio
+
+# ---- Validación (deben dar 0) ----
+# amenazaA hacia algo que no es unidad territorial
+SELECT (COUNT(*) AS ?n) WHERE { ?s eb:amenazaA ?o . FILTER NOT EXISTS { ?o a/rdfs:subClassOf* eb:UnidadTerritorial } }
+
+# ubicadaEn hacia algo que no es un lugar (geo:Feature)
+SELECT (COUNT(*) AS ?n) WHERE { ?s eb:ubicadaEn ?o . FILTER NOT EXISTS { ?o a/rdfs:subClassOf* geo:Feature } }
+
+# nivel de riesgo en algo que no es laguna
+SELECT (COUNT(*) AS ?n) WHERE { ?s eb:tieneNivelRiesgo ?o . FILTER NOT EXISTS { ?s a eb:Laguna } }
+
+# individuos en clases disjuntas (rasgo geográfico y unidad territorial a la vez)
+SELECT (COUNT(DISTINCT ?x) AS ?n) WHERE { ?x a/rdfs:subClassOf* eb:RasgoGeografico . ?x a/rdfs:subClassOf* eb:UnidadTerritorial }
+
+# hechos sin documento de origen
+SELECT (COUNT(*) AS ?n) WHERE { ?h a eb:Hecho . FILTER NOT EXISTS { ?h prov:wasDerivedFrom ?d } }
+
