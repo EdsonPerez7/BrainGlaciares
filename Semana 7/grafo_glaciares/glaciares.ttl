@@ -1,0 +1,559 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix eb: <https://w3id.org/g8-glaciares/ontologia#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/g8-glaciares/ontologia> a owl:Ontology ;
+    rdfs:label "Ontología Enterprise Brain Glaciares (G8)"@es ;
+    dcterms:created "2026-10-08"^^xsd:date ;
+    dcterms:creator "Grupo G8 · Gestión del Conocimiento · UNMSM 2026-II"@es ;
+    dcterms:description "Riesgo glaciar en el Perú: glaciares, lagunas, poblados expuestos, eventos, obras, monitoreo y procedencia de cada hecho. Alineada a GeoSPARQL (lugares), SOSA/SSN (mediciones y métodos) y PROV-O (procedencia)."@es ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:source "Informes técnicos de INAIGEM, ANA y SENAMHI"@es ;
+    rdfs:seeAlso <http://www.opengis.net/ont/geosparql>,
+        <http://www.w3.org/ns/prov-o>,
+        sosa: ;
+    owl:versionIRI <https://w3id.org/g8-glaciares/ontologia/1.1> ;
+    owl:versionInfo "1.1" .
+
+eb:abastecidoPor a owl:ObjectProperty ;
+    rdfs:label "es abastecido por"@es ;
+    rdfs:comment "Inversa de 'abasteceA': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:UnidadTerritorial ;
+    rdfs:range eb:RasgoGeografico ;
+    owl:inverseOf eb:abasteceA .
+
+eb:afectadoPor a owl:ObjectProperty ;
+    rdfs:label "fue afectado por"@es ;
+    rdfs:comment "Inversa de 'afectoA': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:UnidadTerritorial ;
+    rdfs:range eb:Evento ;
+    owl:inverseOf eb:afectoA .
+
+eb:alimentaA a owl:ObjectProperty ;
+    rdfs:label "alimenta a"@es ;
+    rdfs:comment "Inversa de 'alimentadaPor': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:MasaDeHielo ;
+    rdfs:range eb:Laguna ;
+    owl:inverseOf eb:alimentadaPor .
+
+eb:amenazadoPor a owl:ObjectProperty ;
+    rdfs:label "es amenazado por"@es ;
+    rdfs:comment "Inversa de 'amenazaA': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:UnidadTerritorial ;
+    rdfs:range eb:RasgoGeografico ;
+    owl:inverseOf eb:amenazaA .
+
+eb:anio a owl:DatatypeProperty ;
+    rdfs:label "año"@es ;
+    rdfs:comment "Año de un evento, de una medición o de un inventario."@es ;
+    rdfs:domain owl:Thing ;
+    rdfs:range xsd:integer .
+
+eb:anioImagenes a owl:DatatypeProperty ;
+    rdfs:label "año de las imágenes"@es ;
+    rdfs:comment "Año de las imágenes satelitales usadas por el inventario."@es ;
+    rdfs:domain eb:Inventario ;
+    rdfs:range xsd:integer .
+
+eb:confianza a owl:DatatypeProperty ;
+    rdfs:label "confianza"@es ;
+    rdfs:comment "Confianza del hecho (0 a 1) según técnicas y documentos que lo apoyan."@es ;
+    rdfs:domain eb:Hecho ;
+    rdfs:range xsd:double .
+
+eb:contiene a owl:ObjectProperty,
+        owl:TransitiveProperty ;
+    rdfs:label "contiene"@es ;
+    rdfs:comment "Inversa de 'ubicadaEn': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range geo:Feature ;
+    owl:inverseOf eb:ubicadaEn .
+
+eb:ecosistemaDe a owl:ObjectProperty ;
+    rdfs:label "ecosistema de"@es ;
+    rdfs:comment "Inversa de 'tieneEcosistema': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:Ecosistema ;
+    rdfs:range geo:Feature ;
+    owl:inverseOf eb:tieneEcosistema .
+
+eb:escenarioDe a owl:ObjectProperty ;
+    rdfs:label "fue escenario de"@es ;
+    rdfs:comment "Inversa de 'ocurrioEn': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:Evento ;
+    owl:inverseOf eb:ocurrioEn .
+
+eb:especieAlbergadaEn a owl:ObjectProperty ;
+    rdfs:label "especie albergada en"@es ;
+    rdfs:comment "Inversa de 'albergaEspecie': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:Especie ;
+    rdfs:range geo:Feature ;
+    owl:inverseOf eb:albergaEspecie .
+
+eb:estadoObraDe a owl:ObjectProperty ;
+    rdfs:label "estado de obra de"@es ;
+    rdfs:comment "Inversa de 'estadoObra': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:EstadoObra ;
+    rdfs:range eb:Laguna ;
+    owl:inverseOf eb:estadoObra .
+
+eb:evidencia a owl:DatatypeProperty ;
+    rdfs:label "evidencia"@es ;
+    rdfs:comment "Frase del documento que respalda el hecho."@es ;
+    rdfs:domain eb:Hecho ;
+    rdfs:range xsd:string .
+
+eb:fenomenoPresenteEn a owl:ObjectProperty ;
+    rdfs:label "fenómeno presente en"@es ;
+    rdfs:comment "Inversa de 'presentaFenomeno': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:Fenomeno ;
+    rdfs:range geo:Feature ;
+    owl:inverseOf eb:presentaFenomeno .
+
+eb:fuente a owl:DatatypeProperty ;
+    rdfs:label "fuente"@es ;
+    rdfs:comment "Institución o repositorio de donde proviene el documento."@es ;
+    rdfs:domain eb:Documento ;
+    rdfs:range xsd:string .
+
+eb:inventariadaEn a owl:ObjectProperty ;
+    rdfs:label "inventariada en"@es ;
+    rdfs:comment "Inversa de 'inventarioDe': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:Cordillera ;
+    rdfs:range eb:Inventario ;
+    owl:inverseOf eb:inventarioDe .
+
+eb:mencionadoEn a owl:ObjectProperty ;
+    rdfs:label "mencionado en"@es ;
+    rdfs:comment "Inversa de 'menciona': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain owl:Thing ;
+    rdfs:range eb:Documento ;
+    owl:inverseOf eb:menciona .
+
+eb:metodoUsadoEn a owl:ObjectProperty ;
+    rdfs:label "método usado en"@es ;
+    rdfs:comment "Inversa de 'usaMetodo': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:MetodoMonitoreo ;
+    rdfs:range eb:Documento ;
+    owl:inverseOf eb:usaMetodo .
+
+eb:monitorea a owl:ObjectProperty ;
+    rdfs:label "monitorea"@es ;
+    rdfs:comment "Inversa de 'monitoreadoCon': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:MetodoMonitoreo ;
+    rdfs:range eb:RasgoGeografico ;
+    owl:inverseOf eb:monitoreadoCon .
+
+eb:nivelRiesgoDe a owl:ObjectProperty ;
+    rdfs:label "nivel de riesgo de"@es ;
+    rdfs:comment "Inversa de 'tieneNivelRiesgo': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:NivelRiesgo ;
+    rdfs:range eb:Laguna ;
+    owl:inverseOf eb:tieneNivelRiesgo .
+
+eb:nivel_alto a eb:NivelRiesgo ;
+    rdfs:label "Alto"@es .
+
+eb:nivel_bajo a eb:NivelRiesgo ;
+    rdfs:label "Bajo"@es .
+
+eb:nivel_medio a eb:NivelRiesgo ;
+    rdfs:label "Medio"@es .
+
+eb:nivel_muy_alto a eb:NivelRiesgo ;
+    rdfs:label "Muy alto"@es .
+
+eb:obraDe a owl:ObjectProperty ;
+    rdfs:label "obra de"@es ;
+    rdfs:comment "Inversa de 'tieneObraSeguridad': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:ObraSeguridad ;
+    rdfs:range eb:Laguna ;
+    owl:inverseOf eb:tieneObraSeguridad .
+
+eb:pagina a owl:DatatypeProperty ;
+    rdfs:label "página"@es ;
+    rdfs:comment "Página del documento donde está la evidencia del hecho."@es ;
+    rdfs:domain eb:Hecho ;
+    rdfs:range xsd:integer .
+
+eb:propiedadMedida a owl:DatatypeProperty ;
+    rdfs:label "propiedad medida"@es ;
+    rdfs:comment "Qué se midió (superficie, volumen, número de lagunas…)."@es ;
+    rdfs:domain eb:Medicion ;
+    rdfs:range xsd:string .
+
+eb:publica a owl:ObjectProperty ;
+    rdfs:label "publica"@es ;
+    rdfs:comment "Inversa de 'publicadoPor': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:Institucion ;
+    rdfs:range eb:Documento ;
+    owl:inverseOf eb:publicadoPor .
+
+eb:recibeDrenajeDe a owl:ObjectProperty ;
+    rdfs:label "recibe el drenaje de"@es ;
+    rdfs:comment "Inversa de 'drenaHacia': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:RasgoGeografico ;
+    owl:inverseOf eb:drenaHacia .
+
+eb:relacionadoCon a owl:ObjectProperty,
+        owl:SymmetricProperty ;
+    rdfs:label "relacionado con"@es ;
+    rdfs:comment "Relación abierta encontrada por análisis gramatical (el verbo va como dato)."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range geo:Feature .
+
+eb:servicioProvistoPor a owl:ObjectProperty ;
+    rdfs:label "servicio provisto por"@es ;
+    rdfs:comment "Inversa de 'proveeServicio': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:ServicioEcosistemico ;
+    rdfs:range geo:Feature ;
+    owl:inverseOf eb:proveeServicio .
+
+eb:tieneIntervencionDe a owl:ObjectProperty ;
+    rdfs:label "tiene intervención de"@es ;
+    rdfs:comment "Inversa de 'intervieneEn': la misma relación leída en sentido contrario."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:Institucion ;
+    owl:inverseOf eb:intervieneEn .
+
+eb:tieneMedicion a owl:ObjectProperty ;
+    rdfs:label "tiene medicion"@es ;
+    rdfs:comment "Medición de una propiedad (inversa de sosa:hasFeatureOfInterest)."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range eb:Medicion ;
+    owl:inverseOf sosa:hasFeatureOfInterest .
+
+eb:unidad a owl:DatatypeProperty ;
+    rdfs:label "unidad"@es ;
+    rdfs:comment "Unidad de la medición (km², hm³, m…)."@es ;
+    rdfs:domain eb:Medicion ;
+    rdfs:range xsd:string .
+
+eb:valor a owl:DatatypeProperty ;
+    rdfs:label "valor"@es ;
+    rdfs:comment "Valor numérico de la medición."@es ;
+    rdfs:domain eb:Medicion ;
+    rdfs:range xsd:double ;
+    rdfs:subPropertyOf sosa:hasSimpleResult .
+
+geo:sfWithin a owl:ObjectProperty .
+
+prov:Activity a owl:Class .
+
+prov:Organization a owl:Class .
+
+prov:atLocation a owl:ObjectProperty .
+
+prov:wasAttributedTo a owl:ObjectProperty .
+
+sosa:Observation a owl:Class .
+
+sosa:Procedure a owl:Class .
+
+sosa:hasFeatureOfInterest a owl:ObjectProperty .
+
+sosa:hasSimpleResult a owl:DatatypeProperty .
+
+eb:Bofedal a owl:Class ;
+    rdfs:label "Bofedal"@es ;
+    rdfs:comment "Humedal altoandino con nombre propio."@es ;
+    rdfs:subClassOf eb:Ecosistema,
+        eb:RasgoGeografico .
+
+eb:CentroPoblado a owl:Class ;
+    rdfs:label "Centro poblado"@es ;
+    rdfs:comment "Ciudad, centro poblado o comunidad expuesta."@es ;
+    rdfs:subClassOf eb:UnidadTerritorial .
+
+eb:Cuenca a owl:Class ;
+    rdfs:label "Cuenca"@es ;
+    rdfs:comment "Cuenca, subcuenca o microcuenca."@es ;
+    rdfs:subClassOf eb:UnidadHidrografica .
+
+eb:Departamento a owl:Class ;
+    rdfs:label "Departamento"@es ;
+    rdfs:comment "Departamento (región) del Perú."@es ;
+    rdfs:subClassOf eb:UnidadTerritorial .
+
+eb:Distrito a owl:Class ;
+    rdfs:label "Distrito"@es ;
+    rdfs:comment "Distrito."@es ;
+    rdfs:subClassOf eb:UnidadTerritorial .
+
+eb:Glaciar a owl:Class ;
+    rdfs:label "Glaciar"@es ;
+    rdfs:comment "Masa de hielo permanente; se inventaría por cordillera."@es ;
+    rdfs:subClassOf eb:MasaDeHielo ;
+    skos:closeMatch <http://purl.obolibrary.org/obo/ENVO_00000133> .
+
+eb:Nevado a owl:Class ;
+    rdfs:label "Nevado"@es ;
+    rdfs:comment "Montaña con cobertura glaciar."@es ;
+    rdfs:subClassOf eb:MasaDeHielo .
+
+eb:Provincia a owl:Class ;
+    rdfs:label "Provincia"@es ;
+    rdfs:comment "Provincia."@es ;
+    rdfs:subClassOf eb:UnidadTerritorial .
+
+eb:Quebrada a owl:Class ;
+    rdfs:label "Quebrada"@es ;
+    rdfs:comment "Quebrada o valle glaciar."@es ;
+    rdfs:subClassOf eb:UnidadHidrografica .
+
+eb:Rio a owl:Class ;
+    rdfs:label "Rio"@es ;
+    rdfs:comment "Río."@es ;
+    rdfs:subClassOf eb:RasgoGeografico .
+
+eb:abasteceA a owl:ObjectProperty ;
+    rdfs:label "abastece a"@es ;
+    rdfs:comment "Abastece de agua a."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:UnidadTerritorial .
+
+eb:afectoA a owl:ObjectProperty ;
+    rdfs:label "afecto a"@es ;
+    rdfs:comment "Poblado o zona afectada por el evento."@es ;
+    rdfs:domain eb:Evento ;
+    rdfs:range eb:UnidadTerritorial .
+
+eb:albergaEspecie a owl:ObjectProperty ;
+    rdfs:label "alberga especie"@es ;
+    rdfs:comment "Especie presente."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range eb:Especie .
+
+eb:alimentadaPor a owl:ObjectProperty ;
+    rdfs:label "alimentada por"@es ;
+    rdfs:comment "La laguna recibe agua de deshielo de un glaciar o nevado."@es ;
+    rdfs:domain eb:Laguna ;
+    rdfs:range eb:MasaDeHielo .
+
+eb:amenazaA a owl:ObjectProperty ;
+    rdfs:label "amenaza a"@es ;
+    rdfs:comment "Un desborde podría afectar a este poblado (aguas abajo)."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:UnidadTerritorial .
+
+eb:drenaHacia a owl:ObjectProperty ;
+    rdfs:label "drena hacia"@es ;
+    rdfs:comment "Desagua hacia."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:RasgoGeografico .
+
+eb:estadoObra a owl:ObjectProperty ;
+    rdfs:label "estado obra"@es ;
+    rdfs:comment "Estado de una obra de la laguna (la obra va como dato de la relación)."@es ;
+    rdfs:domain eb:Laguna ;
+    rdfs:range eb:EstadoObra .
+
+eb:intervieneEn a owl:ObjectProperty ;
+    rdfs:label "interviene en"@es ;
+    rdfs:comment "Institución que monitorea, evalúa o ejecuta obras."@es ;
+    rdfs:domain eb:Institucion ;
+    rdfs:range eb:RasgoGeografico .
+
+eb:inventarioDe a owl:ObjectProperty ;
+    rdfs:label "inventario de"@es ;
+    rdfs:comment "Cordillera que describe el inventario."@es ;
+    rdfs:domain eb:Inventario ;
+    rdfs:range eb:Cordillera .
+
+eb:menciona a owl:ObjectProperty ;
+    rdfs:label "menciona"@es ;
+    rdfs:comment "El documento habla de la entidad."@es ;
+    rdfs:domain eb:Documento ;
+    rdfs:range owl:Thing .
+
+eb:monitoreadoCon a owl:ObjectProperty ;
+    rdfs:label "monitoreado con"@es ;
+    rdfs:comment "Método con el que se estudió o monitorea."@es ;
+    rdfs:domain eb:RasgoGeografico ;
+    rdfs:range eb:MetodoMonitoreo .
+
+eb:ocurrioEn a owl:ObjectProperty ;
+    rdfs:label "ocurrio en"@es ;
+    rdfs:comment "Lugar de origen del evento."@es ;
+    rdfs:domain eb:Evento ;
+    rdfs:range eb:RasgoGeografico ;
+    rdfs:subPropertyOf prov:atLocation .
+
+eb:presentaFenomeno a owl:ObjectProperty ;
+    rdfs:label "presenta fenomeno"@es ;
+    rdfs:comment "Fenómeno que ocurre en el lugar."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range eb:Fenomeno .
+
+eb:proveeServicio a owl:ObjectProperty ;
+    rdfs:label "provee servicio"@es ;
+    rdfs:comment "Servicio ecosistémico que brinda."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range eb:ServicioEcosistemico .
+
+eb:publicadoPor a owl:ObjectProperty ;
+    rdfs:label "publicado por"@es ;
+    rdfs:comment "Institución autora del documento."@es ;
+    rdfs:domain eb:Documento ;
+    rdfs:range eb:Institucion ;
+    rdfs:subPropertyOf prov:wasAttributedTo .
+
+eb:tieneEcosistema a owl:ObjectProperty ;
+    rdfs:label "tiene ecosistema"@es ;
+    rdfs:comment "Ecosistema presente en el lugar."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range eb:Ecosistema .
+
+eb:tieneNivelRiesgo a owl:ObjectProperty ;
+    rdfs:label "tiene nivel riesgo"@es ;
+    rdfs:comment "Nivel de riesgo de desborde citado en un documento."@es ;
+    rdfs:domain eb:Laguna ;
+    rdfs:range eb:NivelRiesgo .
+
+eb:tieneObraSeguridad a owl:ObjectProperty ;
+    rdfs:label "tiene obra seguridad"@es ;
+    rdfs:comment "Obra de seguridad construida en la laguna."@es ;
+    rdfs:domain eb:Laguna ;
+    rdfs:range eb:ObraSeguridad .
+
+eb:ubicadaEn a owl:ObjectProperty,
+        owl:TransitiveProperty ;
+    rdfs:label "ubicada en"@es ;
+    rdfs:comment "Está dentro de (laguna → subcuenca → provincia → departamento)."@es ;
+    rdfs:domain geo:Feature ;
+    rdfs:range geo:Feature ;
+    rdfs:subPropertyOf geo:sfWithin .
+
+eb:usaMetodo a owl:ObjectProperty ;
+    rdfs:label "usa metodo"@es ;
+    rdfs:comment "El documento aplica o describe el método."@es ;
+    rdfs:domain eb:Documento ;
+    rdfs:range eb:MetodoMonitoreo .
+
+prov:Entity a owl:Class .
+
+eb:Cordillera a owl:Class ;
+    rdfs:label "Cordillera"@es ;
+    rdfs:comment "Cordillera glaciar del Perú (20 según el INAIGEM)."@es ;
+    rdfs:subClassOf eb:RasgoGeografico .
+
+eb:Especie a owl:Class ;
+    rdfs:label "Especie"@es ;
+    rdfs:comment "Especie de flora o fauna."@es .
+
+eb:EstadoObra a owl:Class ;
+    rdfs:label "Estado obra"@es ;
+    rdfs:comment "Estado de una obra de seguridad (operativa, deteriorada, colapsada…)."@es .
+
+eb:Fenomeno a owl:Class ;
+    rdfs:label "Fenomeno"@es ;
+    rdfs:comment "Proceso o problema ambiental (retroceso glaciar, drenaje ácido de roca…)."@es .
+
+eb:ObraSeguridad a owl:Class ;
+    rdfs:label "Obra seguridad"@es ;
+    rdfs:comment "Dique, túnel, sifón, canal de desagüe o sistema de alerta temprana."@es .
+
+eb:ServicioEcosistemico a owl:Class ;
+    rdfs:label "Servicio ecosistemico"@es ;
+    rdfs:comment "Beneficio que brinda un ecosistema (regulación hídrica, agua para riego…)."@es .
+
+eb:UnidadHidrografica a owl:Class ;
+    rdfs:label "Unidad hidrografica"@es ;
+    rdfs:comment "Cuenca, subcuenca, microcuenca o quebrada."@es ;
+    rdfs:subClassOf eb:RasgoGeografico .
+
+eb:Ecosistema a owl:Class ;
+    rdfs:label "Ecosistema"@es ;
+    rdfs:comment "Ecosistema altoandino (bofedal, pajonal, bosque de Polylepis…)."@es .
+
+eb:Evento a owl:Class ;
+    rdfs:label "Evento"@es ;
+    rdfs:comment "Aluvión, avalancha, desborde (GLOF) u otro evento con fecha."@es ;
+    rdfs:subClassOf prov:Activity .
+
+eb:Hecho a owl:Class ;
+    rdfs:label "Hecho"@es ;
+    rdfs:comment "Afirmación extraída de un documento (sujeto, relación, objeto) con su evidencia."@es ;
+    rdfs:subClassOf prov:Entity .
+
+eb:Institucion a owl:Class ;
+    rdfs:label "Institucion"@es ;
+    rdfs:comment "Institución que publica, monitorea o ejecuta obras."@es ;
+    rdfs:subClassOf prov:Organization .
+
+eb:Inventario a owl:Class ;
+    rdfs:label "Inventario"@es ;
+    rdfs:comment "Inventario de glaciares y lagunas de una cordillera en un año."@es ;
+    rdfs:subClassOf prov:Entity .
+
+eb:Medicion a owl:Class ;
+    rdfs:label "Medicion"@es ;
+    rdfs:comment "Valor medido (volumen, área, altitud, superficie, conteos) con unidad, año y fuente."@es ;
+    rdfs:subClassOf sosa:Observation .
+
+eb:MetodoMonitoreo a owl:Class ;
+    rdfs:label "Metodo monitoreo"@es ;
+    rdfs:comment "Método o técnica de monitoreo (batimetría, drones, InSAR…)."@es ;
+    rdfs:subClassOf sosa:Procedure .
+
+eb:MasaDeHielo a owl:Class ;
+    rdfs:label "Masa de hielo"@es ;
+    rdfs:comment "Hielo glaciar: glaciares y nevados."@es ;
+    rdfs:subClassOf eb:RasgoGeografico .
+
+eb:NivelRiesgo a owl:Class ;
+    rdfs:label "Nivel riesgo"@es ;
+    rdfs:comment "Categoría de riesgo de desborde: Muy alto, Alto, Medio, Bajo."@es .
+
+eb:Documento a owl:Class ;
+    rdfs:label "Documento"@es ;
+    rdfs:comment "Documento técnico del corpus (INAIGEM, ANA, SENAMHI)."@es ;
+    rdfs:subClassOf prov:Entity ;
+    owl:disjointWith eb:RasgoGeografico .
+
+eb:Laguna a owl:Class ;
+    rdfs:label "Laguna"@es ;
+    rdfs:comment "Laguna de origen glaciar (periglaciar, proglaciar o supraglaciar)."@es ;
+    rdfs:subClassOf eb:RasgoGeografico ;
+    owl:disjointWith eb:MasaDeHielo ;
+    skos:closeMatch <http://purl.obolibrary.org/obo/ENVO_00000020> .
+
+eb:UnidadTerritorial a owl:Class ;
+    rdfs:label "Unidad territorial"@es ;
+    rdfs:comment "Unidad político-administrativa o asentamiento."@es ;
+    rdfs:subClassOf geo:Feature .
+
+geo:Feature a owl:Class .
+
+eb:RasgoGeografico a owl:Class ;
+    rdfs:label "Rasgo geografico"@es ;
+    rdfs:comment "Elemento del paisaje de montaña con ubicación (GeoSPARQL Feature)."@es ;
+    rdfs:subClassOf geo:Feature ;
+    owl:disjointWith eb:UnidadTerritorial .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:Glaciar eb:Nevado ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:Laguna eb:Rio eb:Cordillera eb:MasaDeHielo eb:UnidadHidrografica eb:Bofedal ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:Cuenca eb:Quebrada ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:Departamento eb:Provincia eb:Distrito eb:CentroPoblado ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:NivelRiesgo eb:EstadoObra eb:Especie eb:Fenomeno eb:ServicioEcosistemico eb:ObraSeguridad eb:Ecosistema ) .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( eb:Documento eb:Hecho eb:Inventario ) .
+

@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:eb="https://w3id.org/g8-glaciares/ontologia#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#ocurrioEn">
+    <rdfs:label xml:lang="es">ocurrio en</rdfs:label>
+    <rdfs:comment xml:lang="es">Lugar de origen del evento.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Evento"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://www.w3.org/ns/prov#atLocation"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#intervieneEn">
+    <rdfs:label xml:lang="es">interviene en</rdfs:label>
+    <rdfs:comment xml:lang="es">Institución que monitorea, evalúa o ejecuta obras.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Institucion"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Hecho">
+    <rdfs:label xml:lang="es">Hecho</rdfs:label>
+    <rdfs:comment xml:lang="es">Afirmación extraída de un documento (sujeto, relación, objeto) con su evidencia.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#presentaFenomeno">
+    <rdfs:label xml:lang="es">presenta fenomeno</rdfs:label>
+    <rdfs:comment xml:lang="es">Fenómeno que ocurre en el lugar.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Fenomeno"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Departamento">
+    <rdfs:label xml:lang="es">Departamento</rdfs:label>
+    <rdfs:comment xml:lang="es">Departamento (región) del Perú.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:Class>
+  <owl:Ontology rdf:about="https://w3id.org/g8-glaciares/ontologia">
+    <rdfs:label xml:lang="es">Ontología Enterprise Brain Glaciares (G8)</rdfs:label>
+    <dcterms:description xml:lang="es">Riesgo glaciar en el Perú: glaciares, lagunas, poblados expuestos, eventos, obras, monitoreo y procedencia de cada hecho. Alineada a GeoSPARQL (lugares), SOSA/SSN (mediciones y métodos) y PROV-O (procedencia).</dcterms:description>
+    <rdfs:seeAlso rdf:resource="http://www.opengis.net/ont/geosparql"/>
+    <rdfs:seeAlso rdf:resource="http://www.w3.org/ns/sosa/"/>
+    <rdfs:seeAlso rdf:resource="http://www.w3.org/ns/prov-o"/>
+  </owl:Ontology>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#proveeServicio">
+    <rdfs:label xml:lang="es">provee servicio</rdfs:label>
+    <rdfs:comment xml:lang="es">Servicio ecosistémico que brinda.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#ServicioEcosistemico"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#anioImagenes">
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Inventario"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </owl:DatatypeProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Glaciar">
+    <rdfs:label xml:lang="es">Glaciar</rdfs:label>
+    <rdfs:comment xml:lang="es">Masa de hielo permanente; se inventaría por cordillera.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#MasaDeHielo"/>
+    <skos:closeMatch rdf:resource="http://purl.obolibrary.org/obo/ENVO_00000133"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#publicadoPor">
+    <rdfs:label xml:lang="es">publicado por</rdfs:label>
+    <rdfs:comment xml:lang="es">Institución autora del documento.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Documento"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Institucion"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://www.w3.org/ns/prov#wasAttributedTo"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#monitoreadoCon">
+    <rdfs:label xml:lang="es">monitoreado con</rdfs:label>
+    <rdfs:comment xml:lang="es">Método con el que se estudió o monitorea.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#MetodoMonitoreo"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Rio">
+    <rdfs:label xml:lang="es">Rio</rdfs:label>
+    <rdfs:comment xml:lang="es">Río.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Nevado">
+    <rdfs:label xml:lang="es">Nevado</rdfs:label>
+    <rdfs:comment xml:lang="es">Montaña con cobertura glaciar.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#MasaDeHielo"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Cuenca">
+    <rdfs:label xml:lang="es">Cuenca</rdfs:label>
+    <rdfs:comment xml:lang="es">Cuenca, subcuenca o microcuenca.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadHidrografica"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#usaMetodo">
+    <rdfs:label xml:lang="es">usa metodo</rdfs:label>
+    <rdfs:comment xml:lang="es">El documento aplica o describe el método.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Documento"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#MetodoMonitoreo"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#relacionadoCon">
+    <rdfs:label xml:lang="es">relacionado con</rdfs:label>
+    <rdfs:comment xml:lang="es">Relación abierta encontrada por análisis gramatical (el verbo va como dato).</rdfs:comment>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#valor">
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Medicion"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+    <rdfs:subPropertyOf>
+      <owl:DatatypeProperty rdf:about="http://www.w3.org/ns/sosa/hasSimpleResult"/>
+    </rdfs:subPropertyOf>
+  </owl:DatatypeProperty>
+  <eb:NivelRiesgo rdf:about="https://w3id.org/g8-glaciares/ontologia#nivel_alto">
+    <rdfs:label xml:lang="es">Alto</rdfs:label>
+  </eb:NivelRiesgo>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#tieneNivelRiesgo">
+    <rdfs:label xml:lang="es">tiene nivel riesgo</rdfs:label>
+    <rdfs:comment xml:lang="es">Nivel de riesgo de desborde citado en un documento.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Laguna"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#NivelRiesgo"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#propiedadMedida">
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Medicion"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#amenazaA">
+    <rdfs:label xml:lang="es">amenaza a</rdfs:label>
+    <rdfs:comment xml:lang="es">Un desborde podría afectar a este poblado (aguas abajo).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#inventarioDe">
+    <rdfs:label xml:lang="es">inventario de</rdfs:label>
+    <rdfs:comment xml:lang="es">Cordillera que describe el inventario.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Inventario"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Cordillera"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#albergaEspecie">
+    <rdfs:label xml:lang="es">alberga especie</rdfs:label>
+    <rdfs:comment xml:lang="es">Especie presente.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Especie"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#afectoA">
+    <rdfs:label xml:lang="es">afecto a</rdfs:label>
+    <rdfs:comment xml:lang="es">Poblado o zona afectada por el evento.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Evento"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Bofedal">
+    <rdfs:label xml:lang="es">Bofedal</rdfs:label>
+    <rdfs:comment xml:lang="es">Humedal altoandino con nombre propio.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#Ecosistema"/>
+  </owl:Class>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#fuente">
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Documento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#drenaHacia">
+    <rdfs:label xml:lang="es">drena hacia</rdfs:label>
+    <rdfs:comment xml:lang="es">Desagua hacia.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Provincia">
+    <rdfs:label xml:lang="es">Provincia</rdfs:label>
+    <rdfs:comment xml:lang="es">Provincia.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#menciona">
+    <rdfs:label xml:lang="es">menciona</rdfs:label>
+    <rdfs:comment xml:lang="es">El documento habla de la entidad.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Documento"/>
+  </owl:ObjectProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Quebrada">
+    <rdfs:label xml:lang="es">Quebrada</rdfs:label>
+    <rdfs:comment xml:lang="es">Quebrada o valle glaciar.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadHidrografica"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#estadoObra">
+    <rdfs:label xml:lang="es">estado obra</rdfs:label>
+    <rdfs:comment xml:lang="es">Estado de una obra de la laguna (la obra va como dato de la relación).</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Laguna"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#EstadoObra"/>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#unidad">
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Medicion"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#alimentadaPor">
+    <rdfs:label xml:lang="es">alimentada por</rdfs:label>
+    <rdfs:comment xml:lang="es">La laguna recibe agua de deshielo de un glaciar o nevado.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Laguna"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#MasaDeHielo"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#tieneObraSeguridad">
+    <rdfs:label xml:lang="es">tiene obra seguridad</rdfs:label>
+    <rdfs:comment xml:lang="es">Obra de seguridad construida en la laguna.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#Laguna"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#ObraSeguridad"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#abasteceA">
+    <rdfs:label xml:lang="es">abastece a</rdfs:label>
+    <rdfs:comment xml:lang="es">Abastece de agua a.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#tieneMedicion">
+    <rdfs:label xml:lang="es">tiene medicion</rdfs:label>
+    <rdfs:comment xml:lang="es">Medición de una propiedad (inversa de sosa:hasFeatureOfInterest).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Medicion"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:about="http://www.w3.org/ns/sosa/hasFeatureOfInterest"/>
+    </owl:inverseOf>
+  </owl:ObjectProperty>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#pagina">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </owl:DatatypeProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#CentroPoblado">
+    <rdfs:label xml:lang="es">Centro poblado</rdfs:label>
+    <rdfs:comment xml:lang="es">Ciudad, centro poblado o comunidad expuesta.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Distrito">
+    <rdfs:label xml:lang="es">Distrito</rdfs:label>
+    <rdfs:comment xml:lang="es">Distrito.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:Class>
+  <eb:NivelRiesgo rdf:about="https://w3id.org/g8-glaciares/ontologia#nivel_bajo">
+    <rdfs:label xml:lang="es">Bajo</rdfs:label>
+  </eb:NivelRiesgo>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#anio">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+  </owl:DatatypeProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#tieneEcosistema">
+    <rdfs:label xml:lang="es">tiene ecosistema</rdfs:label>
+    <rdfs:comment xml:lang="es">Ecosistema presente en el lugar.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="https://w3id.org/g8-glaciares/ontologia#Ecosistema"/>
+  </owl:ObjectProperty>
+  <eb:NivelRiesgo rdf:about="https://w3id.org/g8-glaciares/ontologia#nivel_muy_alto">
+    <rdfs:label xml:lang="es">Muy alto</rdfs:label>
+  </eb:NivelRiesgo>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#evidencia">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:ObjectProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#ubicadaEn">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+    <rdfs:label xml:lang="es">ubicada en</rdfs:label>
+    <rdfs:comment xml:lang="es">Está dentro de (laguna → subcuenca → provincia → departamento).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:range rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <rdfs:subPropertyOf>
+      <owl:ObjectProperty rdf:about="http://www.opengis.net/ont/geosparql#sfWithin"/>
+    </rdfs:subPropertyOf>
+  </owl:ObjectProperty>
+  <eb:NivelRiesgo rdf:about="https://w3id.org/g8-glaciares/ontologia#nivel_medio">
+    <rdfs:label xml:lang="es">Medio</rdfs:label>
+  </eb:NivelRiesgo>
+  <owl:DatatypeProperty rdf:about="https://w3id.org/g8-glaciares/ontologia#confianza">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+  </owl:DatatypeProperty>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Institucion">
+    <rdfs:label xml:lang="es">Institucion</rdfs:label>
+    <rdfs:comment xml:lang="es">Institución que publica, monitorea o ejecuta obras.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Organization"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial">
+    <rdfs:label xml:lang="es">Unidad territorial</rdfs:label>
+    <rdfs:comment xml:lang="es">Unidad político-administrativa o asentamiento.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico">
+    <rdfs:label xml:lang="es">Rasgo geografico</rdfs:label>
+    <rdfs:comment xml:lang="es">Elemento del paisaje de montaña con ubicación (GeoSPARQL Feature).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+    <owl:disjointWith rdf:resource="https://w3id.org/g8-glaciares/ontologia#UnidadTerritorial"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Especie">
+    <rdfs:label xml:lang="es">Especie</rdfs:label>
+    <rdfs:comment xml:lang="es">Especie de flora o fauna.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#MetodoMonitoreo">
+    <rdfs:label xml:lang="es">Metodo monitoreo</rdfs:label>
+    <rdfs:comment xml:lang="es">Método o técnica de monitoreo (batimetría, drones, InSAR…).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/sosa/Procedure"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Documento">
+    <rdfs:label xml:lang="es">Documento</rdfs:label>
+    <rdfs:comment xml:lang="es">Documento técnico del corpus (INAIGEM, ANA, SENAMHI).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+    <owl:disjointWith rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Laguna">
+    <rdfs:label xml:lang="es">Laguna</rdfs:label>
+    <rdfs:comment xml:lang="es">Laguna de origen glaciar (periglaciar, proglaciar o supraglaciar).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+    <skos:closeMatch rdf:resource="http://purl.obolibrary.org/obo/ENVO_00000020"/>
+    <owl:disjointWith rdf:resource="https://w3id.org/g8-glaciares/ontologia#MasaDeHielo"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#NivelRiesgo">
+    <rdfs:label xml:lang="es">Nivel riesgo</rdfs:label>
+    <rdfs:comment xml:lang="es">Categoría de riesgo de desborde: Muy alto, Alto, Medio, Bajo.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Cordillera">
+    <rdfs:label xml:lang="es">Cordillera</rdfs:label>
+    <rdfs:comment xml:lang="es">Cordillera glaciar del Perú (20 según el INAIGEM).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/ns/prov#Activity"/>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Fenomeno">
+    <rdfs:label xml:lang="es">Fenomeno</rdfs:label>
+    <rdfs:comment xml:lang="es">Proceso o problema ambiental (retroceso glaciar, drenaje ácido de roca…).</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Ecosistema">
+    <rdfs:label xml:lang="es">Ecosistema</rdfs:label>
+    <rdfs:comment xml:lang="es">Ecosistema altoandino (bofedal, pajonal, bosque de Polylepis…).</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#EstadoObra">
+    <rdfs:label xml:lang="es">Estado obra</rdfs:label>
+    <rdfs:comment xml:lang="es">Estado de una obra de seguridad (operativa, deteriorada, colapsada…).</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#UnidadHidrografica">
+    <rdfs:label xml:lang="es">Unidad hidrografica</rdfs:label>
+    <rdfs:comment xml:lang="es">Cuenca, subcuenca, microcuenca o quebrada.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#MasaDeHielo">
+    <rdfs:label xml:lang="es">Masa de hielo</rdfs:label>
+    <rdfs:comment xml:lang="es">Hielo glaciar: glaciares y nevados.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="https://w3id.org/g8-glaciares/ontologia#RasgoGeografico"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/ns/sosa/Observation"/>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Inventario">
+    <rdfs:label xml:lang="es">Inventario</rdfs:label>
+    <rdfs:comment xml:lang="es">Inventario de glaciares y lagunas de una cordillera en un año.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Entity"/>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Evento">
+    <rdfs:label xml:lang="es">Evento</rdfs:label>
+    <rdfs:comment xml:lang="es">Aluvión, avalancha, desborde (GLOF) u otro evento con fecha.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/prov#Activity"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.opengis.net/ont/geosparql#Feature"/>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#ObraSeguridad">
+    <rdfs:label xml:lang="es">Obra seguridad</rdfs:label>
+    <rdfs:comment xml:lang="es">Dique, túnel, sifón, canal de desagüe o sistema de alerta temprana.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/ns/prov#Organization"/>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#ServicioEcosistemico">
+    <rdfs:label xml:lang="es">Servicio ecosistemico</rdfs:label>
+    <rdfs:comment xml:lang="es">Beneficio que brinda un ecosistema (regulación hídrica, agua para riego…).</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="https://w3id.org/g8-glaciares/ontologia#Medicion">
+    <rdfs:label xml:lang="es">Medicion</rdfs:label>
+    <rdfs:comment xml:lang="es">Valor medido (volumen, área, altitud, superficie, conteos) con unidad, año y fuente.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/sosa/Observation"/>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/ns/prov#Entity"/>
+  <owl:Class rdf:about="http://www.w3.org/ns/sosa/Procedure"/>
+</rdf:RDF>
