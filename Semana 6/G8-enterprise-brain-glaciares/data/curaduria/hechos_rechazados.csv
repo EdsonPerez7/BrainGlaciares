@@ -1,0 +1,18 @@
+sujeto,tipo_sujeto,relacion,objeto,motivo,fuente_revisada
+Palcacocha,Laguna,amenazaA,Huancayo,"Frase general: 'Las ciudades de Huaraz y Huancayo se encuentran expuestas…' no dice que Palcacocha amenace a Huancayo",20.500.12748/608 p.98
+Aluvión Palcacocha 1800,Evento,*,*,"No existe: 1800 es el número de fallecidos del aluvión de 1941, no un año",20.500.12748/60 p.57
+Aluvión 1800,Evento,*,*,"No existe: '~1800 casualties' del desastre de 1941 (Carey, 2010)",20.500.12543/4372 p.1
+Dirección,Laguna,*,*,"No es una laguna: 'Dirección de Investigación en Glaciares' (nombre de oficina)",20.500.12748/239 p.4
+Coordenadas,Laguna,*,*,"No es una laguna: encabezado 'Coordenadas:' de una ficha técnica",20.500.12748/608 p.58
+Vertiente,Laguna,*,*,"No es una laguna: encabezado 'Vertiente:' de una ficha técnica",20.500.12748/608 p.58
+Quesillococha,Laguna,ubicadaEn,Áncash,"Está en Huánuco (p.79: 'En Huánuco, las lagunas con riesgo muy alto son: Gangrajanca, Quesillococha y Chaclan'); 'Áncash' viene del encabezado de otra tabla",20.500.12748/608 p.41
+Riticocha,Laguna,ubicadaEn,Áncash,"Está en Puno (fila de la tabla: 'Riticocha Apolobamba Puno'); 'Áncash' viene del encabezado de la tabla",20.500.12748/608 p.41
+Upiscocha,Laguna,ubicadaEn,Puno,"Está en Cusco (Ocongate, Quispicanchi); 'Puno' corresponde a otra laguna de la misma frase",20.500.12748/667 p.74
+Upiscocha,Laguna,ubicadaEn,Áncash,"Está en Cusco; 'Áncash' corresponde a río Blanco-Santa Cruz en la misma frase",20.500.12748/667 p.61
+Choclococha,Laguna,ubicadaEn,Ica,"Está en Huancavelica; la frase dice que sus aguas irrigan Ica, no que esté en Ica",20.500.12748/57 p.193
+Salinas,Laguna,ubicadaEn,Moquegua,"La laguna Salinas está en Arequipa; Moquegua se menciona por la reserva que abarca dos departamentos",20.500.12748/634 p.67
+Vilacota,Laguna,ubicadaEn,Puno,"Está en Tacna (distrito de Susapaya, provincia de Tarata); la frase solo dice 'cerca de la frontera con Puno'",20.500.12748/57 p.333
+Ticticocha,Laguna,ubicadaEn,Pasco,"La frase dice 'Quiulacocha (Región Pasco), Ticticocha y Yuracmayo (Región Lima)': Ticticocha no está en Pasco",20.500.12748/470 p.27
+Ticticocha,Laguna,ubicadaEn,Áncash,"La frase habla de acumulación de metales en las lagunas, no ubica a Ticticocha en Áncash",20.500.12748/470 p.27
+Huascarán,*,tieneNivelRiesgo,*,"Son las definiciones de la escala de peligro de un mapa (alto, medio, bajo), no el riesgo del nevado",20.500.12748/627 p.97-98 y 20.500.12748/647 p.34
+Vilcanota,*,tieneNivelRiesgo,*,"La frase cuenta lagunas con riesgo muy alto en la cordillera; el riesgo es de las lagunas, no de la cordillera",20.500.12748/608 p.98
