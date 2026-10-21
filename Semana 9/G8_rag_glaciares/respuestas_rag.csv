@@ -1,0 +1,96 @@
+id,tipo,pregunta,respuesta,responde,n_citas,docs_citados,instituciones_citadas,citas_invalidas,avisos,similitud_max,segundos,fuentes
+P1,competencia,¿Cuántas lagunas de origen glaciar se formaron en la Cordillera Blanca según el inventario de 2023?,"Según el Inventario Nacional de Glaciares y Lagunas de Origen Glaciar 2023 se identificaron 164 lagunas nuevas en todo el país, y la cordillera Blanca es la que registra la mayor cantidad de esas lagunas nuevas [2].  
+
+El documento no indica cuántas de esas 164 lagunas nuevas corresponden específicamente a la cordillera Blanca, por lo que no es posible proporcionar un número exacto.",True,1,1,INAIGEM,0,1 oración(es) con datos sin cita.,0.671,28.0,"Inventario Nacional de Glaciares y Lagunas de Origen Glaciar 2023 — INAIGEM, 2023, pp. 81–82"
+P2,competencia,¿Qué lagunas glaciares de Áncash tienen riesgo muy alto de desborde?,"Las lagunas glaciares de Áncash que se ubican en nivel **muy alto** de riesgo de desborde son:
+
+- **Laguna Palcacocha** (provincia de Huaraz)  
+- **Laguna Tullparaju** (provincia de Huaraz)  
+- **Laguna Cuchillacocha** (provincia de Huaraz)  
+- **Laguna Llaca** (provincia de Huaraz)  
+
+[1]",True,1,1,INAIGEM,0,,0.771,20.8,"Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 68–69"
+P3,competencia,¿Qué centros poblados están aguas abajo de lagunas con riesgo alto y qué estudios los evaluaron?,"Los centros poblados que aparecen en los documentos como ubicados aguas abajo de lagunas con riesgo alto de desborde son:
+
+* **Huancayo, Acopalca, Chamiseria, Pañaspampa y Vilcacoto** – identificados como poblados expuestos a la laguna Lazo Huntay (valor más alto de viviendas expuestas) en la *Evaluación nacional de lagunas glaciares con riesgo de desborde 2024* [1].
+
+* **Cono, Cumpayhuara (Santa Rosa) y Caraz** – poblados situados aguas abajo de la laguna de Parón, con 545 viviendas expuestas según la *Evaluación nacional de lagunas glaciares con riesgo de desborde 2024* [6].
+
+* **Llamacorral, Los Baños y Carahuran** – asentamientos a lo largo del río Santa Cruz, bajo riesgo de desborde de la laguna Arhuaycocha, según la *Evaluación nacional de lagunas glaciares con riesgo de desborde 2024* [7].
+
+* **Sina, Potoni y Koriwara** – centros poblados del distrito de Sina que estarían amenazados por la laguna Vizcachani (y también por Sorapata) en el *Informe de la Situación de los Glaciares y Ecosistemas de Montaña en el Perú 2022* [2].
+
+Estos son los poblados y los estudios que los evaluaron según los fragmentos proporcionados.",True,4,2,INAIGEM,0,,0.73,24.5,"Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 63–64 ; Informe de la Situación de los Glaciares y Ecosistemas de Montaña en el Perú 2022 — INAIGEM, 2025, p. 12 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 52–55 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 55–56"
+P4,competencia,"¿Qué lagunas tuvieron eventos de desborde, de qué glaciar provienen y qué poblados afectaron?","- **Laguna Cancahua Alta** (situada en la Quebrada Ulta, distrito de Carhuaz, Cordillera Blanca). El desborde fue provocado por una avalancha de hielo que impactó la laguna, generó ondas de impulso y un flujo de detritos que recorrió la quebrada Ulta, el río Buin y llegó al río Santa [2]​.  
+  - **Poblado afectado:** la zona del valle del río Santa, sin mencionar poblados específicos; el evento tuvo efectos destructivos por su alta energía, pero no se reportó daño directo a poblados.
+
+- **Laguna A y Laguna B** (dos lagunas sin nombre oficial ubicadas al sur del nevado Vallunaraju, en la microcuenca Llaca, Cordillera Blanca). El 26 de marzo 2025 se produjo un desborde súbito de baja magnitud desencadenado por un movimiento en masa de detritos; el 28 de abril 2025 se produjo un segundo desborde, de mayor magnitud, provocado por el derrumbe de un macizo rocoso de la Formación Chicama y lluvias intensas [4][7].  
+  - **Poblado afectado:** la carretera afirmada Huaraz‑Laguna Llaca, donde se destruyeron aproximadamente 20 m de vía, interrumpiendo temporalmente el acceso a la zona; no se reportaron víctimas ni daños a la ciudad de Huaraz ni a otros centros poblados cercanos [3][4].
+
+- **Laguna Salkantaycocha** (en la cordillera Vilcabamba). El 23 de febrero 2020 se registró un aluvión por desembalse de esta laguna, que causó muertes y desaparecidos [5].  
+  - **Poblado afectado:** no se especifica el poblado exacto, solo se menciona que hubo víctimas humanas.  
+
+En resumen, los eventos de desborde se registraron en la Laguna Cancahua Alta (Nevado Vallunaraju), en las lagunas A y B (también vinculadas al nevado Vallunaraju) y en la Laguna Salkantaycocha (cordillera Vilcabamba). Los daños reportados afectaron principalmente la infraestructura vial (carretera Huaraz‑Laguna Llaca) y provocaron pérdidas humanas en el caso de Salkantaycocha.",True,5,5,INAIGEM,0,,0.632,22.8,"Libro de resumenes Simposio MONFU 2025 — INAIGEM, 2025, pp. 38–39 ; Evaluación del peligro de aluvión por desborde de laguna glaciar en la subcuenca Casca — INAIGEM, 2026, pp. 10–11 ; Inspección técnica del aluvión en la subcuenca Casca debido al desborde de lagunas glaciares el 28 de abril de 2025 — INAIGEM, 2025, p. 8 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 25–26 ; Inspección técnica de la unidad hidrográfica Casca – Llaca para identificar el impacto del drenaje ácido de roca a causa del aluvión ocurrido el 28 de abril, 2025 — INAIGEM, 2025, p. 10"
+P5,competencia,	¿Qué glaciares con retroceso medido (balance de masa) alimentan lagunas que hoy están en riesgo?,No encontré esa información en los documentos del corpus.,False,0,0,,0,,0.638,18.8,
+P6,competencia,¿Qué métodos de monitoreo se aplicaron a lagunas en riesgo y qué institución realizó cada estudio?,"Se identificaron dos enfoques de monitoreo de lagunas glaciares en riesgo:
+
+* **Monitoreo de niveles de agua, alerta temprana y señalización de rutas de evacuación**, así como el mantenimiento de obras de seguridad y la zonificación de áreas de alto peligro. Estas acciones forman parte de la metodología propuesta en la “Evaluación nacional de lagunas glaciares con riesgo de desborde 2024”, elaborada por el **INAIGEM**[3].  
+
+* **Evaluación permanente, inspección y monitoreo de lagunas y glaciares**, realizado por la **Unidad de Glaciología y Recursos Hídricos del INRENA**, según el informe de aforos de los ríos Ranrahirca y Marcará (2001) del **ANA**[6].  
+
+En resumen, el INAIGEM (2024) propone un monitoreo integral que incluye niveles de agua, alerta temprana y gestión territorial, mientras que el INRENA (a través del ANA) lleva a cabo inspecciones y monitoreo continuo de las lagunas glaciares.",True,2,2,"ANA, INAIGEM",0,1 oración(es) con datos sin cita.,0.639,18.4,"Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, p. 98 ; Aforos ríos Ranrahirca y Marcará — ANA, 2001, p. 3"
+P7,competencia,	¿En qué subcuencas coinciden lagunas en riesgo y contaminación por drenaje ácido de roca?,La subcuenca del río Quillcáy es la única que aparece tanto con lagunas evaluadas en riesgo de aluvión como con evidencia de contaminación por drenaje ácido de roca (DAR) [1][6][8]. No se encontraron coincidencias en otras subcuencas del corpus.,True,3,2,INAIGEM,0,,0.622,22.3,"Evaluación del peligro de aluvión por desborde de laguna glaciar en la subcuenca Casca — INAIGEM, 2026, pp. 54–55 ; Riesgos e impactos del drenaje ácido de roca en los medios de vida de la población rural de la subcuenca del río Quillcay. — INAIGEM, 2025, pp. 13–14 ; Riesgos e impactos del drenaje ácido de roca en los medios de vida de la población rural de la subcuenca del río Quillcay. — INAIGEM, 2025, pp. 21–22"
+P8,competencia,¿Qué bofedales están en subcuencas con glaciares en retroceso y qué servicios ecosistémicos brindan?,"Los bofedales que se encuentran en subcuencas donde se está monitoreando el retroceso de glaciares son: **Maucallacta, Cara Cara, Negrohuaycco, Muysiniga y Baños** en la zona del volcán Coropuna [5].  
+
+Estos bofedales aportan varios servicios ecosistémicos, entre los que se destacan:  
+
+* **Regulación hídrica** (actúan como reservorios naturales y regulan el comportamiento hidrológico durante la escorrentía) [5];  
+* **Almacenamiento de agua** y **regulación de los flujos de agua** en la cuenca [7];  
+* **Secuestro de carbono** y contribución a la captura de carbono [7];  
+* **Suministro de alimento para el ganado** y **hábitat para la biodiversidad** (mencionado en la descripción general de los bofedales) [1].  
+
+No se encontraron datos adicionales que indiquen otros bofedales específicos en subcuencas con glaciares en retroceso.",True,3,3,INAIGEM,0,,0.682,20.1,"Estudios en glaciares y ecosistemas de montaña en la cordillera Huaytapallana — INAIGEM, 2025, p. 15 ; Informe Técnico A09 Coropuna 2018 — INAIGEM, 2018, pp. 55–56 ; Revista de glaciares y ecosistemas de montaña 7 — INAIGEM, 2024, p. 14"
+P9,competencia,¿Cómo cambió la superficie glaciar de una cordillera entre los inventarios de 2018 y 2023?,"En el Inventario Nacional de Glaciares de 2018 (INAIGEM) la Cordillera Chila tenía una superficie glaciar total de **0,19 km²** en 2016 [1][4].  
+
+Para el Inventario más reciente de 2023 el documento del INAIGEM solo reporta la extensión glaciar total del país (1050,3 km²) y no desglosa la superficie por cordilla [7].  
+
+**Por lo tanto, con la información disponible solo se conoce el valor de 0,19 km² para 2018; no se dispone de la superficie glaciar de la Cordillera Chila (u otra cordillera específica) en el inventario de 2023.**  
+
+Falta el dato de superficie por cordilla en 2023 para poder describir el cambio.",True,3,2,INAIGEM,0,1 oración(es) con datos sin cita.,0.684,28.2,"Inventario Nacional de Glaciares Las Cordilleras Glaciares del Perú 2018 — INAIGEM, 2018, pp. 260–261 ; Inventario Nacional de Glaciares Las Cordilleras Glaciares del Perú 2018 — INAIGEM, 2018, pp. 262–263 ; Retroceso glaciar en los Andes peruanos durante las últimas seis décadas — INAIGEM, 2025, p. 49"
+P10,competencia,"¿Qué lagunas en riesgo cuentan con obras de seguridad, en qué estado están y qué poblados protegen?","- **Laguna Yanaraju** – obra de seguridad (tajo abierto) con nivel de peligrosidad “alto” en el vaso de la laguna; la obra está en funcionamiento y protege a los asentamientos de la cuenca del río Yanamayo, provincia de Asunción [1].
+
+- **Laguna Allicocha** – obra de seguridad (dique de tierra con revestido y conducto/canal de salida) en estado “regular” de conservación; protege a la población de la cuenca del río Yanamayo, provincia de Asunción [1][2].
+
+- **Laguna Paclascocha** – obra de seguridad (canal de mampostería de piedra) en condiciones “regulares” (presenta deterioro del tarrajeo y necesita limpieza y mantenimiento); la laguna no representa un peligro alto para poblaciones aguas abajo [6].
+
+- **Laguna 513** – cuenta con obras de seguridad (identificadas en la evaluación de 2018) aunque el fragmento no especifica su estado físico; la laguna está en la subcuenca del río Hualcán y su posible aluvión afectaría al centro poblado de Hualcán y a la ciudad de Carhuaz [7].
+
+- **Lagunas Safuna Alta y Safuna Baja** – se evaluaron obras de seguridad para determinar su estado y nivel de peligro, pero el fragmento no indica el estado actual ni los poblados exactos que protegen [8].
+
+En total, los fragmentos confirman obras de seguridad en Yanaraju, Allicocha, Paclascocha y 513; el estado es “regular” en Allicocha y Paclascocha, “alto” en Yanaraju, y desconocido para 513 y las lagunas Safuna [1][2][6][7][8].",True,5,4,INAIGEM,0,,0.629,13.5,"Situación de los Glaciares y Ecosistemas de Montaña en el Perú : Informe Anual 2018 — INAIGEM, 2019, pp. 24–25 ; Situación de los Glaciares y Ecosistemas de Montaña en el Perú : Informe Anual 2018 — INAIGEM, 2019, resumen ; Informe de evaluación del estado actual de las obras de seguridad y entorno de la laguna Pacliascocha — INAIGEM, 2018, p. 12 ; Informe de evaluación del estado actual de las obras de seguridad y entorno de la laguna 513 — INAIGEM, 2018, p. 3 ; Informe de evaluación del estado actual de las obras de seguridad y entorno de la laguna Safuna Alta Y Baja — INAIGEM, 2018, p. 3"
+D1,descriptiva,¿Por qué la laguna Palcacocha es peligrosa?,"La laguna Palcacocha es peligrosa porque está ubicada muy cerca de la ciudad de Huaraz y su gran volumen de agua puede desbordarse rápidamente, generando aluviones devastadores. En 1940 el glaciólogo Hans Kinzl ya la había identificado como una laguna peligrosa y, tras la ruptura del dique frontal en diciembre 1941, se liberaron casi 15 Mm³ de agua, lodo y rocas que causaron la muerte de miles de personas y la destrucción de gran parte de la ciudad [1]. En la evaluación de 2024 se señala que Palcacocha es la laguna con mayor riesgo de desborde en Áncash, alcanzando un volumen histórico de 17 544 832,63 m³ y una profundidad máxima de 70 m [3]. Además, el sistema de monitoreo instalado por la ANA describe a la laguna como peligrosa por su volumen de agua (≈ 16 Mm³) y por las características geomorfológicas de la microcuenca que la vinculan directamente con Huaraz [4].",True,3,3,"ANA, INAIGEM",0,,0.654,27.2,"Evaluación anual de la laguna Palcacocha del año 2024 (seguimiento al comportamiento de glaciares y lagunas a nivel nacional) — ANA, 2024, p. 5 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, p. 46 ; Informe de la situación de los glaciares y ecosistemas de montaña en el Perú — ANA, 2019, p. 78"
+D2,multilingüe,¿Qué factores explican el balance de masa y energía de los glaciares peruanos?,"Los factores que explican el balance de masa y el balance de energía de los glaciares peruanos son:
+
+* **Variables atmosféricas**: temperatura del aire, humedad relativa, velocidad del viento, presión atmosférica y precipitación, que influyen tanto en la energía disponible como en la acumulación de nieve [1].  
+* **Radiación**: radiación solar de onda corta incidente (medida directamente) y radiación neta de onda larga, que aportan o consumen energía en la superficie glaciar [1].  
+* **Flujos de calor**: flujo de calor sensible y latente en la capa subsuperficial, que modifican el balance energético [1].  
+* **Precipitación**: cantidad y forma (nieve) que determina la acumulación de masa y, a escala interanual, es el principal impulsor de la variabilidad del balance de masa [2][8].  
+* **Albedo**: superficie cubierta de nieve tiene albedo alto, reduciendo la absorción de radiación y la ablación; la presencia de hielo o sedimentos oscuros (crioconitas) disminuye el albedo y acelera el derretimiento [4][5][7].  
+* **Elevación y gradiente altitudinal**: la distribución del balance de masa varía con la altitud; por encima de ciertos umbrales (≈ 5150‑5200 m) la nieve se conserva y genera ganancia de masa, mientras que en la zona de lengua (cerca de 0 °C) se produce pérdida [5][7].  
+* **Factores orográficos y geológicos**: diferencias entre cordilleras volcánicas y no volcánicas modifican los patrones altitudinales del balance de masa [3].  
+* **Dinámica del glaciar**: pendiente, espesor y cantidad de agua líquida dentro del hielo afectan el flujo interno y, por tanto, la extensión y el frente glaciar [8].  
+
+Estos elementos interactúan para determinar si un glaciar gana o pierde masa y cómo se distribuye la energía en su superficie.",True,7,6,"ANA, INAIGEM, SENAMHI",0,,0.671,20.5,"Revista de glaciares y ecosistemas de montaña 7 — INAIGEM, 2024, p. 63 ; Glacier mass balance variability in the Cordillera Blanca, Peru and its relationship with climate and the large-scale circulation — ANA, 2008, resumen ; Libro de resumenes Simposio MONFU 2025 — INAIGEM, 2025, pp. 65–66 ; Iniciación de un monitoreo del balance de masa en el glaciar Suyuparina, Cordillera Vilcanota, Perú — ANA, 2015, pp. 11–12 ; Estudios de glaciares por la Autoridad Nacional del Agua - Perú, período 2022-2023 (Meta: seguimiento al comportamiento de glaciares y lagunas a nivel nacional) — ANA, 2023, pp. 87–88 ; Estudios de glaciares por la Autoridad Nacional del Agua - Perú, período 2022-2023 (Meta: seguimiento al comportamiento de glaciares y lagunas a nivel nacional) — ANA, 2023, pp. 71–72 ; Variaciones glaciares y disponibilidad de agua en la cordillera Blanca del Perú desde hace 40 año — SENAMHI, 2010, p. 5"
+D3,histórica,¿Qué ocurrió en el aluvión de Huaraz de 1941?,"El 13 de diciembre de 1941 una avalancha de hielo cayó sobre la laguna Palcacocha, provocó la ruptura del dique frontal y el desbordamiento de la mayor parte del agua almacenada (≈12 MMC) [4]. El aluvión resultante siguió la quebrada Cojup, pasó por la laguna Jircacocha (añadiendo ≈3 MMC) y llegó a la ciudad de Huaraz con alrededor de 20 MMC, destruyendo aproximadamente un tercio de la ciudad [4].  
+
+Los documentos difieren en el número de víctimas: algunos indican ≈1 800 muertes [1][2][5], otros reportan ≈5 000 muertes [3][8] y otro informe menciona una pérdida “aproximada de 2 000 vidas” [4]. Por lo tanto, hay contradicción en los datos de mortalidad.",True,6,6,"ANA, INAIGEM",0,,0.684,29.1,"Evaluación del peligro de aluvión por desborde de laguna glaciar en la subcuenca Casca — INAIGEM, 2026, pp. 9–10 ; Libro de resumenes MONFU 2019 — INAIGEM, 2019, p. 57 ; Inventario Nacional de Glaciares Las Cordilleras Glaciares del Perú 2018 — INAIGEM, 2018, p. 81 ; Evaluación anual de la laguna Palcacocha del año 2024 (seguimiento al comportamiento de glaciares y lagunas a nivel nacional) — ANA, 2024, p. 5 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, p. 26 ; El inventario nacional de glaciares: las cordilleras glaciares del Perú — ANA, 2018, p. 81"
+D4,conteo,¿Cuántas lagunas con riesgo muy alto de desborde hay en cada departamento?,"Según los fragmentos del INAIGEM 2024, el número de lagunas glaciares con **riesgo muy alto** es el siguiente:
+
+- **Áncash:** 26 lagunas [4]  
+- **Cusco:** 13 lagunas [4]  
+- **Lima:** 6 lagunas [4]  
+
+Los demás departamentos que aparecen en el estudio (Puno, Junín, Huánuco, Pasco, Arequipa y la laguna compartida Huánuco/Lima) no tienen datos específicos sobre lagunas con riesgo muy alto; los fragmentos sólo indican que no se identificaron lagunas con riesgo muy alto en Pasco [2] y que los 6 departamentos con riesgo muy alto son Áncash, Cusco, Lima, Junín, Puno y Huánuco, sin precisar cantidades [1].  
+
+Por lo tanto, sólo se pueden proporcionar cifras exactas para Áncash, Cusco y Lima; para los demás departamentos la información no está disponible en los documentos del corpus.",True,3,2,INAIGEM,0,,0.755,20.2,"Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, p. 66 ; Evaluación nacional de lagunas glaciares con riesgo de desborde 2024. — INAIGEM, 2024, pp. 88–89 ; RESUMEN PARA TOMADORES DE DECISIÓN: EVALUACIÓN NACIONAL DE LAGUNAS GLACIARES CON RIESGO DE DESBORDE — INAIGEM, 2024, pp. 11–12"
+D5,fuera del corpus,¿Quién ganó el Mundial de fútbol 2022?,No encontré esa información en los documentos del corpus.,False,0,0,,0,La pregunta no se parece a ningún fragmento del corpus.,0.402,0.1,
