@@ -1,0 +1,199 @@
+id,tipo,pregunta,responde,modo,modelo,autocorregida,herramienta,filas_grafo,n_citas,citas_grafo,citas_texto,docs_citados,instituciones_citadas,avisos,segundos,respuesta,cypher
+P1,competencia,¿Cuántas lagunas de origen glaciar se formaron en la Cordillera Blanca según el inventario de 2023?,True,LLM,caché · groq · openai/gpt-oss-20b,False,P1,5,1,1,0,1,INAIGEM,,0.4,En el inventario de 2023 se registraron **25 lagunas nuevas** en la Cordillera Blanca (periodo 2016‑2020) [3].,"MATCH (i:Inventario)-[:INVENTARIO_DE]->(c:Cordillera {k: $cordillera})
+WHERE i.anio = $anio
+MATCH (i)-[:TIENE_MEDICION]->(m:Medicion)
+WHERE m.propiedad IN ['registraLagunas', 'registraLagunasNuevas', 'registraLagunasProglaciares', 'registraGlaciares', 'registraSuperficieGlaciar']
+RETURN i.nombre AS inventario, m.propiedad AS dato, m.texto AS valor,
+       m.documento AS documento, m.pagina AS pagina, m.evidencia AS evidencia
+ORDER BY dato"
+P2,competencia,¿Qué lagunas glaciares de Áncash tienen riesgo muy alto de desborde?,True,LLM,caché · groq · openai/gpt-oss-20b,False,P2,5,5,5,0,3,"ANA, INAIGEM",,0.3,"- **Laguna Llaca** – riesgo muy alto de desborde. [1]  
+- **Laguna Cuchillacocha** – riesgo muy alto de desborde. [2]  
+- **Laguna Palcacocha** – riesgo muy alto de desborde. [3]  
+- **Laguna Parón** – riesgo muy alto de desborde. [4]  
+- **Laguna Tullparaju** – riesgo muy alto de desborde. [5]","MATCH (l:Laguna)-[r:TIENE_NIVEL_RIESGO]->(n:NivelRiesgo)
+WHERE n.nombre = $nivel AND $departamento IN l.departamentos
+RETURN l.nombre AS laguna, n.nombre AS nivel, r.n_docs AS n_docs,
+       r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY n_docs DESC, laguna"
+P3,competencia,¿Qué centros poblados están aguas abajo de lagunas con riesgo alto y qué estudios los evaluaron?,True,LLM,caché · gemini · gemini-flash-lite-latest,True,P3,72,16,16,0,6,"ANA, INAIGEM",,0.5,"* **Huaraz**: Amenazada por las lagunas Palcacocha, Tullparaju, Llaca y Cuchillacocha, todas de nivel muy alto [1][8][9][11]. Los estudios evaluadores incluyen los códigos `20.500.12748/676`, `20.500.12748/672`, `20.500.12748/668`, `20.500.12748/667`, `20.500.12748/651`, `20.500.12748/648`, `20.500.12748/647`, `20.500.12748/625`, `20.500.12748/608`, `20.500.12748/516`, `20.500.12748/507`, `20.500.12748/325`, `20.500.12748/140`, `20.500.12748/139`, `20.500.12748/137`, `20.500.12748/134`, `20.500.12748/76`, `20.500.12748/705`, `20.500.12748/664`, `20.500.12748/619`, entre otros [1][8][9][11].
+* **Yanama, Ocongate y Ccarhuayo**: Expuestos al desborde de la laguna Upiscocha (nivel alto) [2][3][4]. Los estudios asociados incluyen `20.500.12748/666`, `20.500.12748/667`, `20.500.12748/651`, `20.500.12748/629`, `20.500.12748/612`, `20.500.12748/608` y `20.500.12748/605` [2][3][4].
+* **Caraz, Cono y Cumpayhuara (Santa Rosa)**: Ubicados aguas abajo de la laguna Parón (nivel muy alto) [6][7]. Sus estudios registrados son `20.500.12748/675`, `20.500.12748/648`, `20.500.12748/627`, `20.500.12748/608`, `20.500.12748/502`, `20.500.12748/349`, `20.500.12748/139`, `20.500.12748/60` y `20.500.12748/57` [6][7].
+* **Macashca**: Situado aguas abajo de la laguna Rajucolta (nivel alto) [10]. Sus estudios son `20.500.12748/661`, `20.500.12748/57`, `20.500.12543/5678`, `20.500.12543/4718` y `20.500.12543/2623` [10].
+* **Baños, Queropalca, Santa Rosa, Concepción y Jesús**: Expuestos al peligro de la laguna Gangrajanca (nivel muy alto) [12][13][14][15]. Los estudios asociados son `20.500.12748/639`, `20.500.12748/608`, `20.500.12748/57` y `20.500.12543/2623` [12][13][14][15].
+* **Carhuaz y Marcará**: Relacionados con la laguna Pacliashcocha (nivel alto) [16][17]. Sus estudios evaluadores son `20.500.12748/171`, `20.500.12748/139`, `20.500.12748/608`, `20.500.12543/3906` y `20.500.12543/2004` [16][17].","MATCH (l:Laguna)-[r:AMENAZA_A]->(p:CentroPoblado)
+WHERE l.nivel_max IN $niveles AND p.dudoso = false
+OPTIONAL MATCH (d:Documento)-[:MENCIONA]->(l), (d)-[:MENCIONA]->(p)
+RETURN l.nombre AS laguna, l.nivel_max AS nivel, p.nombre AS poblado, 'el texto lo dice' AS via, '' AS subcuenca,
+       collect(DISTINCT d.id) AS estudios, r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+UNION
+MATCH (l:Laguna)-[:UBICADA_EN]->(c)<-[r:UBICADA_EN]-(p:CentroPoblado)
+WHERE l.nivel_max IN $niveles AND c.hidro = true AND c.grande = false AND p.dudoso = false
+OPTIONAL MATCH (d:Documento)-[:MENCIONA]->(l), (d)-[:MENCIONA]->(p)
+RETURN l.nombre AS laguna, l.nivel_max AS nivel, p.nombre AS poblado, 'misma subcuenca' AS via, c.nombre AS subcuenca,
+       collect(DISTINCT d.id) AS estudios, r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia"
+P4,competencia,"¿Qué lagunas tuvieron eventos de desborde, de qué glaciar provienen y qué poblados afectaron?",True,LLM,caché · gemini · gemini-flash-lite-latest,False,P4,82,20,20,0,12,"ANA, INAIGEM",,0.4,"Basándose en la evidencia del grafo y los documentos, se presentan los eventos de desborde de lagunas registrados (se muestran 20 de 82 filas del grafo):
+
+* **Laguna Tambillo:** Sin glaciar de origen especificado en el grafo; poblados afectados: Huaraz, Carhuaz, Macashca, Rampac Chico y Ancash (eventos en 1870 y 1883) [1][2].
+* **Laguna Solterococha:** Sin glaciar de origen especificado; poblados afectados: Huaraz, Yungay, Carhuaz, Huari y Ranrahirca (evento en 1917 y ruptura en 1932) [3].
+* **Laguna Palcacocha:** Glaciares de origen: Palcaraju, Pucaranra y Ranrapalca; poblados afectados: Huaraz (avalanchas y aluviones en 1932, 1941 y 1947) [4][8][11][14].
+* **Laguna Pakliashcocha:** Sin glaciar ni poblados especificados (evento en 1938) [5].
+* **Laguna Arteza / Artesa:** Sin glaciar especificado; poblados afectados: Carhuaz (aluvión en 1938) [6][7].
+* **Laguna Jircacocha / Paleolake Jircacocha:** Sin glaciar ni poblados especificados (evento en 1941) [9][10].
+* **Laguna UH Quilcay:** Sin glaciar ni poblados especificados (aluvión en 1941) [12].
+* **Laguna Artesoncocha:** Sin glaciar especificado; poblados afectados: Huaraz, Yungay, Carhuaz, Huari y Ranrahirca (aluvión en 1941 y 1951) [13][16].
+* **Laguna Jancarurish:** Sin glaciar especificado; poblados afectados: Huaraz (aluvión en 1950) [15].
+* **Laguna Parón:** Glaciares de origen: Parón, Aguja, Hatunraju y Jatunraju; poblados afectados: Huaraz, Yungay, Carhuaz, Huari y Ranrahirca (aluvión en 1953) [17].
+* **Laguna Tullparaju:** Glaciar de origen: Tullparaju; poblados afectados: Huaraz, Yungay, Carhuaz, Huari y Ranrahirca (deslizamiento en 1962) [18].
+* **Laguna Chuspicocha:** Glaciares de origen: Chuspicocha, Huaytapallana y Talves; sin poblados especificados (aluvión en 1969) [19].
+* **Laguna Safuna Alta:** Glaciares de origen: Pucahirca y Pisco; sin poblados especificados (evento en 1970) [20].","MATCH (e:Evento)-[r:OCURRIO_EN]->(l:Laguna)
+OPTIONAL MATCH (l)-[:ALIMENTADA_POR]->(g)
+OPTIONAL MATCH (e)-[:AFECTO_A]->(p)
+OPTIONAL MATCH (e)-[:TIENE_MEDICION]->(v:Medicion)
+WHERE v.propiedad = 'causoVictimas'
+RETURN e.nombre AS evento, e.anio AS anio, l.nombre AS laguna,
+       collect(DISTINCT g.nombre) AS glaciar_origen, collect(DISTINCT p.nombre) AS poblados_afectados,
+       collect(DISTINCT v.texto) AS victimas, r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY anio"
+P5,competencia,¿Qué glaciares con retroceso medido (balance de masa) alimentan lagunas que hoy están en riesgo?,True,LLM,caché · gemini · gemini-flash-lite-latest,False,P5,15,2,2,0,2,INAIGEM,,0.2,"A partir de los datos disponibles, los glaciares con retroceso medido (balance de masa) que alimentan lagunas asociadas a un nivel de riesgo son:
+
+* **Glaciar Palcaraju:** Alimenta la laguna Palcacocha, la cual se encuentra en nivel de riesgo ""Muy alto"" [8].
+* **Glaciar Pucaranra:** Alimenta la laguna Pacliashcocha, la cual presenta un nivel de riesgo ""Alto"" [12].","MATCH (l:Laguna)-[ra:ALIMENTADA_POR]->(g)
+WHERE l.nivel_max IN $niveles AND g.tipo IN ['Glaciar', 'Nevado']
+OPTIONAL MATCH (g)-[:MONITOREADO_CON]->(m:MetodoMonitoreo)
+WHERE m.nombre IN $balance
+OPTIONAL MATCH (g)-[:PRESENTA_FENOMENO]->(f:Fenomeno)
+WHERE f.nombre = 'Retroceso glaciar'
+OPTIONAL MATCH (d:Documento)-[:MENCIONA]->(g), (d)-[:USA_METODO]->(mb:MetodoMonitoreo)
+WHERE mb.nombre IN $balance
+WITH l, g, ra, count(DISTINCT m) AS n_medido, count(DISTINCT f) AS n_reportado, count(DISTINCT d) AS n_doc
+WHERE n_medido + n_reportado + n_doc > 0
+RETURN g.nombre AS glaciar,
+       CASE WHEN n_medido > 0 THEN 'medido (balance de masa)'
+            WHEN n_reportado > 0 THEN 'retroceso reportado'
+            ELSE 'en documento con balance de masa' END AS retroceso,
+       l.nombre AS laguna, l.nivel_max AS nivel, ra.documento AS documento, ra.pagina AS pagina, ra.evidencia AS evidencia
+ORDER BY retroceso DESC, glaciar"
+P6,competencia,¿Qué métodos de monitoreo se aplicaron a lagunas en riesgo y qué institución realizó cada estudio?,True,LLM,caché · gemini · gemini-flash-lite-latest,False,P6,37,20,20,0,16,"ANA, INAIGEM",,0.3,"De acuerdo con la información disponible (el grafo devolvió 37 filas en total; se muestran 20 de 12 lagunas distintas), los métodos de monitoreo y estudio aplicados a lagunas en riesgo y las instituciones que los realizaron son:
+
+* **Laguna Artizón:** Se aplicó batimetría por la Unidad de Glaciología del INAIGEM [1], y fotogrametría (generando un modelo de elevación y ortomosaico) por el INAIGEM [2].
+* **Laguna Cuchillacocha:** Se realizaron estudios de topografía y batimetría por la ANA (Autoridad Administrativa del Agua) [3], y se recomendó la instalación de un limnímetro automático en la quebrada de Cojup [4].
+* **Laguna Gangrajanca:** Se aplicaron estudios batimétricos, evaluación con dron (UAV), fotogrametría, modelamiento numérico de flujo (FLOW-3D Hydro) y se propuso un sistema de monitoreo en tiempo real, en actividades coordinadas por la Unidad de Glaciología del INAIGEM, la ANA, el INDECI y la Municipalidad Distrital de Queropalca [5][6][7][8][9].
+* **Laguna Llaca:** Se realizaron estudios topográficos y batimétricos, así como análisis con modelos de elevación digital a partir de vuelos de dron, con la participación de la Unidad de Glaciología, INDECI, Electroperú, la Autoridad Administrativa del Agua y el Instituto de Ciencia y Tecnología de Austria (documentado por INAIGEM) [10][11].
+* **Laguna Pacliashcocha:** Cuenta con registros de evaluación de su vaso de almacenamiento por batimetría a cargo del INAIGEM, la Unidad de Glaciología (y Recursos Hídricos), el Ministerio de Energía y Minas y la Dirección de Investigación en Glaciares del INAIGEM [12].
+* **Laguna Palcacocha:** Se han aplicado batimetrías, cámaras de videovigilancia, monitoreo con estación meteorológica automática (EMA) desde febrero de 2017, fotogrametría, limnígrafos/limnímetros, modelamiento de flujos (RAMMS y FLO-2D) y teledetección [13][14][15][16][17][18][19]. Estos estudios involucraron al INAIGEM, la Unidad de Glaciología, la ANA, el SENAMHI, el Gobierno Regional de Áncash y el INDECI [13][15][16][17][18][19].
+* **Laguna Parón:** Se realizaron estudios batimétricos (como el de 2006) para medir su volumen de agua, con la participación del INAIGEM, la Unidad de Glaciología, el INRENA, la ANA, el SENAMHI y el IRD [20].","MATCH (l:Laguna)-[r:MONITOREADO_CON]->(m:MetodoMonitoreo)
+WHERE l.nivel_max IN $niveles
+OPTIONAL MATCH (i:Institucion)-[:INTERVIENE_EN]->(l)
+OPTIONAL MATCH (doc:Documento)-[:PUBLICADO_POR]->(pub:Institucion)
+WHERE doc.id = r.documento
+RETURN l.nombre AS laguna, m.nombre AS metodo, collect(DISTINCT i.nombre) AS instituciones_en_texto,
+       collect(DISTINCT pub.nombre) AS institucion_del_documento,
+       r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY laguna, metodo"
+P7,competencia,¿En qué subcuencas coinciden lagunas en riesgo y contaminación por drenaje ácido de roca?,True,LLM,caché · gemini · gemini-flash-lite-latest,False,P7,18,4,4,0,4,INAIGEM,,0.3,"Basándose en los documentos del corpus y el grafo de conocimiento, las subcuencas donde se reportan lagunas en riesgo coinciden con la presencia o afectación por drenaje ácido de roca (DAR) en las siguientes:
+
+* **Subcuenca Llaca:** Cuenta con la laguna en riesgo Llaca y problemas asociados de drenaje ácido de roca en la misma zona [2][5].
+* **Subcuenca Quillcay:** Presenta lagunas en riesgo (como Palcacocha, Upiscocha, Tullparaju, Llaca y Cuchillacocha) y registros de drenaje ácido de roca (relacionados con Yanamarey, Palcacocha y Llaca) [12].
+
+Se muestran 2 de un total de 18 valores distintos de subcuenca en el resultado completo [18].","MATCH (l:Laguna)-[:UBICADA_EN]->(c)
+WHERE l.nivel_max IN $niveles AND c.hidro = true AND c.grande = false
+MATCH (f:Fenomeno)
+WHERE f.nombre = $fenomeno
+OPTIONAL MATCH (c)-[r1:PRESENTA_FENOMENO]->(f)
+OPTIONAL MATCH (x)-[:UBICADA_EN]->(c), (x)-[r2:PRESENTA_FENOMENO]->(f)
+WITH c, l, r1, x, r2
+WHERE r1 IS NOT NULL OR r2 IS NOT NULL
+RETURN c.nombre AS subcuenca, collect(DISTINCT l.nombre) AS lagunas_en_riesgo,
+       collect(DISTINCT x.nombre) AS con_drenaje_acido,
+       collect(DISTINCT coalesce(r1.documento, r2.documento)) AS documentos,
+       collect(DISTINCT coalesce(r1.evidencia, r2.evidencia)) AS evidencias
+ORDER BY subcuenca"
+P8,competencia,¿Qué bofedales están en subcuencas con glaciares en retroceso y qué servicios ecosistémicos brindan?,True,LLM,caché · groq · openai/gpt-oss-20b,False,P8,5,1,0,1,1,INAIGEM,,0.5,"- **Bofedal Cochapampa**  
+  - **Subcuenca:** Quillcayhuanca, la cual está alimentada por glaciares en retroceso [8].  
+  - **Servicios ecosistémicos que brinda:**  
+    - Regulación hídrica  
+    - Aprovisionamiento de agua (calidad y cantidad)  
+    - Almacenamiento de carbono  
+    - Forraje y pastoreo  
+    - Hábitat y biodiversidad  
+
+No se identificaron otros bofedales en subcuencas con glaciares en retroceso dentro de la evidencia proporcionada.","MATCH (g)-[:PRESENTA_FENOMENO]->(f:Fenomeno)
+WHERE f.nombre = 'Retroceso glaciar' AND g.tipo IN ['Glaciar', 'Nevado', 'Cuenca', 'Quebrada']
+MATCH (b:Bofedal)-[rb:UBICADA_EN]->(c)
+WHERE c.hidro = true AND c.grande = false AND b.dudoso = false AND (c.id = g.id OR EXISTS { MATCH (g)-[:UBICADA_EN]->(c) })
+OPTIONAL MATCH (b)-[:PROVEE_SERVICIO]->(s:ServicioEcosistemico)
+OPTIONAL MATCH (e:Ecosistema)-[:PROVEE_SERVICIO]->(s2:ServicioEcosistemico)
+WHERE e.k = 'bofedal'
+RETURN b.nombre AS bofedal, c.nombre AS subcuenca, collect(DISTINCT g.nombre) AS en_retroceso,
+       collect(DISTINCT s.nombre) AS servicios_del_bofedal, collect(DISTINCT s2.nombre) AS servicios_de_los_bofedales,
+       rb.documento AS documento, rb.pagina AS pagina, rb.evidencia AS evidencia
+ORDER BY subcuenca, bofedal"
+P9,competencia,¿Cómo cambió la superficie glaciar de una cordillera entre los inventarios de 2018 y 2023?,True,LLM,caché · groq · openai/gpt-oss-20b,False,P9,19,2,2,0,1,INAIGEM,,0.3,"La superficie glaciar de la Cordillera Blanca pasó de **449.75 km² en 2018** a **424.86 km² en 2023**, una reducción de **24.89 km²** (≈ 5.5 %). [16][19]","MATCH (i:Inventario)-[:INVENTARIO_DE]->(c:Cordillera {k: $cordillera})
+MATCH (i)-[:TIENE_MEDICION]->(m:Medicion)
+WHERE m.propiedad = 'registraSuperficieGlaciar' AND m.valor IS NOT NULL
+RETURN i.anio AS anio, i.anio_imagenes AS anio_imagenes, m.valor AS km2, m.confianza AS confianza,
+       m.documento AS documento, m.pagina AS pagina, m.evidencia AS evidencia
+ORDER BY anio"
+P10,competencia,"¿Qué lagunas en riesgo cuentan con obras de seguridad, en qué estado están y qué poblados protegen?",True,LLM,caché · gemini · gemini-flash-lite-latest,False,P10,66,19,18,1,10,"ANA, INAIGEM",,0.4,"Con base en la información del grafo y los documentos del corpus (mostrando 20 de 66 filas disponibles en el grafo), las lagunas con riesgo que cuentan con obras de seguridad, su estado y los poblados que protegen son:
+
+* **Artizón:** Cuenta con canal de desagüe, dique, presa y obras de seguridad; su estado es colapsado y deteriorado (en Artizón Bajo el dique natural fue desplazado y removido aguas abajo) [1][2][3][4]. No se registran poblados protegidos específicos en los datos.
+* **Cuchillacocha:** Cuenta con dique, obras de seguridad, presa y un sistema de alerta temprana operativo; su estado es deteriorado [6][7][8][9]. Protege al poblado de Huaraz [6][7][8][9].
+* **Gangrajanca:** Cuenta con dique, presa y un sistema de alerta temprana; su estado es colapsado y deteriorado [10][11][12]. Protege a los poblados de Queropalca, Baños, Jesús y Baños, y Concepción [10][11][12].
+* **Llaca:** Cuenta con dique, obras de seguridad, presa, un sistema de alerta temprana y un dique artificial de 9 metros de alto; su estado es deteriorado / requiere mantenimiento (evidencia un deterioro generalizado en sus componentes) [14][15][16][17][18]. Protege al poblado de Huaraz [14][15][16][17][18].
+* **Pacliashcocha:** Cuenta con un canal de desagüe y un dique (el canal es de mampostería de piedra en condiciones regulares con deterioro de tarrajeo) [19][20][24]. Protege a los poblados de Carhuaz y Marcará [19][20].","MATCH (l:Laguna)-[r:TIENE_OBRA]->(o:ObraSeguridad)
+WHERE l.nivel_max IN $niveles
+OPTIONAL MATCH (l)-[re:ESTADO_OBRA]->(e:EstadoObra)
+WHERE re.obra = o.nombre
+OPTIONAL MATCH (l)-[:AMENAZA_A]->(p:CentroPoblado)
+WHERE p.dudoso = false
+RETURN l.nombre AS laguna, l.nivel_max AS nivel, o.nombre AS obra, collect(DISTINCT e.nombre) AS estado,
+       collect(DISTINCT p.nombre) AS poblados_protegidos, r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY laguna, obra"
+D1,descriptiva,¿Por qué la laguna Palcacocha es peligrosa?,True,LLM,caché · groq · openai/gpt-oss-20b,False,texto,0,3,0,3,2,"ANA, INAIGEM",,0.1,"La laguna Palcacocha se considera peligrosa por varias razones documentadas:
+
+- **Estado de emergencia y riesgo inminente**: La Dirección Nacional de Prevención del INDECI, basándose en el Informe Técnico N° 014‑2010‑ANA‑DCPRH‑GLA/NSP, declaró que la situación de la laguna Palcacocha constituye un *PELIGRO INMINENTE* y se declaró Estado de Emergencia a la cuenca mediante el D.S. 002‑2011‑PCM. [1]  
+- **Origen glaciar y ubicación**: La laguna es de origen glaciar y se ubica en la parte baja del glaciar Palcaraju, cuyo pico alcanza los 6 174 m s.n.m., situándose en la cabecera de la quebrada Cojup. [2]  
+- **Frentes agrietados y colgantes**: El glaciar Pucaranra presenta frentes agrietados y colgantes que amenazan con impactar sobre la laguna, incrementando el riesgo de desbordes. [3]  
+- **Inadecuado sistema de sifonaje**: El sistema de sifonaje instalado (tuberías que obstruyen el conducto de desagüe) no cumple una función de seguridad; de hecho, podría generar un volumen adicional importante por encima de la cota de rebose, agravando el riesgo de desbordes. [3]  
+
+En conjunto, la combinación de un estado de emergencia, la presencia de glaciares con frentes inestables y un sistema de drenaje ineficaz hacen que la laguna Palcacocha sea considerada peligrosa.",
+D2,multilingüe,¿Qué factores explican el balance de masa y energía de los glaciares peruanos?,True,LLM,caché · groq · openai/gpt-oss-20b,False,texto,0,4,0,4,4,"ANA, INAIGEM",,0.2,"Los estudios citados señalan que el balance de masa y la energía de los glaciares peruanos dependen de:
+
+- **Variables atmosféricas**: temperatura, humedad y precipitación, especialmente la precipitación, que es el principal impulsor de las fluctuaciones del balance de masa en la Cordillera Blanca. La temperatura influye indirectamente al aumentar la precipitación, lo que a su vez afecta el balance de masa. [2]
+- **Balance de energía superficial (SEB)**: se calcula con modelos acoplados a la capa de nieve e hielo (COSIPY) que incorporan la interacción glaciar‑atmósfera. [1]
+- **Albedo y cobertura de nieve**: la presencia de nieve aumenta el albedo, reduciendo la energía disponible para la ablación y favoreciendo la acumulación. [4]
+- **Métodos de medición in situ**: instalación de balizas y pozos de nieve para medir la acumulación en metros equivalentes de agua, lo que permite determinar gradientes altitudinales de pérdida de masa. [3]",
+D3,histórica,¿Qué ocurrió en el aluvión de Huaraz de 1941?,True,LLM,caché · gemini · gemini-flash-lite-latest,False,ficha,60,6,2,4,5,"ANA, INAIGEM",,0.5,"En el aluvión de Huaraz de 1941 ocurrieron los siguientes hechos:
+
+* El **13 de diciembre de 1941**, una masa de hielo y rocas (avalancha) del nevado Palcaraju impactó en la laguna Palcacocha [21][23].
+* El impacto generó una ola de gran altura que sobrepasó, erosionó y rompió el dique morrénico frontal que contenía la laguna [21][23][24].
+* Se liberó un flujo aluviónico de alta energía compuesto de agua, sedimentos, rocas y hielo que descendió por la quebrada Cojup a una velocidad estimada entre 30 y 40 km/h [21][24].
+* El aluvión afectó y devastó gran parte de la ciudad de Huaraz (destruyendo aproximadamente la tercera parte), cobrando la vida de miles de personas (aproximadamente 5 000 fallecidos) y dañando infraestructura como el ferrocarril Chimbote-Huallanca [2][3][22][24].","MATCH (e:Evento)-[r:OCURRIO_EN]->(l:Laguna)
+WHERE e.k CONTAINS 'huaraz' AND e.anio = 1941
+OPTIONAL MATCH (e)-[afecto:AFECTO_A]->(cp:CentroPoblado)
+RETURN e.nombre AS evento, e.anio AS anio, l.nombre AS laguna,
+       collect(DISTINCT cp.nombre) AS centros_poblados_afectados,
+       r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY evento, laguna
+LIMIT 50"
+D4,conteo,¿Cuántas lagunas con riesgo muy alto de desborde hay en cada departamento?,True,LLM,groq · openai/gpt-oss-120b,True,E3_conteo_departamento,2,1,0,1,1,INAIGEM,,0.8,"- **Áncash**: 26 lagunas con riesgo muy alto de desborde[5].  
+- **Cusco**: 13 lagunas con riesgo muy alto de desborde[5].  
+- **Lima**: 6 lagunas con riesgo muy alto de desborde[5].","MATCH (l:Laguna)
+WHERE l.nivel_max IN $niveles
+UNWIND l.departamentos AS departamento
+RETURN departamento, count(DISTINCT l) AS lagunas_en_riesgo, collect(DISTINCT l.nombre) AS lagunas
+ORDER BY lagunas_en_riesgo DESC"
+D5,fuera del corpus,¿Quién ganó el Mundial de fútbol 2022?,False,LLM,,False,texto,0,0,0,0,0,,La pregunta no se parece a nada del corpus ni a ninguna entidad del grafo (no se llamó al LLM).,0.0,No encontré esa información en el grafo ni en los documentos del corpus.,
+G1,negación,¿Qué lagunas en riesgo alto o muy alto no tienen obras de seguridad registradas?,True,LLM,caché · groq · openai/gpt-oss-20b,False,E1_negacion_sin_obras,6,1,0,1,1,INAIGEM,,0.5,"- **Tullparaju** (cota 4 350 m, subcuenca Santa Quillcay, provincia Huaraz) – riesgo alto y no se menciona obra de seguridad registrada. [9]  
+- **Cuchillacocha** (cota 4 650 m, subcuenca Santa Quillcay, provincia Huaraz) – riesgo alto y no se menciona obra de seguridad registrada. [9]  
+- **Ochsapalca** (cota 4 800 m, subcuenca Santa Paltay, provincia Huaraz) – riesgo alto; el dique morrénico “no cuenta con obra de seguridad”. [9]","MATCH (l:Laguna)-[r:TIENE_NIVEL_RIESGO]->(n:NivelRiesgo)
+WHERE n.nombre IN $niveles AND NOT EXISTS { MATCH (l)-[:TIENE_OBRA]->(:ObraSeguridad) }
+RETURN l.nombre AS laguna, n.nombre AS nivel, l.departamentos AS departamentos, r.documento AS documento, r.pagina AS pagina, r.evidencia AS evidencia
+ORDER BY nivel DESC, laguna"
+G2,conteo varios saltos,¿Qué cordillera tiene más lagunas en riesgo?,True,LLM,caché · groq · openai/gpt-oss-20b,False,E4_conteo_cordillera,13,1,1,0,0,,,0.2,"La cordillera que presenta la mayor cantidad de lagunas glaciares en riesgo es la **Cordillera Oriental**, con **13 lagunas** identificadas en riesgo. [1]","MATCH (l:Laguna)-[:UBICADA_EN*1..3]->(c:Cordillera)
+WHERE l.nivel_max IN $niveles
+RETURN c.nombre AS cordillera, count(DISTINCT l) AS lagunas_en_riesgo, collect(DISTINCT l.nombre) AS lagunas
+ORDER BY lagunas_en_riesgo DESC"
+G3,camino,¿Cómo se relaciona el nevado Huascarán con Yungay?,True,LLM,caché · groq · openai/gpt-oss-20b,False,camino,2,3,2,1,2,"ANA, INAIGEM",,0.2,"- El nevado Huascarán se ubica dentro de la **Unidad Hidrográfica Ranrahirca** [1][2].  
+- La Unidad Hidrográfica Ranrahirca está situada en el **departamento de Yungay** (provincia de Yungay, distrito de Yungay) [1][2].  
+- El fenómeno de avalancha de hielo y nieve ocurrido el 20 de junio 2023 se desarrolló en el **área del glaciar que ocupa parte del distrito de Yungay** [3].",
