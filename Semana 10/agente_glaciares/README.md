@@ -13,8 +13,8 @@ Esta entrega se agrega a `Semana 10/` sin modificar lo que ya existe: solo lee l
 ## Cómo está organizado
 
 ```
-semana10_agente_glaciares.ipynb    Demo: conversa con el agente en la nube (ya ejecutado)
-agente_glaciares/
+Semana 10/semana10_agente_glaciares.ipynb    Demo: conversa con el agente en la nube (ya ejecutado)
+Semana 10/agente_glaciares/
   agente.py                        El ciclo del agente (LangGraph)
   herramientas.py                  Las 7 herramientas y la numeración de las citas
   llm.py                           Cadena de modelos: si uno falla o agota su cuota, pasa al siguiente
