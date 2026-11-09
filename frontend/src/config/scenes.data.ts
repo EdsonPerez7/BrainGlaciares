@@ -40,7 +40,7 @@ export interface LagunaConEscenas {
 export const LAGUNAS_ESCENAS: Record<string, LagunaConEscenas> = {
   "513": {
     id: "513",
-    nombre: "Laguna 513",
+    nombre: "513",
     departamento: "Áncash",
     cordillera: "Blanca",
     glaciarCabecera: "Hualcán",
