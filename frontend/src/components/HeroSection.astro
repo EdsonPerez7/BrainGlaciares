@@ -1,289 +1,185 @@
 ---
-// HeroSection.astro: Recorrido Infinito Vectorial de Cordilleras y Nevados del Perú
-// 100% SVG + CSS Keyframes a 60fps con paralaje y difuminado blanco a alta montaña
+// HeroSection.astro: Recorrido Frontal en Perspectiva (Carretera y Quebrada Andina hacia el frente)
+// Simulación continua de avance por la cordillera con desniveles, altitudes y cumbres glaciares
 ---
 
-<section class="relative overflow-hidden border-b border-slate-200 bg-[#060c18] w-full min-h-[560px] lg:min-h-[620px] xl:min-h-[660px] flex items-center">
+<section class="relative overflow-hidden border-b border-slate-200 bg-[#060c18] w-full min-h-[580px] lg:min-h-[640px] xl:min-h-[680px] flex items-center">
   
   <!-- ======================================================== -->
-  <!-- FONDO Y RECORRIDO INFINITO VECTORIAL EN SVG (DERECHA)     -->
+  <!-- LIENZO EN PERSPECTIVA FRONTAL (AVANCE HACIA ADELANTE)     -->
   <!-- ======================================================== -->
   <div class="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none">
     
-    <!-- Cielo estrellado y gradiente astronómico -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#030611] via-[#091224] to-[#121e38]"></div>
+    <!-- Cielo andino profundo con atardecer/anochecer astronómico -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#030612] via-[#091226] to-[#14203a]"></div>
 
-    <!-- Puntos de estrellas fijas de fondo -->
+    <!-- Puntos de estrellas fijas en el cenit -->
     <svg class="absolute inset-0 w-full h-full opacity-60" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="15%" cy="12%" r="1" fill="#ffffff" />
-      <circle cx="28%" cy="20%" r="1.5" fill="#bae6fd" />
-      <circle cx="42%" cy="8%" r="1" fill="#ffffff" />
-      <circle cx="58%" cy="15%" r="1.8" fill="#e0f2fe" />
-      <circle cx="72%" cy="22%" r="1.2" fill="#ffffff" />
-      <circle cx="85%" cy="10%" r="1.5" fill="#bae6fd" />
-      <circle cx="93%" cy="25%" r="1" fill="#ffffff" />
-      <circle cx="35%" cy="28%" r="1.2" fill="#bae6fd" />
-      <circle cx="65%" cy="32%" r="1" fill="#ffffff" />
-      <circle cx="80%" cy="38%" r="1.5" fill="#bae6fd" />
+      <circle cx="20%" cy="10%" r="1" fill="#ffffff" />
+      <circle cx="35%" cy="18%" r="1.5" fill="#bae6fd" />
+      <circle cx="50%" cy="8%" r="1" fill="#ffffff" />
+      <circle cx="68%" cy="14%" r="1.8" fill="#e0f2fe" />
+      <circle cx="82%" cy="12%" r="1.2" fill="#ffffff" />
+      <circle cx="92%" cy="20%" r="1.5" fill="#bae6fd" />
+      <circle cx="75%" cy="26%" r="1" fill="#ffffff" />
+      <circle cx="88%" cy="32%" r="1.3" fill="#bae6fd" />
     </svg>
 
-    <!-- CAPA 1: Siluetas Lejanas de la Cordillera (Velocidad Lenta: 75s) -->
-    <div class="track-paralaje-lenta absolute bottom-0 left-0 h-[480px] w-[4800px] flex">
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 480" preserveAspectRatio="none">
-        <polygon points="0,480 80,310 240,390 420,250 580,380 750,220 920,360 1120,240 1280,380 1480,210 1660,370 1850,230 2050,390 2240,260 2400,380 2400,480" fill="#0b1428" opacity="0.6" />
-      </svg>
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 480" preserveAspectRatio="none">
-        <polygon points="0,480 80,310 240,390 420,250 580,380 750,220 920,360 1120,240 1280,380 1480,210 1660,370 1850,230 2050,390 2240,260 2400,380 2400,480" fill="#0b1428" opacity="0.6" />
-      </svg>
-    </div>
+    <!-- ESCENARIO SVG EN PERSPECTIVA FRONTAL (1400 x 680) -->
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1400 680" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <!-- Gradientes de Montañas en Profundidad -->
+        <linearGradient id="pico-fondo-luz" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#475569" />
+          <stop offset="50%" stop-color="#334155" />
+          <stop offset="100%" stop-color="#1e293b" />
+        </linearGradient>
+        <linearGradient id="pico-fondo-sombra" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1e293b" />
+          <stop offset="60%" stop-color="#0f172a" />
+          <stop offset="100%" stop-color="#020617" />
+        </linearGradient>
 
-    <!-- CAPA 2: Cordillera Intermedia con Aristas Rocosas (Velocidad Media: 45s) -->
-    <div class="track-paralaje-media absolute bottom-0 left-0 h-[500px] w-[4800px] flex">
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 500" preserveAspectRatio="none">
-        <polygon points="0,500 120,360 290,440 500,280 670,410 860,260 1060,420 1260,270 1440,430 1640,270 1830,420 2040,280 2230,420 2400,340 2400,500" fill="#111d36" opacity="0.8" />
-      </svg>
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 500" preserveAspectRatio="none">
-        <polygon points="0,500 120,360 290,440 500,280 670,410 860,260 1060,420 1260,270 1440,430 1640,270 1830,420 2040,280 2230,420 2400,340 2400,500" fill="#111d36" opacity="0.8" />
-      </svg>
-    </div>
+        <linearGradient id="nieve-cumbre" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="40%" stop-color="#f0f9ff" />
+          <stop offset="75%" stop-color="#bae6fd" />
+          <stop offset="100%" stop-color="#38bdf8" />
+        </linearGradient>
 
-    <!-- CAPA 3: GRANDES NEVADOS Y ETIQUETAS NOMINALES (Velocidad Principal: 32s) -->
-    <!-- Contiene Huascarán, Alpamayo, Yerupajá, Ausangate, Hualcán y Palcaraju -->
-    <div id="track-cordillera-principal" class="track-paralaje-nevados absolute bottom-0 left-0 h-[560px] w-[4800px] flex pointer-events-auto">
-      
-      <!-- CICLO 1 (2400px de longitud) -->
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 560" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="pico-luz-h" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#475569" />
-            <stop offset="50%" stop-color="#334155" />
-            <stop offset="100%" stop-color="#1e293b" />
-          </linearGradient>
-          <linearGradient id="pico-sombra-h" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#1e293b" />
-            <stop offset="60%" stop-color="#0f172a" />
-            <stop offset="100%" stop-color="#020617" />
-          </linearGradient>
-          <linearGradient id="nieve-h" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="45%" stop-color="#f0f9ff" />
-            <stop offset="85%" stop-color="#bae6fd" />
-            <stop offset="100%" stop-color="#38bdf8" />
-          </linearGradient>
-          <linearGradient id="lago-turq-h" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#38bdf8" />
-            <stop offset="100%" stop-color="#0369a1" />
-          </linearGradient>
-          <filter id="glow-badge" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
-          </filter>
-        </defs>
+        <!-- Asfalto y camino andino con perspectiva -->
+        <linearGradient id="carretera-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0b1322" />
+          <stop offset="40%" stop-color="#131e33" />
+          <stop offset="100%" stop-color="#1e2d4a" />
+        </linearGradient>
 
-        <!-- 1. NEVADO HUASCARÁN SUR (6,768 m) - Coloso del Perú -->
-        <g id="pico-huascaran" class="cursor-pointer group">
-          <!-- Vertientes -->
-          <polygon points="340,70 130,560 340,560" fill="url(#pico-luz-h)" />
-          <polygon points="340,70 340,560 550,560" fill="url(#pico-sombra-h)" />
-          <!-- Casquete glaciar y seracs -->
-          <path d="M 340,70 L 250,195 L 290,185 L 320,225 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="url(#nieve-h)" />
-          <path d="M 340,70 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="#0284c7" opacity="0.35" />
-          <!-- Grietas del hielo -->
-          <line x1="315" y1="130" x2="330" y2="160" stroke="#0284c7" stroke-width="1.5" />
-          <line x1="355" y1="125" x2="345" y2="155" stroke="#0284c7" stroke-width="1.5" />
-          <!-- Línea conector a la etiqueta -->
-          <line x1="340" y1="70" x2="340" y2="40" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="340" cy="70" r="3" fill="#38bdf8" />
-          <!-- Etiqueta Flotante -->
-          <g transform="translate(230, 8)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Huascarán</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,768 m · Cordillera Blanca</text>
-          </g>
+        <!-- Banqueta / Borde de contención morrénica -->
+        <linearGradient id="morrena-talud-l" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0f172a" />
+          <stop offset="100%" stop-color="#1e293b" />
+        </linearGradient>
+        <linearGradient id="morrena-talud-r" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#1e293b" />
+          <stop offset="100%" stop-color="#090d16" />
+        </linearGradient>
+
+        <!-- Filtro Glow para etiquetas y líneas reflectivas -->
+        <filter id="glow-road" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- ======================================================== -->
+      <!-- CAPA 1: COLOSO NEVADO DE FONDO (PUNTO DE FUGA)           -->
+      <!-- Nevado Huascarán / Abra Portachuelo en el horizonte      -->
+      <!-- ======================================================== -->
+      <g id="montana-horizonte-centro" class="anim-pulso-horizonte">
+        <!-- Vertientes del pico central que corona el camino -->
+        <polygon points="900,110 740,360 900,360" fill="url(#pico-fondo-luz)" />
+        <polygon points="900,110 900,360 1060,360" fill="url(#pico-fondo-sombra)" />
+        <!-- Casquete glaciar cumbre -->
+        <path d="M 900,110 L 840,195 L 870,185 L 890,215 L 900,195 L 920,220 L 940,190 L 960,200 Z" fill="url(#nieve-cumbre)" />
+        <path d="M 900,110 L 900,195 L 920,220 L 940,190 L 960,200 Z" fill="#0284c7" opacity="0.35" />
+        
+        <!-- Cartela flotante del pico de destino -->
+        <g transform="translate(805, 55)">
+          <rect x="0" y="0" width="190" height="32" rx="16" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" filter="url(#glow-road)" />
+          <circle cx="16" cy="16" r="3.5" fill="#38bdf8" />
+          <text x="26" y="15" fill="#ffffff" font-size="11" font-weight="800" font-family="sans-serif">Nevado Huascarán</text>
+          <text x="26" y="25" fill="#94a3b8" font-size="9" font-weight="600" font-family="sans-serif">6,768 m · Cordillera Blanca</text>
         </g>
+      </g>
 
-        <!-- 2. NEVADO ALPAMAYO (5,947 m) - Pirámide Glaciar Emblemática -->
-        <g id="pico-alpamayo" class="cursor-pointer group">
-          <polygon points="740,140 580,560 740,560" fill="url(#pico-luz-h)" />
-          <polygon points="740,140 740,560 900,560" fill="url(#pico-sombra-h)" />
-          <path d="M 740,140 L 670,240 L 705,230 L 725,260 L 740,240 L 760,265 L 780,235 L 810,245 Z" fill="url(#nieve-h)" />
-          <!-- Estrías de fluting alpino -->
-          <line x1="720" y1="180" x2="695" y2="230" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
-          <line x1="740" y1="170" x2="735" y2="235" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
-          <line x1="760" y1="180" x2="775" y2="230" stroke="#0284c7" stroke-width="1.5" opacity="0.8" />
-          <line x1="740" y1="140" x2="740" y2="105" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="740" cy="140" r="3" fill="#38bdf8" />
-          <!-- Etiqueta Flotante -->
-          <g transform="translate(635, 72)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Alpamayo</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">5,947 m · Cordillera Blanca</text>
-          </g>
-        </g>
+      <!-- ======================================================== -->
+      <!-- CAPA 2: PAREDES LATERALES DEL CAÑÓN / DESNIVELES ROCOSOS  -->
+      <!-- Flanquean la carretera a izquierda y derecha             -->
+      <!-- ======================================================== -->
+      <!-- Macizo Lateral Izquierdo (Pared alta del cañón) -->
+      <polygon points="460,330 200,680 660,680 780,350" fill="url(#morrena-talud-l)" opacity="0.95" />
+      <path d="M 460,330 L 610,220 L 780,350 Z" fill="url(#pico-fondo-luz)" />
+      <path d="M 610,220 L 570,265 L 610,250 L 640,270 Z" fill="url(#nieve-cumbre)" />
+      <!-- Etiqueta Flanco Izquierdo -->
+      <g transform="translate(510, 175)">
+        <rect x="0" y="0" width="180" height="30" rx="15" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2" fill-opacity="0.9" />
+        <circle cx="14" cy="15" r="3.5" fill="#38bdf8" />
+        <text x="24" y="15" fill="#ffffff" font-size="10.5" font-weight="800" font-family="sans-serif">Pared Glaciar Huandoy</text>
+        <text x="24" y="24" fill="#94a3b8" font-size="8.5" font-weight="600" font-family="sans-serif">6,395 m · Cañón de Llanganuco</text>
+      </g>
 
-        <!-- 3. NEVADO YERUPAJÁ (6,635 m) - Cordillera Huayhuash -->
-        <g id="pico-yerupaja" class="cursor-pointer group">
-          <polygon points="1150,95 940,560 1150,560" fill="url(#pico-luz-h)" />
-          <polygon points="1150,95 1150,560 1350,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1150,95 L 1060,210 L 1100,200 L 1130,235 L 1150,215 L 1180,245 L 1210,210 L 1240,220 Z" fill="url(#nieve-h)" />
-          <line x1="1150" y1="95" x2="1150" y2="60" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1150" cy="95" r="3" fill="#38bdf8" />
-          <!-- Etiqueta Flotante -->
-          <g transform="translate(1040, 28)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Yerupajá</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,635 m · Cord. Huayhuash</text>
-          </g>
-        </g>
+      <!-- Macizo Lateral Derecho (Paredes rocosas de avance) -->
+      <polygon points="1020,350 1140,680 1400,680 1340,330" fill="url(#morrena-talud-r)" opacity="0.95" />
+      <path d="M 1020,350 L 1180,210 L 1340,330 Z" fill="url(#pico-fondo-sombra)" />
+      <path d="M 1180,210 L 1140,260 L 1180,245 L 1220,265 Z" fill="url(#nieve-cumbre)" />
+      <!-- Etiqueta Flanco Derecho -->
+      <g transform="translate(1090, 165)">
+        <rect x="0" y="0" width="180" height="30" rx="15" fill="#0f172a" stroke="#10b981" stroke-width="1.2" fill-opacity="0.9" />
+        <circle cx="14" cy="15" r="3.5" fill="#10b981" />
+        <text x="24" y="15" fill="#ffffff" font-size="10.5" font-weight="800" font-family="sans-serif">Macizo Chopicalqui</text>
+        <text x="24" y="24" fill="#34d399" font-size="8.5" font-weight="600" font-family="sans-serif">6,354 m · Paso Portachuelo</text>
+      </g>
 
-        <!-- 4. NEVADO AUSANGATE (6,384 m) - Cordillera Vilcanota (Cusco) -->
-        <g id="pico-ausangate" class="cursor-pointer group">
-          <polygon points="1560,115 1360,560 1560,560" fill="url(#pico-luz-h)" />
-          <polygon points="1560,115 1560,560 1760,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1560,115 L 1480,220 L 1520,210 L 1545,245 L 1560,225 L 1585,250 L 1615,220 L 1640,230 Z" fill="url(#nieve-h)" />
-          <!-- Laguna turquesa de pie de glaciar -->
-          <ellipse cx="1470" cy="480" rx="90" ry="22" fill="url(#lago-turq-h)" opacity="0.9" />
-          <line x1="1560" y1="115" x2="1560" y2="80" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1560" cy="115" r="3" fill="#38bdf8" />
-          <!-- Etiqueta Flotante -->
-          <g transform="translate(1450, 48)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Ausangate</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,384 m · Cord. Vilcanota</text>
-          </g>
-        </g>
+      <!-- ======================================================== -->
+      <!-- CAPA 3: LA CARRETERA ANDINA Y AVANCE HACIA EL FRENTE      -->
+      <!-- Converge en el punto de fuga (900, 350) y se ensancha    -->
+      <!-- ======================================================== -->
+      <!-- Superficie de la calzada -->
+      <polygon points="892,348 908,348 1160,680 660,680" fill="url(#carretera-grad)" />
 
-        <!-- 5. NEVADO HUALCÁN (6,122 m) & LAGUNA 513 -->
-        <g id="pico-hualcan" class="cursor-pointer group">
-          <polygon points="1960,120 1770,560 1960,560" fill="url(#pico-luz-h)" />
-          <polygon points="1960,120 1960,560 2160,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1960,120 L 1880,225 L 1920,215 L 1945,250 L 1960,230 L 1985,255 L 2015,225 L 2040,235 Z" fill="url(#nieve-h)" />
-          <!-- Espejo de Laguna 513 -->
-          <ellipse cx="1960" cy="460" rx="80" ry="20" fill="url(#lago-turq-h)" />
-          <line x1="1960" y1="120" x2="1960" y2="85" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1960" cy="120" r="3" fill="#10b981" />
-          <!-- Etiqueta Flotante -->
-          <g transform="translate(1850, 52)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#10b981" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Hualcán · Laguna 513</text>
-            <text x="28" y="27" fill="#34d399" font-size="9.5" font-weight="600" font-family="sans-serif">6,122 m · Cordillera Blanca</text>
-          </g>
-        </g>
+      <!-- Bordes / Bermas de la carretera con perspectiva -->
+      <line x1="892" y1="348" x2="660" y2="680" stroke="#f59e0b" stroke-width="3.5" opacity="0.8" />
+      <line x1="908" y1="348" x2="1160" y2="680" stroke="#f59e0b" stroke-width="3.5" opacity="0.8" />
 
-        <!-- Arista de enlace final hacia x=2400 -->
-        <polygon points="2280,130 2120,560 2280,560" fill="url(#pico-luz-h)" />
-        <polygon points="2280,130 2280,560 2400,320 2400,560" fill="url(#pico-sombra-h)" />
-      </svg>
+      <!-- Guías de curvas de nivel / franjas laterales de avance (animadas) -->
+      <g class="anim-franjas-camino">
+        <!-- Línea central discontinua acelerada hacia el frente -->
+        <line x1="900" y1="348" x2="910" y2="680" stroke="#ffffff" stroke-width="5" stroke-linecap="round" class="linea-eje-carretera" />
+      </g>
 
-      <!-- CICLO 2 (Duplicado idéntico de 2400px para bucle infinito perfecto) -->
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 560" preserveAspectRatio="none">
-        <!-- Replicación exacta para seamless loop -->
-        <g id="pico-huascaran-dup" class="cursor-pointer group">
-          <polygon points="340,70 130,560 340,560" fill="url(#pico-luz-h)" />
-          <polygon points="340,70 340,560 550,560" fill="url(#pico-sombra-h)" />
-          <path d="M 340,70 L 250,195 L 290,185 L 320,225 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="url(#nieve-h)" />
-          <path d="M 340,70 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="#0284c7" opacity="0.35" />
-          <line x1="315" y1="130" x2="330" y2="160" stroke="#0284c7" stroke-width="1.5" />
-          <line x1="355" y1="125" x2="345" y2="155" stroke="#0284c7" stroke-width="1.5" />
-          <line x1="340" y1="70" x2="340" y2="40" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="340" cy="70" r="3" fill="#38bdf8" />
-          <g transform="translate(230, 8)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Huascarán</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,768 m · Cordillera Blanca</text>
-          </g>
-        </g>
+      <!-- Postes / Balizas reflectivas andinas a los lados de la carretera -->
+      <g class="anim-balizas-avance">
+        <!-- Balizas lado izquierdo -->
+        <circle cx="875" cy="375" r="2" fill="#38bdf8" />
+        <circle cx="845" cy="425" r="3" fill="#38bdf8" />
+        <circle cx="795" cy="500" r="4.5" fill="#38bdf8" />
+        <circle cx="720" cy="610" r="6" fill="#38bdf8" />
 
-        <g id="pico-alpamayo-dup" class="cursor-pointer group">
-          <polygon points="740,140 580,560 740,560" fill="url(#pico-luz-h)" />
-          <polygon points="740,140 740,560 900,560" fill="url(#pico-sombra-h)" />
-          <path d="M 740,140 L 670,240 L 705,230 L 725,260 L 740,240 L 760,265 L 780,235 L 810,245 Z" fill="url(#nieve-h)" />
-          <line x1="720" y1="180" x2="695" y2="230" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
-          <line x1="740" y1="170" x2="735" y2="235" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
-          <line x1="760" y1="180" x2="775" y2="230" stroke="#0284c7" stroke-width="1.5" opacity="0.8" />
-          <line x1="740" y1="140" x2="740" y2="105" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="740" cy="140" r="3" fill="#38bdf8" />
-          <g transform="translate(635, 72)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Alpamayo</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">5,947 m · Cordillera Blanca</text>
-          </g>
-        </g>
+        <!-- Balizas lado derecho -->
+        <circle cx="925" cy="375" r="2" fill="#38bdf8" />
+        <circle cx="955" cy="425" r="3" fill="#38bdf8" />
+        <circle cx="1010" cy="500" r="4.5" fill="#38bdf8" />
+        <circle cx="1090" cy="610" r="6" fill="#38bdf8" />
+      </g>
 
-        <g id="pico-yerupaja-dup" class="cursor-pointer group">
-          <polygon points="1150,95 940,560 1150,560" fill="url(#pico-luz-h)" />
-          <polygon points="1150,95 1150,560 1350,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1150,95 L 1060,210 L 1100,200 L 1130,235 L 1150,215 L 1180,245 L 1210,210 L 1240,220 Z" fill="url(#nieve-h)" />
-          <line x1="1150" y1="95" x2="1150" y2="60" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1150" cy="95" r="3" fill="#38bdf8" />
-          <g transform="translate(1040, 28)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Yerupajá</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,635 m · Cord. Huayhuash</text>
-          </g>
-        </g>
+      <!-- Laguna turquesa visible en una curva del desfiladero -->
+      <ellipse cx="780" cy="375" rx="45" ry="12" fill="#0284c7" opacity="0.8" />
+      <text x="780" y="378" fill="#e0f2fe" font-size="8" font-weight="700" text-anchor="middle" font-family="sans-serif">Lag. Llanganuco</text>
 
-        <g id="pico-ausangate-dup" class="cursor-pointer group">
-          <polygon points="1560,115 1360,560 1560,560" fill="url(#pico-luz-h)" />
-          <polygon points="1560,115 1560,560 1760,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1560,115 L 1480,220 L 1520,210 L 1545,245 L 1560,225 L 1585,250 L 1615,220 L 1640,230 Z" fill="url(#nieve-h)" />
-          <ellipse cx="1470" cy="480" rx="90" ry="22" fill="url(#lago-turq-h)" opacity="0.9" />
-          <line x1="1560" y1="115" x2="1560" y2="80" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1560" cy="115" r="3" fill="#38bdf8" />
-          <g transform="translate(1450, 48)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Ausangate</text>
-            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,384 m · Cord. Vilcanota</text>
-          </g>
-        </g>
+    </svg>
 
-        <g id="pico-hualcan-dup" class="cursor-pointer group">
-          <polygon points="1960,120 1770,560 1960,560" fill="url(#pico-luz-h)" />
-          <polygon points="1960,120 1960,560 2160,560" fill="url(#pico-sombra-h)" />
-          <path d="M 1960,120 L 1880,225 L 1920,215 L 1945,250 L 1960,230 L 1985,255 L 2015,225 L 2040,235 Z" fill="url(#nieve-h)" />
-          <ellipse cx="1960" cy="460" rx="80" ry="20" fill="url(#lago-turq-h)" />
-          <line x1="1960" y1="120" x2="1960" y2="85" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
-          <circle cx="1960" cy="120" r="3" fill="#10b981" />
-          <g transform="translate(1850, 52)" filter="url(#glow-badge)">
-            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
-            <circle cx="16" cy="17" r="4" fill="#10b981" />
-            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Hualcán · Laguna 513</text>
-            <text x="28" y="27" fill="#34d399" font-size="9.5" font-weight="600" font-family="sans-serif">6,122 m · Cordillera Blanca</text>
-          </g>
-        </g>
-
-        <polygon points="2280,130 2120,560 2280,560" fill="url(#pico-luz-h)" />
-        <polygon points="2280,130 2280,560 2400,320 2400,560" fill="url(#pico-sombra-h)" />
-      </svg>
-
-    </div>
-
-    <!-- CAPA 4: Morenas Frontales en Primer Plano (Velocidad Más Dinámica: 20s) -->
-    <div class="track-paralaje-cercana absolute bottom-0 left-0 h-[380px] w-[4800px] flex">
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 380" preserveAspectRatio="none">
-        <polygon points="0,380 90,320 280,360 480,290 690,360 920,280 1140,360 1380,290 1620,360 1860,300 2100,370 2400,310 2400,380" fill="#040813" opacity="0.85" />
-      </svg>
-      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 380" preserveAspectRatio="none">
-        <polygon points="0,380 90,320 280,360 480,290 690,360 920,280 1140,360 1380,290 1620,360 1860,300 2100,370 2400,310 2400,380" fill="#040813" opacity="0.85" />
-      </svg>
+    <!-- Indicador de Cota / Altimetría Dinámica en vivo (Ascenso continuo) -->
+    <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-slate-950/85 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-700/70 text-xs shadow-2xl">
+      <div class="flex flex-col">
+        <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Perfil Altimétrico en Ruta</span>
+        <span id="indicador-altitud-dinamica" class="font-mono font-bold text-sky-400 text-sm">3,850 m s.n.m. · Quebrada Llanganuco</span>
+      </div>
+      <div class="h-8 w-px bg-slate-800"></div>
+      <div class="flex items-center gap-1.5 text-emerald-400 font-mono text-xs font-semibold">
+        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Rumbo 042° NE</span>
+      </div>
     </div>
 
   </div>
 
   <!-- ======================================================== -->
-  <!-- CAPA DE DIFUMINADO / MÁSCARA GRADUAL                     -->
-  <!-- Pasa suavemente de Blanco Sólido a la Cordillera Azul   -->
+  <!-- MÁSCARA GRADUAL DE DIFUMINADO (BLANCO A ALTA MONTAÑA)     -->
   <!-- ======================================================== -->
   <div class="absolute inset-y-0 left-0 w-full lg:w-[65%] xl:w-[58%] 2xl:w-[52%] bg-gradient-to-r from-white via-white via-70% to-transparent pointer-events-none z-10 hidden lg:block"></div>
-  <!-- Versión móvil (difuminado de arriba a abajo) -->
   <div class="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white via-white/90 to-transparent pointer-events-none z-10 lg:hidden"></div>
 
   <!-- ======================================================== -->
@@ -296,7 +192,7 @@
       <!-- Pastilla Institucional -->
       <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-xs text-slate-700 shadow-xs">
         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-semibold text-slate-900">398 Informes oficiales</span>
+        <span class="font-semibold text-slate-900">398 Informes oficiales digitalizados</span>
         <span class="text-slate-300">|</span>
         <span>Evidencia con trazabilidad científica</span>
       </div>
@@ -307,7 +203,7 @@
           ¿Hay riesgo donde vives?
         </h1>
         <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
-          Escribe tu pueblo, departamento o una laguna: te mostramos qué glaciares hay aguas arriba, qué pasó antes y de qué informe técnico oficial proviene cada dato.
+          Escribe tu pueblo, departamento o una laguna: te mostramos qué glaciares hay aguas arriba, qué desniveles existen y de qué informe técnico oficial proviene cada evidencia.
         </p>
       </div>
 
@@ -349,117 +245,73 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- CONTROL DISCRETO DE ANIMACIÓN DE LA CORDILLERA (HUD)     -->
-  <!-- ======================================================== -->
-  <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-700/60 text-[11px] text-slate-300 shadow-xl">
-    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-    <span class="font-mono font-medium">Recorrido Andino Infinito</span>
-    <button id="btn-toggle-paralaje" type="button" class="ml-1 text-slate-400 hover:text-white transition" title="Pausar / Reanudar recorrido">
-      <svg id="icon-pause-loop" class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
-      <svg id="icon-play-loop" class="h-3.5 w-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    </button>
-  </div>
-
 </section>
 
 <!-- ======================================================== -->
-<!-- ESTILOS CSS DE ANIMACIÓN INFINITA A 60 FPS               -->
+<!-- ESTILOS Y ANIMACIONES CSS DE PERSPECTIVA HACIA EL FRENTE -->
 <!-- ======================================================== -->
 <style>
-  /* Desplazamiento seamless a 60fps con transform3d (acelerado por GPU) */
-  @keyframes loopCordilleraLenta {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-2400px, 0, 0); }
-  }
-  @keyframes loopCordilleraMedia {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-2400px, 0, 0); }
-  }
-  @keyframes loopCordilleraNevados {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-2400px, 0, 0); }
-  }
-  @keyframes loopCordilleraCercana {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-2400px, 0, 0); }
+  /* Línea central de la carretera: simula velocidad continua hacia adelante */
+  .linea-eje-carretera {
+    stroke-dasharray: 24 36;
+    animation: avanzarCarretera 0.75s linear infinite;
   }
 
-  .track-paralaje-lenta {
-    animation: loopCordilleraLenta 85s linear infinite;
-    will-change: transform;
-  }
-  .track-paralaje-media {
-    animation: loopCordilleraMedia 55s linear infinite;
-    will-change: transform;
-  }
-  .track-paralaje-nevados {
-    animation: loopCordilleraNevados 38s linear infinite;
-    will-change: transform;
-  }
-  .track-paralaje-cercana {
-    animation: loopCordilleraCercana 24s linear infinite;
-    will-change: transform;
+  @keyframes avanzarCarretera {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: -60;
+    }
   }
 
-  /* Efecto al posar el ratón: desaceleración suave para leer con calma */
-  .track-paralaje-nevados:hover {
-    animation-play-state: paused;
+  /* Balizas reflectivas que aumentan de escala y avanzan */
+  @keyframes pulsoHorizonte {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.02);
+    }
   }
 
-  /* Estado pausado manual */
-  .paralaje-paused {
-    animation-play-state: paused !important;
+  .anim-pulso-horizonte {
+    transform-origin: 900px 350px;
+    animation: pulsoHorizonte 8s ease-in-out infinite;
   }
 </style>
 
 <script>
-  // Control de Pausa / Reanudar el recorrido
-  const btnToggle = document.getElementById('btn-toggle-paralaje');
-  const iconPause = document.getElementById('icon-pause-loop');
-  const iconPlay = document.getElementById('icon-play-loop');
-  const tracks = document.querySelectorAll('[class*="track-paralaje-"]');
-  let isMoving = true;
+  // Altimetría dinámica simulando el avance por la cordillera
+  const altitudEl = document.getElementById('indicador-altitud-dinamica');
+  const cotasRuta = [
+    { cota: "3,050 m s.n.m.", hito: "Valle del Callejón de Huaylas" },
+    { cota: "3,420 m s.n.m.", hito: "Inicio Quebrada de Llanganuco" },
+    { cota: "3,850 m s.n.m.", hito: "Laguna Chinancocha" },
+    { cota: "4,210 m s.n.m.", hito: "Curva de los Seracs de Huandoy" },
+    { cota: "4,767 m s.n.m.", hito: "Paso Abra Portachuelo" },
+  ];
 
-  btnToggle?.addEventListener('click', () => {
-    isMoving = !isMoving;
-    tracks.forEach(track => {
-      if (isMoving) {
-        track.classList.remove('paralaje-paused');
-      } else {
-        track.classList.add('paralaje-paused');
-      }
-    });
-
-    if (isMoving) {
-      iconPause?.classList.remove('hidden');
-      iconPlay?.classList.add('hidden');
-    } else {
-      iconPause?.classList.add('hidden');
-      iconPlay?.classList.remove('hidden');
+  let rutaIdx = 0;
+  setInterval(() => {
+    rutaIdx = (rutaIdx + 1) % cotasRuta.length;
+    if (altitudEl) {
+      altitudEl.style.opacity = '0';
+      setTimeout(() => {
+        altitudEl.textContent = `${cotasRuta[rutaIdx].cota} · ${cotasRuta[rutaIdx].hito}`;
+        altitudEl.style.opacity = '1';
+      }, 200);
     }
-  });
+  }, 4500);
 
-  // Buscador sugerencias directas
+  // Buscador sugerencias
   const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
   const sugerencias = document.querySelectorAll('.btn-sugerencia');
   sugerencias.forEach(btn => {
     btn.addEventListener('click', () => {
       if (searchInput && btn.textContent) {
         searchInput.value = btn.textContent.trim();
-        window.location.hash = 'buscar';
-      }
-    });
-  });
-
-  // Clic en los picos de la cordillera para navegar o filtrar
-  const picos = document.querySelectorAll('[id^="pico-"]');
-  picos.forEach(p => {
-    p.addEventListener('click', () => {
-      const id = p.getAttribute('id') || '';
-      if (id.includes('hualcan') || id.includes('513')) {
-        window.location.hash = 'simulador-cordillera';
-      } else {
         window.location.hash = 'buscar';
       }
     });
