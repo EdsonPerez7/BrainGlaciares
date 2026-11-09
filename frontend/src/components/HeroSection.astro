@@ -120,12 +120,12 @@
 
   if (canvas && containerEtiquetas) {
     
-    // 1. Escena y Niebla Atmosférica Diurna Alpina (Exacto a la foto de referencia)
+    // 1. Escena y Niebla Atmosférica Diurna Alpina (25% cielo / 75% cordillera)
     const scene = new THREE.Scene();
-    const skyColor = new THREE.Color('#78b6eb');
-    const fogColor = new THREE.Color('#a8cfee');
+    const skyColor = new THREE.Color('#6ba5e7');
+    const fogColor = new THREE.Color('#b6daf5');
     scene.background = skyColor;
-    scene.fog = new THREE.FogExp2(fogColor, 0.00085);
+    scene.fog = new THREE.FogExp2(fogColor, 0.00065);
 
     // Bóveda celeste diurna con degradado atmosférico
     const vertexSky = `
@@ -147,23 +147,23 @@
         gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
       }
     `;
-    const skyGeo = new THREE.SphereGeometry(1800, 32, 15);
+    const skyGeo = new THREE.SphereGeometry(2200, 32, 16);
     const skyMat = new THREE.ShaderMaterial({
       vertexShader: vertexSky,
       fragmentShader: fragmentSky,
       uniforms: {
-        topColor: { value: new THREE.Color('#3b82f6') },
-        bottomColor: { value: new THREE.Color('#cce4f7') },
-        offset: { value: 33 },
-        exponent: { value: 0.6 }
+        topColor: { value: new THREE.Color('#1d4ed8') },
+        bottomColor: { value: new THREE.Color('#dbeafe') },
+        offset: { value: 25 },
+        exponent: { value: 0.52 }
       },
       side: THREE.BackSide
     });
     const skyMesh = new THREE.Mesh(skyGeo, skyMat);
     scene.add(skyMesh);
 
-    // Cámara con FOV cinematográfico de 46°
-    const camera = new THREE.PerspectiveCamera(46, canvas.clientWidth / canvas.clientHeight, 2, 3400);
+    // Cámara con FOV cinematográfico de 44°
+    const camera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 2, 3600);
     
     const renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -480,8 +480,8 @@
     lagoMesh.position.set(50, 19, -800);
     scene.add(lagoMesh);
 
-    // 7. Cinemática de Vuelo Aéreo de Alta Cota (Y = 172)
-    const ALTURA_CRUCERO = 172; // Vuelo alto a 6,100 m con vista panorámica majestuosa
+    // 7. Cinemática de Vuelo Aéreo: 25% Cielo / 75% Nevados (Horizonte despejado)
+    const ALTURA_CRUCERO = 152; // Cota de crucero óptima
     const VELOCIDAD_AVION = 42; // Unidades por segundo
     let posCamZ = 0;
     const clock = new THREE.Clock();
@@ -497,7 +497,7 @@
       }
     }
 
-    // 8. Ciclo de Animación a 60 FPS con Virajes y Alabeo
+    // 8. Ciclo de Animación a 60 FPS: Encuadre Panorámico (25% Cielo / 75% Cordillera)
     function animate() {
       requestAnimationFrame(animate);
       resize();
@@ -507,13 +507,15 @@
 
       // Trayectoria curva suave por el centro del valle
       const curvePhase = posCamZ * 0.002;
-      const camX = 50 + Math.sin(curvePhase) * 26;
-      const camY = ALTURA_CRUCERO + Math.cos(curvePhase * 1.5) * 5;
+      const camX = 50 + Math.sin(curvePhase) * 28;
+      const camY = ALTURA_CRUCERO + Math.cos(curvePhase * 1.5) * 4;
       camera.position.set(camX, camY, posCamZ);
 
-      // Mirar hacia adelante y abajo (perspectiva de reconocimiento aéreo con pitch de ~20°)
-      const lookAheadX = camX + Math.cos(curvePhase) * 10;
-      camera.lookAt(lookAheadX, 36, posCamZ - 220);
+      // El punto focal Y = 108 sitúa el horizonte exactamente en el 25% superior de la pantalla
+      // dejando 25% de cielo diurno abierto y 75% de relieve andino nevado majestuoso
+      const lookAheadX = camX + Math.cos(curvePhase) * 12;
+      const targetY = 108;
+      camera.lookAt(lookAheadX, targetY, posCamZ - 240);
 
       // Alabeo aerodinámico natural (roll de avión en curvas)
       camera.rotation.z = -Math.cos(curvePhase) * 0.045;
