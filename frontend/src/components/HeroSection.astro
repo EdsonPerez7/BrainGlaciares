@@ -47,7 +47,7 @@
   <div class="relative z-30 w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 lg:py-16 pointer-events-none">
     
     <!-- Tarjeta flotante con cristal esmerilado oscuro de alto contraste -->
-    <div class="max-w-xl xl:max-w-2xl bg-slate-950/75 backdrop-blur-xl p-6 sm:p-8 lg:p-9 rounded-3xl shadow-2xl border border-white/15 text-white space-y-6 pointer-events-auto">
+    <div id="hero-cockpit-card" class="max-w-xl xl:max-w-2xl bg-slate-950/75 backdrop-blur-xl p-6 sm:p-8 lg:p-9 rounded-3xl shadow-2xl border border-white/15 text-white space-y-6 pointer-events-auto">
       
       <!-- Pastilla Institucional -->
       <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs text-slate-200 shadow-xs backdrop-blur-md">
@@ -125,7 +125,7 @@
     const skyColor = new THREE.Color('#6ba5e7');
     const fogColor = new THREE.Color('#b6daf5');
     scene.background = skyColor;
-    scene.fog = new THREE.FogExp2(fogColor, 0.00065);
+    scene.fog = new THREE.FogExp2(fogColor, 0.00062);
 
     // Bóveda celeste diurna con degradado atmosférico
     const vertexSky = `
@@ -163,7 +163,7 @@
     scene.add(skyMesh);
 
     // Cámara con FOV cinematográfico de 44°
-    const camera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 2, 3600);
+    const camera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 2, 3800);
     
     const renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -178,31 +178,49 @@
     scene.add(hemiLight);
 
     // Sol alpino brillante (luz direccional con tono blanco cálido)
-    const sunLight = new THREE.DirectionalLight('#fffdf5', 3.2);
+    const sunLight = new THREE.DirectionalLight('#fffdf5', 3.3);
     sunLight.position.set(-240, 380, -140);
     scene.add(sunLight);
 
     // Luz secundaria difusa reflejada por la nieve
-    const fillLight = new THREE.DirectionalLight('#93c5fd', 1.1);
+    const fillLight = new THREE.DirectionalLight('#93c5fd', 1.15);
     fillLight.position.set(220, 160, 200);
     scene.add(fillLight);
 
     // 3. Catálogo de Nevados Emblemáticos del RAG (Sur a Norte)
+    // Distribución alternada orgánica: flanco derecho, flanco izquierdo, centro y diagonales
+    const LONGITUD_TOTAL = 5600;
+    const ANCHO_CORREDOR = 800;
+    const SEG_X = 180;
+    const SEG_Z = 600;
+
     const NEVADOS_RAG = [
       {
         id: 'ausangate',
         nombre: 'NEVADO AUSANGATE',
         cota: '6,384 m s. n. m.',
         cordillera: 'Cordillera Vilcanota · Cusco',
-        pos: new THREE.Vector3(120, 132, -380),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: 85,
+        z: -350,
+        altura: 146,
+        radio: 110,
+        perfil: 'massive',
         colorPunto: '#38bdf8'
       },
       {
         id: 'quelccaya',
         nombre: 'GLACIAR QUELCCAYA',
         cota: '5,670 m s. n. m.',
-        cordillera: 'Casquete Tropical · Puno',
-        pos: new THREE.Vector3(-40, 102, -700),
+        cordillera: 'Casquete Tropical más Extenso · Puno',
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: -70,
+        z: -720,
+        altura: 122,
+        radio: 130,
+        perfil: 'dome',
         colorPunto: '#38bdf8'
       },
       {
@@ -210,7 +228,13 @@
         nombre: 'NEVADO SALKANTAY',
         cota: '6,271 m s. n. m.',
         cordillera: 'Cordillera Vilcabamba · Cusco',
-        pos: new THREE.Vector3(135, 126, -1020),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: 35,
+        z: -1100,
+        altura: 142,
+        radio: 115,
+        perfil: 'pyramid',
         colorPunto: '#38bdf8'
       },
       {
@@ -218,7 +242,13 @@
         nombre: 'NEVADO PARIACACA',
         cota: '5,750 m s. n. m.',
         cordillera: 'Cordillera Central · Lima/Junín',
-        pos: new THREE.Vector3(-35, 108, -1340),
+        tipoLabel: 'Cuenca Monitoreada',
+        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+        x: -80,
+        z: -1480,
+        altura: 126,
+        radio: 105,
+        perfil: 'massive',
         colorPunto: '#10b981'
       },
       {
@@ -226,15 +256,27 @@
         nombre: 'NEVADO HUAYTAPALLANA',
         cota: '5,557 m s. n. m.',
         cordillera: 'Glaciar Lasuntay · Junín',
-        pos: new THREE.Vector3(115, 110, -1660),
+        tipoLabel: 'Cuenca Monitoreada',
+        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+        x: 90,
+        z: -1860,
+        altura: 120,
+        radio: 100,
+        perfil: 'ridge',
         colorPunto: '#10b981'
       },
       {
         id: 'siula',
         nombre: 'NEVADO SIULA GRANDE',
         cota: '6,344 m s. n. m.',
-        cordillera: 'Cordillera Huayhuash',
-        pos: new THREE.Vector3(-25, 126, -1980),
+        cordillera: 'Cordillera Huayhuash · Arista Este',
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: -45,
+        z: -2240,
+        altura: 144,
+        radio: 110,
+        perfil: 'pyramid',
         colorPunto: '#38bdf8'
       },
       {
@@ -242,7 +284,13 @@
         nombre: 'NEVADO YERUPAJÁ',
         cota: '6,635 m s. n. m.',
         cordillera: 'Cordillera Huayhuash · 2ª Cumbre',
-        pos: new THREE.Vector3(125, 136, -2300),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: 75,
+        z: -2620,
+        altura: 154,
+        radio: 125,
+        perfil: 'massive',
         colorPunto: '#38bdf8'
       },
       {
@@ -250,7 +298,13 @@
         nombre: 'NEVADO PASTORURI',
         cota: '5,240 m s. n. m.',
         cordillera: 'Cordillera Blanca Sur · Áncash',
-        pos: new THREE.Vector3(-30, 104, -2620),
+        tipoLabel: 'Cuenca Monitoreada',
+        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+        x: -35,
+        z: -3000,
+        altura: 115,
+        radio: 95,
+        perfil: 'dome',
         colorPunto: '#10b981'
       },
       {
@@ -258,7 +312,13 @@
         nombre: 'NEVADO PALCARAJU',
         cota: '6,274 m s. n. m.',
         cordillera: 'Cabecera Laguna Palcacocha',
-        pos: new THREE.Vector3(130, 128, -2940),
+        tipoLabel: 'Riesgo Aluviónico GLOF',
+        badgeBg: 'bg-rose-500/25 text-rose-300 border-rose-400/40',
+        x: 85,
+        z: -3380,
+        altura: 142,
+        radio: 115,
+        perfil: 'ridge',
         colorPunto: '#f43f5e'
       },
       {
@@ -266,7 +326,13 @@
         nombre: 'NEVADO HUASCARÁN SUR',
         cota: '6,768 m s. n. m.',
         cordillera: 'Máxima Cumbre del Perú · Áncash',
-        pos: new THREE.Vector3(-35, 146, -3260),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: 10,
+        z: -3780,
+        altura: 162,
+        radio: 140,
+        perfil: 'massive',
         colorPunto: '#38bdf8'
       },
       {
@@ -274,7 +340,13 @@
         nombre: 'NEVADO HUALCÁN',
         cota: '6,122 m s. n. m.',
         cordillera: 'Cabecera Laguna 513 · Áncash',
-        pos: new THREE.Vector3(120, 124, -3580),
+        tipoLabel: 'Cuenca Monitoreada',
+        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+        x: 80,
+        z: -4160,
+        altura: 138,
+        radio: 110,
+        perfil: 'ridge',
         colorPunto: '#10b981'
       },
       {
@@ -282,15 +354,27 @@
         nombre: 'NEVADO CHOPICALQUI',
         cota: '6,354 m s. n. m.',
         cordillera: 'Cordillera Blanca Central',
-        pos: new THREE.Vector3(-25, 130, -3900),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: -55,
+        z: -4540,
+        altura: 144,
+        radio: 115,
+        perfil: 'pyramid',
         colorPunto: '#38bdf8'
       },
       {
         id: 'artesonraju',
         nombre: 'NEVADO ARTESONRAJU',
         cota: '6,025 m s. n. m.',
-        cordillera: 'Cabecera Laguna Parón · Áncash',
-        pos: new THREE.Vector3(125, 122, -4220),
+        cordillera: 'Cabecera Laguna Parón · Pirámide',
+        tipoLabel: 'Cuenca Monitoreada',
+        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+        x: 65,
+        z: -4920,
+        altura: 135,
+        radio: 105,
+        perfil: 'pyramid',
         colorPunto: '#10b981'
       },
       {
@@ -298,47 +382,173 @@
         nombre: 'NEVADO ALPAMAYO',
         cota: '5,947 m s. n. m.',
         cordillera: 'Pirámide Glaciar · Cordillera Blanca',
-        pos: new THREE.Vector3(65, 118, -4540),
+        tipoLabel: 'Glaciar Emblemático',
+        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
+        x: -15,
+        z: -5300,
+        altura: 132,
+        radio: 100,
+        perfil: 'pyramid',
         colorPunto: '#38bdf8'
       }
     ];
 
-    // Crear elementos DOM para las etiquetas flotantes
-    const etiquetasDOM = NEVADOS_RAG.map(n => {
+    // Helper para mantener coordenadas Z dentro del ciclo periódico
+    function wrapZ(z: number, length: number): number {
+      const m = z % length;
+      return m <= 0 ? m : m - length;
+    }
+
+    // 4. Función de Elevación Continua y Fotorrealista del Terreno
+    function getTerrainElevation(worldX: number, worldZ: number): number {
+      const cycleZ = wrapZ(worldZ, LONGITUD_TOTAL);
+
+      // Valle central y relieve base
+      const distValle = Math.abs(worldX - 5);
+      const factorFlancos = Math.min(1.0, Math.pow(distValle / 75, 1.3));
+
+      // Armónicos ridged multifractal para crestas afiladas reales
+      const r1 = 1.0 - Math.abs(Math.sin(worldX * 0.018 + cycleZ * 0.009));
+      const r2 = 1.0 - Math.abs(Math.sin(worldX * 0.038 - cycleZ * 0.016 + 0.5));
+      const r3 = 1.0 - Math.abs(Math.cos(worldX * 0.075 + cycleZ * 0.035));
+      const r4 = 1.0 - Math.abs(Math.sin(worldX * 0.15 - cycleZ * 0.08));
+
+      // Relieve base de valles y cordones secundarios (entre 18 y 58 de altura)
+      const aristas = Math.pow(r1, 2.0) * 22 + Math.pow(r2, 1.6) * 14 + r3 * 7 + r4 * 3;
+      let elevation = 16 + factorFlancos * 26 + aristas;
+
+      // Colosos Emblemáticos del RAG con crestas piramidales y aristas dominantes
+      for (const n of NEVADOS_RAG) {
+        const dx = worldX - n.x;
+        const dz = cycleZ - n.z;
+        const distSq = dx * dx + dz * dz;
+        const rSq = n.radio * n.radio;
+
+        if (distSq < rSq) {
+          const dist = Math.sqrt(distSq);
+          const u = 1.0 - dist / n.radio;
+          const angle = Math.atan2(dz, dx);
+
+          let crestFactor = 1.0;
+          if (n.perfil === 'pyramid') {
+            // Pirámide con 4 aristas afiladas (como Alpamayo y Artesonraju)
+            const ridges = Math.pow(Math.abs(Math.cos(angle * 2)), 1.5);
+            crestFactor = 0.72 + 0.38 * ridges;
+          } else if (n.perfil === 'massive') {
+            // Macizo imponente con arista principal (como Huascarán, Yerupajá, Ausangate)
+            const ridges = Math.pow(Math.abs(Math.cos(angle * 1.5 + 0.4)), 1.3);
+            crestFactor = 0.78 + 0.32 * ridges;
+          } else if (n.perfil === 'ridge') {
+            // Cresta afilada longitudinal
+            const ridges = Math.pow(Math.abs(Math.sin(angle)), 1.6);
+            crestFactor = 0.75 + 0.35 * ridges;
+          } else {
+            // Casquete/domo glaciar
+            crestFactor = 1.0;
+          }
+
+          const shape = Math.pow(u, 1.6) * crestFactor;
+          const boost = (n.altura - elevation) * shape;
+          if (boost > 0) {
+            elevation += boost;
+          }
+        }
+      }
+
+      return Math.max(6, elevation);
+    }
+
+    // 5. Balizas 3D en la Cumbre de cada Nevado
+    const beaconsGroup = new THREE.Group();
+    scene.add(beaconsGroup);
+
+    const beaconsMeshList = NEVADOS_RAG.map(n => {
+      const bGroup = new THREE.Group();
+
+      // Esfera luminosa de cumbre
+      const orbGeo = new THREE.SphereGeometry(1.6, 16, 16);
+      const orbMat = new THREE.MeshBasicMaterial({ color: n.colorPunto });
+      const orbMesh = new THREE.Mesh(orbGeo, orbMat);
+      bGroup.add(orbMesh);
+
+      // Anillo halo horizontal de telemetría
+      const ringGeo = new THREE.RingGeometry(1.8, 2.7, 32);
+      ringGeo.rotateX(-Math.PI / 2);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: n.colorPunto,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      bGroup.add(ringMesh);
+
+      // Destello láser vertical tenue que corona la cumbre
+      const beamGeo = new THREE.CylinderGeometry(0.08, 0.35, 14, 8);
+      beamGeo.translate(0, 7, 0);
+      const beamMat = new THREE.MeshBasicMaterial({
+        color: '#ffffff',
+        transparent: true,
+        opacity: 0.45
+      });
+      const beamMesh = new THREE.Mesh(beamGeo, beamMat);
+      bGroup.add(beamMesh);
+
+      beaconsGroup.add(bGroup);
+      return { data: n, group: bGroup, ring: ringMesh };
+    });
+
+    // 6. Elementos DOM para Etiquetas de Cumbres con Anclaje 1:1 y Badge Semántico
+    const etiquetasDOM = NEVADOS_RAG.map((n, idx) => {
       const el = document.createElement('div');
-      el.className = 'absolute top-0 left-0 transition-opacity duration-300 flex flex-col items-center pointer-events-none opacity-0';
+      el.className = 'absolute top-0 left-0 transition-opacity duration-300 flex flex-col items-center pointer-events-none opacity-0 select-none';
       el.innerHTML = `
         <div class="flex flex-col items-center">
-          <div class="bg-slate-950/85 border border-white/20 rounded-xl px-3.5 py-1.5 shadow-2xl backdrop-blur-md flex flex-col items-center text-center">
-            <span class="text-[9.5px] tracking-wider font-black text-white uppercase">${n.nombre}</span>
-            <span class="text-[11px] font-mono font-bold text-sky-300 leading-tight">${n.cota}</span>
-            <span class="text-[8.5px] text-slate-300 font-medium">${n.cordillera}</span>
+          <!-- Tarjeta HUD de telemetría cartográfica con clasificación científica -->
+          <div class="bg-slate-950/90 border border-white/20 rounded-2xl px-3.5 py-2 shadow-[0_12px_36px_rgba(0,0,0,0.65)] backdrop-blur-md flex flex-col items-center text-center ring-1 ring-white/10 min-w-[160px]">
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase border ${n.badgeBg} mb-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${n.colorPunto}"></span>
+              <span>${n.tipoLabel}</span>
+            </div>
+            <div class="flex items-center gap-1.5 mb-0.5">
+              <svg class="w-3 h-3 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L1 21h22L12 2zm0 4.5l6.5 11.5h-13L12 6.5z"/>
+              </svg>
+              <span class="text-[10px] tracking-wider font-black text-white uppercase">${n.nombre}</span>
+            </div>
+            <span class="text-[13px] font-mono font-black text-sky-300 leading-tight">${n.cota}</span>
+            <span class="text-[9px] text-slate-300 font-medium">${n.cordillera}</span>
           </div>
-          <div class="w-0.5 h-5 bg-gradient-to-b from-sky-300 to-transparent"></div>
-          <div class="w-2.5 h-2.5 rounded-full" style="background-color: ${n.colorPunto}; box-shadow: 0 0 10px ${n.colorPunto};"></div>
+          <!-- Pin vertical indicador conectado al punto de cumbre -->
+          <div class="w-[1.5px] h-7 bg-gradient-to-b from-sky-300 to-sky-400 shadow-[0_0_8px_#38bdf8]"></div>
+          <!-- Punto de anclaje de cumbre en pantalla -->
+          <div class="relative flex items-center justify-center">
+            <span class="absolute w-4 h-4 rounded-full border border-sky-300 animate-ping opacity-60"></span>
+            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${n.colorPunto}; box-shadow: 0 0 12px ${n.colorPunto};"></span>
+          </div>
         </div>
       `;
       containerEtiquetas.appendChild(el);
-      return { data: n, dom: el };
+      return { data: n, dom: el, beacon: beaconsMeshList[idx] };
     });
 
-    // 4. Textura de Roca Alpina y Estratos Metamórficos (Generador Procedural)
+    // 7. Textura Procedural de Roca Andina y Estrías Metamórficas
     function createAlpineTexture(): THREE.CanvasTexture {
       const texCanvas = document.createElement('canvas');
       texCanvas.width = 1024;
       texCanvas.height = 1024;
       const ctx = texCanvas.getContext('2d')!;
 
-      // Base mineral de roca andina (granito y esquisto pardo/gris)
+      // Base mineral de roca andina
       ctx.fillStyle = '#443e39';
       ctx.fillRect(0, 0, 1024, 1024);
 
-      // Estrías y canales de erosión vertical por donde desciende el deshielo
-      for (let i = 0; i < 18000; i++) {
+      // Estrías y canales de erosión vertical
+      for (let i = 0; i < 20000; i++) {
         const x = Math.random() * 1024;
         const y = Math.random() * 1024;
         const w = Math.random() * 2.5 + 1;
-        const h = Math.random() * 24 + 6;
+        const h = Math.random() * 26 + 6;
         ctx.fillStyle = Math.random() > 0.45 ? 'rgba(240,248,255,0.08)' : 'rgba(25,20,16,0.12)';
         ctx.fillRect(x, y, w, h);
       }
@@ -346,104 +556,79 @@
       const texture = new THREE.CanvasTexture(texCanvas);
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(16, 80);
+      texture.repeat.set(16, 90);
       return texture;
     }
 
     const alpineTexture = createAlpineTexture();
 
-    // 5. Generación del Relieve Andino Fotorrealista (Ridged Multifractal)
-    // Crestas afiladas, aristas, canales y cuencas glaciares profundas
-    const LONGITUD_TOTAL = 4800;
-    const ANCHO_CORREDOR = 720;
-    const SEG_X = 180;
-    const SEG_Z = 520;
-
+    // 8. Construcción de la Geometría del Terreno (Malla Continua)
     const terrainGeo = new THREE.PlaneGeometry(ANCHO_CORREDOR, LONGITUD_TOTAL, SEG_X, SEG_Z);
     terrainGeo.rotateX(-Math.PI / 2);
 
     const posAttr = terrainGeo.attributes.position;
 
-    // Función de ruido Ridged Multifractal para crestas afiladas reales (como en la foto de referencia)
-    function ridgedNoise(x: number, z: number): number {
-      // 1. Cresta base principal (valle central en X ≈ 40..60, montañas a izquierda y derecha)
-      const distEje = Math.abs(x - 50);
-      const factorMontana = Math.min(1.0, Math.pow(distEje / 60, 1.4));
-
-      // Armónicos de crestas afiladas (1.0 - abs(sin))
-      let r1 = 1.0 - Math.abs(Math.sin(x * 0.016 + z * 0.008));
-      let r2 = 1.0 - Math.abs(Math.sin(x * 0.035 - z * 0.018 + 0.7));
-      let r3 = 1.0 - Math.abs(Math.cos(x * 0.07 + z * 0.04));
-      let r4 = 1.0 - Math.abs(Math.sin(x * 0.14 - z * 0.09));
-
-      let aristas = Math.pow(r1, 1.8) * 38 + Math.pow(r2, 1.6) * 22 + r3 * 10 + r4 * 4;
-
-      let elevation = 18 + factorMontana * 58 + aristas;
-
-      // 2. Colosos emblemáticos del RAG con crestas piramidales imponentes
-      for (const n of NEVADOS_RAG) {
-        const dx = x - n.pos.x;
-        const dz = z - n.pos.z;
-        const distSq = dx * dx + dz * dz;
-        const radio = 85;
-        if (distSq < radio * radio) {
-          const t = 1.0 - Math.sqrt(distSq) / radio;
-          // Cresta afilada piramidal con acanalado glacial
-          const formaPico = Math.pow(t, 1.7) * (1.0 + 0.3 * Math.cos(Math.atan2(dz, dx) * 4));
-          elevation += formaPico * (n.pos.y - 48);
-        }
-      }
-
-      return Math.max(6, elevation);
-    }
-
     for (let i = 0; i < posAttr.count; i++) {
-      const x = posAttr.getX(i);
-      const z = posAttr.getZ(i);
-      posAttr.setY(i, ridgedNoise(x, z));
+      const localX = posAttr.getX(i);
+      const localZ = posAttr.getZ(i);
+      // En world space: terrainMesh está en Z = -LONGITUD_TOTAL / 2
+      const worldZ = localZ - LONGITUD_TOTAL / 2;
+      posAttr.setY(i, getTerrainElevation(localX, worldZ));
     }
 
-    // Calcular normales continuas de alta precisión
     terrainGeo.computeVertexNormals();
 
-    // 6. Coloración Basada en Pendiente (Roca expuesta en laderas vs Nieve en neveros y crestas)
+    // 9. Coloración de Nieve y Roca según Cota y Pendiente (Fotorrealismo)
     const normalAttr = terrainGeo.attributes.normal;
     const colors: number[] = [];
 
-    // Paleta fotorrealista exacta de la foto de referencia
     const cRocaOscura = new THREE.Color('#2d2621'); // Granito pardo/gris oscuro
     const cRocaMedia = new THREE.Color('#4a4038');  // Roca mineral cálida
     const cTaludGris = new THREE.Color('#6b635b');  // Talud de morrena
-    const cHieloAzulado = new THREE.Color('#94cbeb'); // Hielo glaciar
-    const cNievePura = new THREE.Color('#f8fafc');   // Nieve blanca brillante
+    const cHieloAzulado = new THREE.Color('#8dc8ea'); // Hielo glaciar
+    const cNievePura = new THREE.Color('#fcfdff');   // Nieve blanca brillante
 
     for (let i = 0; i < posAttr.count; i++) {
       const y = posAttr.getY(i);
-      const ny = normalAttr.getY(i); // Inclinación de la pendiente
+      const ny = normalAttr.getY(i);
 
       const col = new THREE.Color();
 
-      // En la foto de referencia:
-      // - Paredes verticales escarpadas (ny bajo): roca parda/gris oscura con grietas de nieve
-      // - Crestas, neveros y laderas suaves (ny alto): nieve blanca resplandeciente
-      if (ny < 0.52) {
-        // Paredes casi verticales: roca expuesta
-        col.copy(cRocaOscura).lerp(cRocaMedia, y / 140);
-      } else if (ny < 0.72) {
-        // Laderas intermedias: transición de roca con canales de nieve
-        const t = (ny - 0.52) / 0.20;
-        col.copy(cRocaMedia).lerp(cTaludGris, t);
-        if (y > 60) {
-          col.lerp(cHieloAzulado, (y - 60) / 80 * 0.4);
+      if (y < 42) {
+        // Fondo del valle y morrenas bajas: roca oscura y talud mineral
+        const t = Math.max(0, Math.min(1, (y - 12) / 30));
+        col.copy(cRocaOscura).lerp(cRocaMedia, t);
+        if (ny > 0.75) {
+          col.lerp(cTaludGris, 0.35);
+        }
+      } else if (y < 85) {
+        // Zona intermedia: roca con canales de deshielo y neveros
+        const tAlt = (y - 42) / 43;
+        if (ny < 0.45) {
+          col.copy(cRocaOscura).lerp(cRocaMedia, tAlt);
+        } else if (ny < 0.68) {
+          col.copy(cRocaMedia).lerp(cTaludGris, 0.7);
+        } else {
+          col.copy(cTaludGris).lerp(cHieloAzulado, tAlt * 0.8);
         }
       } else {
-        // Crestas, neveros y cumbres glaciadas: nieve blanca pura con brillo alpino
-        const t = (ny - 0.72) / 0.28;
-        col.copy(cHieloAzulado).lerp(cNievePura, Math.min(1.0, t * 1.3));
+        // Alta montaña y cumbres glaciares (Y >= 85)
+        const tCumbre = Math.min(1.0, (y - 85) / 50);
+        if (ny < 0.32) {
+          // Paredes verticales de roca expuesta
+          col.copy(cRocaMedia).lerp(cTaludGris, 0.4);
+        } else if (ny < 0.52) {
+          // Canales mixtos de roca y hielo azul
+          col.copy(cTaludGris).lerp(cHieloAzulado, tCumbre);
+        } else {
+          // Glaciares colosales, cornisas y cumbres: blanco resplandeciente
+          const tNieve = (ny - 0.52) / 0.48;
+          col.copy(cHieloAzulado).lerp(cNievePura, Math.min(1.0, tNieve * 1.25 + tCumbre * 0.35));
+        }
       }
 
       // Oclusión ambiental sutil en quebradas profundas
-      const ao = Math.min(1.0, Math.max(0.42, Math.pow(y / 65, 0.4)));
+      const ao = Math.min(1.0, Math.max(0.40, Math.pow(y / 60, 0.35)));
       col.multiplyScalar(ao);
 
       colors.push(col.r, col.g, col.b);
@@ -463,27 +648,35 @@
     terrainMesh.position.set(0, 0, -LONGITUD_TOTAL / 2);
     scene.add(terrainMesh);
 
-    // Malla gemela continua
-    const terrainMesh2 = terrainMesh.clone();
+    // Malla gemela continua para vuelo infinito
+    const terrainMesh2 = new THREE.Mesh(terrainGeo, terrainMat);
     terrainMesh2.position.set(0, 0, -LONGITUD_TOTAL / 2 - LONGITUD_TOTAL);
     scene.add(terrainMesh2);
 
-    // Espejo de agua de laguna glaciar en un circo intermedio (como en la foto de referencia)
-    const lagoGeo = new THREE.PlaneGeometry(160, 220);
-    lagoGeo.rotateX(-Math.PI / 2);
-    const lagoMat = new THREE.MeshStandardMaterial({
-      color: '#1b324d',
-      roughness: 0.15,
-      metalness: 0.85
-    });
-    const lagoMesh = new THREE.Mesh(lagoGeo, lagoMat);
-    lagoMesh.position.set(50, 19, -800);
-    scene.add(lagoMesh);
+    // Espejos de agua de lagunas glaciares en circos de morrena
+    function createGlacialLake(x: number, y: number, z: number, w: number, h: number) {
+      const lagoGeo = new THREE.PlaneGeometry(w, h);
+      lagoGeo.rotateX(-Math.PI / 2);
+      const lagoMat = new THREE.MeshStandardMaterial({
+        color: '#13405c',
+        roughness: 0.12,
+        metalness: 0.88
+      });
+      const lake = new THREE.Mesh(lagoGeo, lagoMat);
+      lake.position.set(x, y, z);
+      scene.add(lake);
+      return lake;
+    }
 
-    // 7. Cinemática de Vuelo Aéreo: 25% Cielo / 75% Nevados (Horizonte despejado)
-    const ALTURA_CRUCERO = 152; // Cota de crucero óptima
+    createGlacialLake(15, 17, -980, 140, 190);
+    createGlacialLake(-20, 17, -3200, 160, 220);
+    createGlacialLake(25, 17, -4750, 150, 200);
+
+    // 10. Cinemática de Vuelo Aéreo con Rumbo Diagonal y Ojo Vertical Dinámico
+    const ALTURA_CRUCERO = 148; // Cota de crucero base
     const VELOCIDAD_AVION = 42; // Unidades por segundo
     let posCamZ = 0;
+    let currentLookY = 104; // Altura de mirada dinámica inicial (lerp suave)
     const clock = new THREE.Clock();
 
     function resize() {
@@ -497,7 +690,7 @@
       }
     }
 
-    // 8. Ciclo de Animación a 60 FPS: Encuadre Panorámico (25% Cielo / 75% Cordillera)
+    // 11. Ciclo de Animación a 60 FPS con Seguimiento de Cumbres Altas
     function animate() {
       requestAnimationFrame(animate);
       resize();
@@ -505,57 +698,123 @@
       const delta = Math.min(clock.getDelta(), 0.1);
       posCamZ -= VELOCIDAD_AVION * delta;
 
-      // Trayectoria curva suave por el centro del valle
-      const curvePhase = posCamZ * 0.002;
-      const camX = 50 + Math.sin(curvePhase) * 28;
-      const camY = ALTURA_CRUCERO + Math.cos(curvePhase * 1.5) * 4;
+      // Trayectoria con rumbo diagonal hacia arriba y hacia la derecha (Rumbo 032° NNE)
+      const curvePhase = posCamZ * 0.0018;
+      // Posición de la aeronave con deriva lateral derecha para abrir campo respecto al cockpit izquierdo
+      const camX = 14 + Math.sin(curvePhase) * 16;
+      const camY = ALTURA_CRUCERO + Math.cos(curvePhase * 1.4) * 3.5;
       camera.position.set(camX, camY, posCamZ);
 
-      // El punto focal Y = 108 sitúa el horizonte exactamente en el 25% superior de la pantalla
-      // dejando 25% de cielo diurno abierto y 75% de relieve andino nevado majestuoso
-      const lookAheadX = camX + Math.cos(curvePhase) * 12;
-      const targetY = 108;
-      camera.lookAt(lookAheadX, targetY, posCamZ - 240);
+      // SEGUIMIENTO DINÁMICO DE MIRADA (OJO VERTICAL Y DIAGONAL):
+      // Si se aproxima un nevado prominente o coloso, elevamos la mirada para contemplar su cumbre
+      // con suficiente cielo arriba, y luego la mirada vuelve a descender al horizonte
+      let targetLookY = 104;
+      for (const item of etiquetasDOM) {
+        const n = item.data;
+        let aheadZ = (n.z - (posCamZ % LONGITUD_TOTAL)) % LONGITUD_TOTAL;
+        if (aheadZ > 0) aheadZ -= LONGITUD_TOTAL;
+        const distZ = -aheadZ;
 
-      // Alabeo aerodinámico natural (roll de avión en curvas)
-      camera.rotation.z = -Math.cos(curvePhase) * 0.045;
+        // Zona de aproximación visual (entre 70 y 480 unidades de distancia)
+        if (distZ > 70 && distZ < 480 && n.altura > 124) {
+          const excess = n.altura - 124;
+          // Curva gaussiana suave de aproximación y alejamiento
+          const bellCurve = Math.sin(((distZ - 70) / 410) * Math.PI);
+          const elevacionOjo = excess * 0.85 * bellCurve;
+          if (elevacionOjo > (targetLookY - 104)) {
+            targetLookY = 104 + elevacionOjo;
+          }
+        }
+      }
+
+      // Interpolación suave y orgánica de la mirada vertical (sin saltos bruscos)
+      currentLookY = THREE.MathUtils.lerp(currentLookY, targetLookY, delta * 2.8);
+
+      // Punto focal hacia adelante con vector diagonal hacia arriba a la derecha
+      const lookAheadX = camX + 16 + Math.cos(curvePhase) * 8;
+      camera.lookAt(lookAheadX, currentLookY, posCamZ - 260);
+
+      // Alabeo aerodinámico natural (roll de avión en curvas suaves)
+      camera.rotation.z = -Math.cos(curvePhase) * 0.035;
 
       // Mantener la esfera celeste acompañando la posición de la cámara
       skyMesh.position.set(camera.position.x, 0, camera.position.z);
 
-      // Reciclaje infinito
+      // Reciclaje infinito de vuelo
       if (posCamZ < -LONGITUD_TOTAL) {
         posCamZ += LONGITUD_TOTAL;
       }
 
-      // 9. Proyección Matemática y Visibilidad de Etiquetas
+      // 12. Proyección Matemática y Visibilidad de Etiquetas y Balizas
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
+      const cockpitCard = document.getElementById('hero-cockpit-card');
+      const cockpitRect = cockpitCard ? cockpitCard.getBoundingClientRect() : null;
+
+      let closestNevado: { nombre: string; cota: string; tipoLabel: string } | null = null;
+      let minDistance = Infinity;
 
       for (const item of etiquetasDOM) {
-        const peakPos = item.data.pos.clone();
-        const distZ = camera.position.z - peakPos.z;
+        const n = item.data;
 
-        if (distZ > 20 && distZ < 720) {
-          const proj = peakPos.clone().project(camera);
+        // Calcular posición en el ciclo relativa a la aeronave
+        let aheadZ = (n.z - (posCamZ % LONGITUD_TOTAL)) % LONGITUD_TOTAL;
+        if (aheadZ > 0) aheadZ -= LONGITUD_TOTAL;
+        const distZ = -aheadZ; // Distancia hacia adelante (positiva)
 
-          if (proj.z < 1.0 && proj.x >= -1.1 && proj.x <= 1.1 && proj.y >= -1.1 && proj.y <= 1.1) {
+        // Posición física exacta de la cumbre en el espacio 3D
+        const summitWorldPos = new THREE.Vector3(n.x, n.altura, posCamZ + aheadZ);
+
+        // Posicionar la baliza 3D exactamente en la cumbre
+        item.beacon.group.position.copy(summitWorldPos);
+        item.beacon.ring.rotation.z += 0.02;
+
+        // Rango de visibilidad óptimo (aproximación visual de 25 a 820 unidades)
+        if (distZ >= 25 && distZ <= 820) {
+          item.beacon.group.visible = true;
+
+          // Proyección matemática 3D -> 2D
+          const proj = summitWorldPos.clone().project(camera);
+
+          // Verificar si está dentro del frustum de la cámara
+          if (proj.z < 1.0 && proj.x >= -1.05 && proj.x <= 1.05 && proj.y >= -1.05 && proj.y <= 1.05) {
             const screenX = (proj.x * 0.5 + 0.5) * w;
             const screenY = (-proj.y * 0.5 + 0.5) * h;
 
-            if (screenX > 30 && screenX < w - 30 && screenY > 40 && screenY < h - 40) {
-              let opac = 1.0;
-              if (distZ > 480) {
-                opac = (720 - distZ) / 240;
-              } else if (distZ < 90) {
-                opac = (distZ - 20) / 70;
+            // Bounding box en pantalla
+            if (screenX > 25 && screenX < w - 25 && screenY > 30 && screenY < h - 25) {
+              
+              // Verificar si colisiona con la tarjeta de la consola cockpit en el lado izquierdo
+              let occludedByCockpit = false;
+              if (cockpitRect) {
+                if (
+                  screenX >= cockpitRect.left - 20 &&
+                  screenX <= cockpitRect.right + 20 &&
+                  screenY >= cockpitRect.top - 20 &&
+                  screenY <= cockpitRect.bottom + 20
+                ) {
+                  occludedByCockpit = true;
+                }
               }
 
-              item.dom.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) translate(-50%, -100%)`;
-              item.dom.style.opacity = String(Math.max(0, Math.min(1, opac)));
+              if (occludedByCockpit) {
+                item.dom.style.opacity = '0';
+              } else {
+                // Suavizado de opacidad por distancia de vuelo
+                let opac = 1.0;
+                if (distZ > 520) {
+                  opac = (820 - distZ) / 300;
+                } else if (distZ < 90) {
+                  opac = (distZ - 25) / 65;
+                }
 
-              if (distZ > 80 && distZ < 300 && hudTelemetria) {
-                hudTelemetria.textContent = `Aproximación: ${item.data.nombre} (${item.data.cota})`;
+                item.dom.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) translate(-50%, -100%)`;
+                item.dom.style.opacity = String(Math.max(0, Math.min(1, opac)));
+
+                if (distZ < minDistance && distZ > 60) {
+                  minDistance = distZ;
+                  closestNevado = n;
+                }
               }
             } else {
               item.dom.style.opacity = '0';
@@ -564,8 +823,13 @@
             item.dom.style.opacity = '0';
           }
         } else {
+          item.beacon.group.visible = false;
           item.dom.style.opacity = '0';
         }
+      }
+
+      if (closestNevado && hudTelemetria && minDistance < 420) {
+        hudTelemetria.textContent = `Aproximación: ${closestNevado.nombre} (${closestNevado.cota}) · ${closestNevado.tipoLabel}`;
       }
 
       renderer.render(scene, camera);
