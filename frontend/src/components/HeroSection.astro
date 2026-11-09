@@ -1,37 +1,37 @@
 ---
-import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 ---
 
-<section class="relative overflow-hidden border-b border-slate-200 bg-white py-12 lg:py-16">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+<section class="relative overflow-hidden border-b border-slate-200 bg-white py-8 lg:py-12 w-full">
+  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-center">
       
       <!-- Lado Izquierdo: Buscador y Mensaje Principal -->
-      <div class="lg:col-span-6 space-y-6">
-        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
+      <div class="lg:col-span-5 xl:col-span-5 space-y-6">
+        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-xs text-slate-600 shadow-sm">
           <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          <span class="font-medium text-slate-900">398 Informes oficiales</span>
+          <span class="font-semibold text-slate-900">398 Informes oficiales</span>
           <span>·</span>
           <span>Cada dato con su fuente</span>
         </div>
 
         <div class="space-y-3">
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15]">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-black tracking-tight text-slate-950 leading-[1.12]">
             ¿Hay riesgo de desborde donde vives?
           </h1>
-          <p class="text-base text-slate-600 leading-relaxed max-w-xl">
+          <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
             Escribe tu pueblo o una laguna: te mostramos qué hay aguas arriba, qué pasó antes y de qué documento técnico proviene cada evidencia.
           </p>
         </div>
 
-        <!-- Buscador con predictivo -->
-        <div class="relative max-w-lg">
+        <!-- Buscador interactivo -->
+        <div class="relative max-w-xl">
           <div class="relative flex items-center">
             <input 
               id="hero-search-input"
               type="text" 
               placeholder="Escribe tu pueblo, departamento o una laguna..." 
-              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 pl-11 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 pl-11 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition"
             />
             <svg class="absolute left-3.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -41,82 +41,178 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
           <!-- Sugerencias rápidas -->
           <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
             <span class="font-medium text-slate-400">O prueba con:</span>
-            <button type="button" class="btn-sugerencia rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 hover:bg-slate-100 transition">Huaraz</button>
-            <button type="button" class="btn-sugerencia rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 hover:bg-slate-100 transition">Parón</button>
-            <button type="button" class="btn-sugerencia rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 hover:bg-slate-100 transition">Cusco</button>
-            <button type="button" class="btn-sugerencia rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 hover:bg-slate-100 transition">Laguna 513</button>
+            <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-sm">Huaraz</button>
+            <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-sm">Parón</button>
+            <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-sm">Cusco</button>
+            <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-sm">Laguna 513</button>
           </div>
         </div>
       </div>
 
-      <!-- Lado Derecho: Simulación Esquemática Interactiva (Corte Transversal) -->
-      <div class="lg:col-span-6">
-        <div class="rounded-2xl border border-slate-800 bg-slate-950 p-5 shadow-xl text-white">
+      <!-- Lado Derecho: Visualizador SVG de 5 Escenas (Replica exacta de la cordillera) -->
+      <div class="lg:col-span-7 xl:col-span-7">
+        <div class="rounded-3xl border border-slate-900/40 bg-[#0c1322] shadow-2xl overflow-hidden flex flex-col text-white">
           
-          <!-- Pestañas de Lagunas Críticas -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-3 text-xs border-b border-slate-800">
-            {LAGUNAS_DESTACADAS.map((l, idx) => (
+          <!-- Barra superior: Selector de Lagunas -->
+          <div class="p-3.5 sm:p-4 bg-[#0c1322] border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {Object.values(LAGUNAS_ESCENAS).map((l, idx) => (
               <button 
                 type="button" 
-                class={`tab-laguna whitespace-nowrap rounded-lg px-3 py-1.5 font-medium transition ${idx === 0 ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'}`}
-                data-id={l.id}
-                data-nombre={l.nombre}
-                data-volumen={l.volumen_hm3}
-                data-altitud={l.altitud_msnm}
-                data-glaciar={l.glaciar_origen}
-                data-riesgo={l.riesgo}
-                data-ano={l.ano_evento_critico || 'N/A'}
+                class={`tab-laguna-escena whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold transition-all flex items-center gap-2 ${idx === 0 ? 'bg-white text-slate-950 shadow-md' : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                data-laguna-id={l.id}
               >
-                <span class={`inline-block h-1.5 w-1.5 rounded-full mr-1.5 ${l.riesgo === 'Muy alto' ? 'bg-rose-500' : 'bg-amber-400'}`}></span>
-                {l.nombre} {l.ano_evento_critico ? `· ${l.ano_evento_critico}` : ''}
+                <span class={`h-2 w-2 rounded-full ${l.id === '513' ? 'bg-emerald-500' : l.id === 'upiscocha' ? 'bg-amber-400' : 'bg-rose-500'}`}></span>
+                <span>{l.nombre} {l.anoEvento ? `· ${l.anoEvento}` : ''}</span>
               </button>
             ))}
           </div>
 
-          <!-- Lienzo Esquemático de la Montaña y Laguna (SVG Interactivo) -->
-          <div class="relative mt-4 h-56 w-full rounded-xl bg-slate-900/60 overflow-hidden flex items-center justify-center border border-slate-800/80">
-            <svg id="esquema-corte" class="h-full w-full" viewBox="0 0 500 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Fondo cielo de alta montaña -->
-              <rect width="500" height="240" fill="#090d16" />
+          <!-- Lienzo SVG de la Cordillera (Escenas 1 a 5) -->
+          <div class="relative h-64 sm:h-72 md:h-80 w-full bg-[#101b33] overflow-hidden flex items-center justify-center">
+            
+            <svg id="svg-cordillera" class="h-full w-full" viewBox="0 0 600 320" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <!-- Gradientes de Montañas e Iluminación -->
+                <linearGradient id="grad-cielo" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0c1322" />
+                  <stop offset="100%" stop-color="#16233f" />
+                </linearGradient>
 
-              <!-- Montaña y Glaciar colgante (Fondo) -->
-              <path d="M 0,240 L 90,80 L 160,130 L 260,30 L 360,140 L 440,90 L 500,240 Z" fill="#131c2e" />
-              <!-- Casquete de Nieve y Hielo -->
-              <path d="M 90,80 L 115,100 L 140,85 L 160,130 L 210,75 L 260,30 L 310,85 L 360,140 L 400,110 L 440,90 L 470,120 L 500,105 L 500,240 L 0,240 Z" fill="#1e293b" opacity="0.4" />
-              <path d="M 230,45 L 260,30 L 290,55 L 260,65 Z" fill="#f8fafc" />
-              <path d="M 75,95 L 90,80 L 110,95 Z" fill="#e2e8f0" />
+                <linearGradient id="grad-pico" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2a3f6f" />
+                  <stop offset="100%" stop-color="#141e33" />
+                </linearGradient>
 
-              <!-- Morrena y vaso de la laguna -->
-              <path d="M 120,240 Q 180,180 230,180 Q 300,180 370,240 Z" fill="#0f172a" />
-              
-              <!-- Agua de la laguna (dinámica con animación de oleaje sutil) -->
-              <ellipse id="esquema-agua" cx="250" cy="190" rx="90" ry="25" fill="#0284c7" opacity="0.85">
-                <animate attributeName="ry" values="24;26;24" dur="4s" repeatCount="indefinite" />
+                <linearGradient id="grad-sombra" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#1e2c4d" />
+                  <stop offset="100%" stop-color="#141e33" />
+                </linearGradient>
+
+                <!-- Agua del Lago -->
+                <linearGradient id="grad-agua" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#0284c7" />
+                </linearGradient>
+              </defs>
+
+              <!-- Fondo cielo -->
+              <rect width="600" height="320" fill="url(#grad-cielo)" />
+
+              <!-- Cordilleras de fondo (siluetas estilizadas) -->
+              <polygon points="0,320 80,160 160,260 250,140 340,270 450,120 540,240 600,170 600,320" fill="#131e36" />
+              <polygon points="0,320 120,180 220,290 380,150 500,280 600,200 600,320" fill="#182746" opacity="0.8" />
+
+              <!-- Montaña Principal Central (Hualcán / Palcaraju / Huandoy) -->
+              <!-- Cara iluminada izquierda -->
+              <polygon points="300,30 110,320 300,320" fill="url(#grad-pico)" />
+              <!-- Cara con sombra derecha -->
+              <polygon points="300,30 300,320 490,320" fill="url(#grad-sombra)" />
+
+              <!-- Casquete Glaciar de Nieve (Pico Blanco) -->
+              <g id="casquete-hielo">
+                <path d="M 300,30 L 235,115 L 260,110 L 280,125 L 300,115 L 320,128 L 345,110 L 365,118 Z" fill="#ffffff" />
+                <!-- Sombra sutil del casquete -->
+                <path d="M 300,30 L 300,115 L 320,128 L 345,110 L 365,118 Z" fill="#e2e8f0" opacity="0.85" />
+              </g>
+
+              <!-- Valle y Vaso Glaciar -->
+              <path d="M 170,320 Q 300,210 430,320 Z" fill="#0f172a" />
+
+              <!-- Morrena frontal (arco dorado/marrón) -->
+              <path id="svg-morrena" d="M 210,245 Q 300,275 390,245" fill="none" stroke="#d97706" stroke-width="7" stroke-linecap="round" />
+
+              <!-- Espejo de Agua de la Laguna -->
+              <ellipse id="svg-lago" cx="300" cy="242" rx="75" ry="20" fill="url(#grad-agua)" opacity="0.95">
+                <animate attributeName="ry" values="19;21;19" dur="3s" repeatCount="indefinite" />
               </ellipse>
 
-              <!-- Etiquetas técnicas dentro del esquema -->
-              <text id="txt-glaciar" x="260" y="25" fill="#94a3b8" font-size="10" font-family="sans-serif" text-anchor="middle" font-weight="600">Palcaraju (Glaciar de cabecera)</text>
-              <rect x="180" y="178" width="140" height="22" rx="4" fill="#0284c7" fill-opacity="0.9" />
-              <text id="txt-laguna" x="250" y="193" fill="#ffffff" font-size="11" font-family="sans-serif" text-anchor="middle" font-weight="700">Laguna Palcacocha</text>
-            </svg>
+              <!-- Ola de aluvión (visible solo en Escena 3: el día que pasó) -->
+              <g id="svg-aluvion-ola" class="hidden">
+                <path d="M 270,240 Q 300,225 330,240 Q 300,250 270,240" fill="#38bdf8" opacity="0.8">
+                  <animate attributeName="d" values="M 270,240 Q 300,225 330,240 Q 300,250 270,240; M 250,238 Q 300,215 350,238 Q 300,255 250,238; M 270,240 Q 300,225 330,240 Q 300,250 270,240" dur="1.2s" repeatCount="indefinite" />
+                </path>
+                <circle cx="300" cy="235" r="4" fill="#ffffff" opacity="0.9">
+                  <animate attributeName="r" values="3;7;3" dur="1s" repeatCount="indefinite" />
+                </circle>
+              </g>
 
-            <!-- Indicador en vivo de volumen y altitud -->
-            <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs bg-slate-900/90 backdrop-blur-sm px-3.5 py-2 rounded-lg border border-slate-700/60">
-              <div class="flex items-center gap-3">
-                <span class="text-slate-400">Volumen:</span>
-                <span id="stat-volumen" class="font-bold text-sky-400">17.3 millones de m³</span>
-                <span class="text-slate-600">|</span>
-                <span class="text-slate-400">Altitud:</span>
-                <span id="stat-altitud" class="font-medium text-slate-200">4,566 msnm</span>
-              </div>
-              <a href="#comparar" class="text-sky-400 hover:text-sky-300 font-medium text-[11px] underline underline-offset-2">Ficha completa →</a>
-            </div>
+              <!-- Dique / Obra de Seguridad (visible en Escena 5 cuando hay obra) -->
+              <g id="svg-dique-obra" class="hidden">
+                <rect x="282" y="258" width="36" height="10" rx="3" fill="#10b981" />
+                <line x1="290" y1="263" x2="310" y2="263" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+              </g>
+
+              <!-- Etiquetas flotantes estilizadas -->
+              <!-- Pastilla Pico de la Montaña -->
+              <g id="badge-pico" transform="translate(370, 35)">
+                <rect x="0" y="0" width="105" height="34" rx="17" fill="#ffffff" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.4))" />
+                <text id="lbl-nombre-pico" x="52" y="21" fill="#0f172a" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">Hualcán</text>
+              </g>
+
+              <!-- Pastilla Nombre de la Laguna -->
+              <g id="badge-laguna" transform="translate(155, 185)">
+                <rect x="0" y="0" width="135" height="36" rx="18" fill="#0284c7" fill-opacity="0.85" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.3))" />
+                <text id="lbl-nombre-laguna" x="67" y="22" fill="#ffffff" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">Laguna 513</text>
+              </g>
+            </svg>
           </div>
 
-          <!-- Controles de navegación de la muestra -->
-          <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
-            <span class="text-[11px] text-slate-500">Haz clic en cada laguna para ver su vaso y nivel de riesgo</span>
-            <span id="stat-riesgo-badge" class="rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[11px] font-semibold border border-rose-500/30">Riesgo: Muy alto</span>
+          <!-- Panel de Narrativa: 5 Escenas con Barra de Progreso y Controles -->
+          <div class="p-5 sm:p-6 bg-[#0f172a] border-t border-slate-800 space-y-4">
+            
+            <!-- Barra de progreso segmentada de 5 escenas -->
+            <div class="grid grid-cols-5 gap-2">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button 
+                  type="button" 
+                  class="btn-escena-seg h-1.5 rounded-full transition-all bg-slate-700 hover:bg-slate-500"
+                  data-escena-index={n}
+                  title={`Ir a Escena ${n}`}
+                ></button>
+              ))}
+            </div>
+
+            <!-- Subtítulo de la escena: ej. "513, Áncash. Escena 1 de 5: el hielo" -->
+            <div class="flex items-center justify-between text-xs font-semibold text-sky-400">
+              <span id="txt-escena-subtitulo">513, Áncash. Escena 1 de 5: el hielo</span>
+              <span id="txt-escena-alerta" class="hidden text-amber-400 font-medium">○ Pieza que falta en los documentos</span>
+            </div>
+
+            <!-- Texto descriptivo de la escena -->
+            <p id="txt-escena-cuerpo" class="text-sm sm:text-base font-bold text-slate-100 leading-snug min-h-[48px]">
+              El deshielo de Hualcán alimenta la laguna 513. En todo el Perú ya se perdió el 52 % del hielo (1962-2016).
+            </p>
+
+            <!-- Pie de la escena: Fuente + Controles [ ◀ ] [ || ] [ ▶ ] + [ Ver ficha ] -->
+            <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-t border-slate-800/80">
+              <span id="txt-escena-fuente" class="text-slate-400 font-medium">Fuente: INAIGEM 2017 · p. 9</span>
+
+              <div class="flex items-center gap-2">
+                <!-- Controles de reproducción -->
+                <div class="flex items-center gap-1 bg-slate-800/80 rounded-lg p-0.5 border border-slate-700/60">
+                  <button id="ctrl-prev" type="button" class="p-1.5 text-slate-300 hover:text-white rounded hover:bg-slate-700 transition" title="Escena anterior">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <button id="ctrl-playpause" type="button" class="p-1.5 text-slate-300 hover:text-white rounded hover:bg-slate-700 transition" title="Pausar / Reproducir">
+                    <svg id="icon-pause" class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+                    <svg id="icon-play" class="h-3.5 w-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                  <button id="ctrl-next" type="button" class="p-1.5 text-slate-300 hover:text-white rounded hover:bg-slate-700 transition" title="Escena siguiente">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+
+                <!-- Botón Ver Ficha -->
+                <a 
+                  id="btn-ver-ficha"
+                  href="#comparar" 
+                  class="whitespace-nowrap rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 px-3.5 py-1.5 font-bold text-xs transition shadow-sm"
+                >
+                  Ver ficha de 513
+                </a>
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -127,43 +223,175 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
 </section>
 
 <script>
-  // Interactividad de pestañas en el Hero
-  const tabs = document.querySelectorAll('.tab-laguna');
-  const txtGlaciar = document.getElementById('txt-glaciar');
-  const txtLaguna = document.getElementById('txt-laguna');
-  const statVolumen = document.getElementById('stat-volumen');
-  const statAltitud = document.getElementById('stat-altitud');
-  const statRiesgo = document.getElementById('stat-riesgo-badge');
+  import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => {
-        t.classList.remove('bg-slate-800', 'text-white', 'shadow-sm');
-        t.classList.add('text-slate-400');
-      });
-      tab.classList.add('bg-slate-800', 'text-white', 'shadow-sm');
-      tab.classList.remove('text-slate-400');
+  let lagunaActivaId = "513";
+  let escenaActual = 1; // 1 a 5
+  let timerAutoPlay: any = null;
+  let isPlaying = true;
 
-      const nombre = tab.getAttribute('data-nombre') || '';
-      const glaciar = tab.getAttribute('data-glaciar') || '';
-      const volumen = tab.getAttribute('data-volumen') || '';
-      const altitud = tab.getAttribute('data-altitud') || '';
-      const riesgo = tab.getAttribute('data-riesgo') || '';
+  // Elementos DOM
+  const tabsLaguna = document.querySelectorAll('.tab-laguna-escena');
+  const segmentos = document.querySelectorAll('.btn-escena-seg');
+  const txtSubtitulo = document.getElementById('txt-escena-subtitulo');
+  const txtAlerta = document.getElementById('txt-escena-alerta');
+  const txtCuerpo = document.getElementById('txt-escena-cuerpo');
+  const txtFuente = document.getElementById('txt-escena-fuente');
+  const btnFicha = document.getElementById('btn-ver-ficha');
+  
+  // Elementos SVG
+  const lblPico = document.getElementById('lbl-nombre-pico');
+  const lblLaguna = document.getElementById('lbl-nombre-laguna');
+  const svgLago = document.getElementById('svg-lago');
+  const svgAluvion = document.getElementById('svg-aluvion-ola');
+  const svgDique = document.getElementById('svg-dique-obra');
 
-      if (txtLaguna) txtLaguna.textContent = `Laguna ${nombre}`;
-      if (txtGlaciar) txtGlaciar.textContent = `${glaciar} (Glaciar de cabecera)`;
-      if (statVolumen) statVolumen.textContent = `${volumen} millones de m³`;
-      if (statAltitud) statAltitud.textContent = `${altitud} msnm`;
-      if (statRiesgo) {
-        statRiesgo.textContent = `Riesgo: ${riesgo}`;
-        statRiesgo.className = riesgo === 'Muy alto' 
-          ? 'rounded bg-rose-500/20 text-rose-300 px-2 py-0.5 text-[11px] font-semibold border border-rose-500/30'
-          : 'rounded bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[11px] font-semibold border border-amber-500/30';
+  // Controles
+  const btnPrev = document.getElementById('ctrl-prev');
+  const btnNext = document.getElementById('ctrl-next');
+  const btnPlayPause = document.getElementById('ctrl-playpause');
+  const iconPause = document.getElementById('icon-pause');
+  const iconPlay = document.getElementById('icon-play');
+
+  function renderizarEscena() {
+    const dataLaguna = LAGUNAS_ESCENAS[lagunaActivaId] || LAGUNAS_ESCENAS["513"];
+    const escena = dataLaguna.escenas.find(e => e.numero === escenaActual) || dataLaguna.escenas[0];
+
+    // 1. Textos
+    if (txtSubtitulo) {
+      txtSubtitulo.textContent = `${dataLaguna.nombre}, ${dataLaguna.departamento}. Escena ${escena.numero} de 5: ${escena.tituloFase}`;
+    }
+    if (txtCuerpo) txtCuerpo.textContent = escena.texto;
+    if (txtFuente) txtFuente.textContent = escena.fuente;
+    if (btnFicha) {
+      btnFicha.textContent = `Ver ficha de ${dataLaguna.nombre}`;
+      btnFicha.setAttribute('href', `#comparar`);
+    }
+
+    // Alerta de pieza faltante (Escena 4)
+    if (txtAlerta) {
+      if (escena.alertaFalta) {
+        txtAlerta.textContent = `○ ${escena.alertaFalta}`;
+        txtAlerta.classList.remove('hidden');
+      } else {
+        txtAlerta.classList.add('hidden');
       }
+    }
+
+    // 2. Barra de progreso de 5 segmentos
+    segmentos.forEach((seg, idx) => {
+      const segNum = idx + 1;
+      seg.classList.remove('bg-white', 'bg-slate-700', 'bg-slate-400');
+      if (segNum < escenaActual) {
+        seg.classList.add('bg-slate-400');
+      } else if (segNum === escenaActual) {
+        seg.classList.add('bg-white');
+      } else {
+        seg.classList.add('bg-slate-700');
+      }
+    });
+
+    // 3. Etiquetas SVG
+    if (lblPico) lblPico.textContent = dataLaguna.glaciarCabecera;
+    if (lblLaguna) lblLaguna.textContent = `Laguna ${dataLaguna.nombre}`;
+
+    // 4. Parámetros dinámicos del SVG
+    if (svgLago) {
+      svgLago.setAttribute('rx', String(escena.svgVisual.aguaRx));
+      svgLago.setAttribute('ry', String(escena.svgVisual.aguaRy));
+    }
+
+    // 5. Visuales condicionales (Ola de aluvión y Dique)
+    if (svgAluvion) {
+      if (escena.svgVisual.tieneOla) {
+        svgAluvion.classList.remove('hidden');
+      } else {
+        svgAluvion.classList.add('hidden');
+      }
+    }
+
+    if (svgDique) {
+      if (escena.svgVisual.tieneDique) {
+        svgDique.classList.remove('hidden');
+      } else {
+        svgDique.classList.add('hidden');
+      }
+    }
+  }
+
+  function avanzarEscena() {
+    escenaActual = escenaActual < 5 ? escenaActual + 1 : 1;
+    renderizarEscena();
+  }
+
+  function retrocederEscena() {
+    escenaActual = escenaActual > 1 ? escenaActual - 1 : 5;
+    renderizarEscena();
+  }
+
+  function reiniciarAutoPlay() {
+    if (timerAutoPlay) clearInterval(timerAutoPlay);
+    if (isPlaying) {
+      timerAutoPlay = setInterval(avanzarEscena, 4500);
+    }
+  }
+
+  // Event Listeners: Pestañas de Lagunas
+  tabsLaguna.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement;
+      tabsLaguna.forEach(t => {
+        t.classList.remove('bg-white', 'text-slate-950', 'shadow-md');
+        t.classList.add('bg-slate-900/80', 'text-slate-400');
+      });
+      target.classList.add('bg-white', 'text-slate-950', 'shadow-md');
+      target.classList.remove('bg-slate-900/80', 'text-slate-400');
+
+      lagunaActivaId = target.getAttribute('data-laguna-id') || "513";
+      escenaActual = 1;
+      renderizarEscena();
+      reiniciarAutoPlay();
     });
   });
 
-  // Buscador predictivo rápido
+  // Event Listeners: Clic directo en segmentos de progreso
+  segmentos.forEach((seg, idx) => {
+    seg.addEventListener('click', () => {
+      escenaActual = idx + 1;
+      renderizarEscena();
+      reiniciarAutoPlay();
+    });
+  });
+
+  // Controles
+  btnPrev?.addEventListener('click', () => {
+    retrocederEscena();
+    reiniciarAutoPlay();
+  });
+
+  btnNext?.addEventListener('click', () => {
+    avanzarEscena();
+    reiniciarAutoPlay();
+  });
+
+  btnPlayPause?.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      iconPause?.classList.remove('hidden');
+      iconPlay?.classList.add('hidden');
+      reiniciarAutoPlay();
+    } else {
+      iconPause?.classList.add('hidden');
+      iconPlay?.classList.remove('hidden');
+      if (timerAutoPlay) clearInterval(timerAutoPlay);
+    }
+  });
+
+  // Inicializar primera escena y autoplay
+  renderizarEscena();
+  reiniciarAutoPlay();
+
+  // Buscador sugerencias
   const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
   const sugerencias = document.querySelectorAll('.btn-sugerencia');
   sugerencias.forEach(btn => {
