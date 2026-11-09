@@ -15,7 +15,7 @@ export const SITE_CONFIG = {
   domain: "brainglaciares.pages.dev",
   fallbackDomain: "brainglaciaresunmsm.pages.dev",
   // Si no hay variable de entorno, apunta al túnel de producción de Cloudflare
-  apiBaseUrl: import.meta.env.PUBLIC_API_URL || "https://boring-dns-degree-quarterly.trycloudflare.com",
+  apiBaseUrl: import.meta.env.PUBLIC_API_URL || "https://literacy-enjoyed-basin-priorities.trycloudflare.com",
 
   // Navegación principal (Sobria e institucional)
   navigation: [

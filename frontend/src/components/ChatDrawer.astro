@@ -202,17 +202,51 @@ import { SITE_CONFIG } from '../config/site.config';
                   pasosTexto.textContent = `Ejecutando herramienta: ${data.herramienta || 'Búsqueda semántica'}`;
                 } else if (data.tipo === 'final') {
                   const r = data.resultado;
-                  aiBubble.innerHTML = r.respuesta.replace(/\n/g, '<br/>');
                   
-                  // Mostrar fuentes
-                  if (r.citas && r.citas.length > 0 && listaFuentes && panelFuentes) {
+                  // Formatear Markdown: negritas, itálicas, viñetas y citas interactivas
+                  let html = r.respuesta
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="italic text-slate-700">$1</em>')
+                    .replace(/\[(\d+)\]/g, '<button type="button" class="btn-cita-pill inline-flex items-center justify-center font-bold text-[10px] bg-sky-100 text-sky-800 rounded px-1.5 py-0.5 mx-0.5 hover:bg-sky-200 transition" data-cita="$1">[$1]</button>')
+                    .split('\n')
+                    .map((l: string) => l.trim().startsWith('- ') 
+                      ? `<div class="flex items-start gap-2 my-1"><span class="h-1.5 w-1.5 rounded-full bg-slate-400 mt-1.5 flex-shrink-0"></span><span>${l.substring(2)}</span></div>` 
+                      : (l ? `<p class="my-1">${l}</p>` : ''))
+                    .join('');
+
+                  aiBubble.innerHTML = html;
+                  
+                  // Mostrar fuentes detalladas
+                  if (r.fuentes && r.fuentes.length > 0 && listaFuentes && panelFuentes) {
                     listaFuentes.innerHTML = '';
-                    r.citas.forEach((c: any) => {
+                    r.fuentes.forEach((f: any) => {
                       const li = document.createElement('li');
-                      li.innerHTML = `<strong>[${c.numero}]</strong> ${c.doc} (página ${c.pag})`;
+                      li.id = `fuente-item-${f.n}`;
+                      li.className = 'p-1.5 rounded hover:bg-slate-200/60 transition flex flex-col gap-0.5 border-b border-slate-200/50 last:border-none';
+                      li.innerHTML = `
+                        <div class="flex items-center gap-1.5">
+                          <span class="rounded bg-sky-600 text-white font-bold text-[9px] px-1 py-0.2">[${f.n}]</span>
+                          <span class="font-semibold text-slate-800">${f.referencia || f.documento || 'Documento oficial'}</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 italic pl-4">"${f.evidencia ? f.evidencia.slice(0, 160) + '...' : (f.texto || '')}"</p>
+                      `;
                       listaFuentes.appendChild(li);
                     });
                     panelFuentes.classList.remove('hidden');
+
+                    // Evento al hacer clic en una cita [n]: resalta la fuente en el panel inferior
+                    aiBubble.querySelectorAll('.btn-cita-pill').forEach(btn => {
+                      btn.addEventListener('click', (e) => {
+                        const num = (e.currentTarget as HTMLElement).getAttribute('data-cita');
+                        const target = document.getElementById(`fuente-item-${num}`);
+                        if (target && panelFuentes) {
+                          panelFuentes.classList.remove('hidden');
+                          target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                          target.classList.add('bg-amber-100');
+                          setTimeout(() => target.classList.remove('bg-amber-100'), 2000);
+                        }
+                      });
+                    });
                   }
                 }
               } catch {}
