@@ -1,0 +1,290 @@
+---
+import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+---
+
+<section id="comparar" class="border-b border-slate-200 bg-slate-50/50 py-14">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    
+    <!-- Encabezado de la sección -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900">Compara y descubre</h2>
+      <p class="text-sm text-slate-500 mt-1">Pon una laguna contra otra, combina datos del inventario y analiza sus relaciones en el grafo</p>
+    </div>
+
+    <!-- Barra de selección de Lagunas -->
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lagunas a comparar:</span>
+          
+          <select id="comp-l1" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 shadow-sm">
+            {LAGUNAS_DESTACADAS.map(l => (
+              <option value={l.id} selected={l.id === 'palcacocha'}>
+                {l.nombre} · {l.departamento}
+              </option>
+            ))}
+          </select>
+
+          <span class="text-xs font-semibold text-slate-400">vs</span>
+
+          <select id="comp-l2" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 shadow-sm">
+            {LAGUNAS_DESTACADAS.map(l => (
+              <option value={l.id} selected={l.id === 'paron'}>
+                {l.nombre} · {l.departamento}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <!-- Botón para detonar explicación analítica -->
+        <button 
+          id="btn-explicar-diferencia"
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+        >
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Explícame la diferencia técnica</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Comparativa de Barras de Métricas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      
+      <!-- Panel de Atributos Físicos y Amenaza -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+          <span>Atributos de Riesgo y Capacidad</span>
+          <span class="text-xs font-normal text-slate-400">Datos verificados en Neo4j</span>
+        </h3>
+
+        <!-- Métrica 1: Nivel de Riesgo -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-medium">
+            <span class="text-slate-600">Nivel de riesgo de desborde</span>
+            <span id="txt-comp-riesgo" class="font-bold text-slate-900">Ambas en riesgo Muy Alto</span>
+          </div>
+          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
+            <div id="bar-riesgo-l1" class="h-full bg-rose-600 w-1/2"></div>
+            <div id="bar-riesgo-l2" class="h-full bg-rose-500 w-1/2"></div>
+          </div>
+        </div>
+
+        <!-- Métrica 2: Poblados amenazados aguas abajo -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-medium">
+            <span class="text-slate-600">Poblados amenazados aguas abajo</span>
+            <span id="txt-comp-poblados" class="font-bold text-slate-900">1 pueblo vs 3 pueblos</span>
+          </div>
+          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
+            <div id="bar-pob-l1" class="h-full bg-sky-600 w-[25%]" title="Huaraz (1)"></div>
+            <div id="bar-pob-l2" class="h-full bg-cyan-500 w-[75%]" title="Caraz, Pueblo Libre, Huaylas (3)"></div>
+          </div>
+        </div>
+
+        <!-- Métrica 3: Volumen almacenado -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-medium">
+            <span class="text-slate-600">Volumen de agua almacenada</span>
+            <span id="txt-comp-vol" class="font-bold text-slate-900">17.3 hm³ vs 55.0 hm³</span>
+          </div>
+          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
+            <div id="bar-vol-l1" class="h-full bg-indigo-600 w-[31%]"></div>
+            <div id="bar-vol-l2" class="h-full bg-blue-500 w-[100%]"></div>
+          </div>
+        </div>
+
+        <!-- Obras de seguridad y mitigación -->
+        <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <span id="label-l1" class="font-bold text-slate-900 block">Palcacocha:</span>
+            <span id="obras-l1" class="text-slate-500">Sifones y dique de seguridad</span>
+          </div>
+          <div>
+            <span id="label-l2" class="font-bold text-slate-900 block">Parón:</span>
+            <span id="obras-l2" class="text-slate-500">Túnel de desagüe artificial</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Línea de Tiempo de Estudios Acumulados -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            ¿Cuál se ha estudiado más, y desde cuándo?
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">
+            Curva de estudios acumulados en el corpus institucional (1966–2026)
+          </p>
+
+          <!-- Gráfico de curvas de estudios en SVG -->
+          <div class="mt-6 h-40 w-full relative">
+            <svg class="h-full w-full" viewBox="0 0 400 120" preserveAspectRatio="none">
+              <!-- Rejilla horizontal -->
+              <line x1="0" y1="20" x2="400" y2="20" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="100" x2="400" y2="100" stroke="#f1f5f9" stroke-width="1" />
+
+              <!-- Curva Laguna 1 (Palcacocha: 68 docs desde 1972) -->
+              <path 
+                d="M 0,110 L 60,110 L 100,105 L 180,90 L 260,65 L 340,35 L 400,15" 
+                fill="none" 
+                stroke="#0284c7" 
+                stroke-width="2.5" 
+                stroke-linecap="round"
+              />
+
+              <!-- Curva Laguna 2 (Parón: 33 docs desde 1966) -->
+              <path 
+                d="M 0,110 L 20,108 L 80,100 L 160,88 L 240,75 L 320,60 L 400,45" 
+                fill="none" 
+                stroke="#d97706" 
+                stroke-width="2.5" 
+                stroke-linecap="round"
+                stroke-dasharray="4 2"
+              />
+            </svg>
+
+            <!-- Leyenda de años en el eje X -->
+            <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
+              <span>1965</span>
+              <span>1985</span>
+              <span>2005</span>
+              <span>2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-2 w-2 rounded-full bg-sky-600"></span>
+            <span id="curva-txt-l1" class="text-slate-700 font-medium">Palcacocha: 68 docs (desde 1972)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-2 w-2 rounded-full bg-amber-600"></span>
+            <span id="curva-txt-l2" class="text-slate-700 font-medium">Parón: 33 docs (desde 1966)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Red de relaciones: Lo que las une y lo que las separa -->
+    <div class="rounded-xl border border-slate-200 bg-slate-950 p-6 text-white shadow-md">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+        <div>
+          <h3 class="text-sm font-bold text-slate-100 tracking-tight">Lo que las une y lo que las separa</h3>
+          <p class="text-xs text-slate-400">Subgrafo de entidades compartidas vs entidades disjuntas</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Compartido</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Propio Laguna 1</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-400"></span> Propio Laguna 2</span>
+        </div>
+      </div>
+
+      <!-- Lienzo visual de nodos interactivos en SVG -->
+      <div class="my-6 h-64 w-full flex items-center justify-center relative">
+        <svg class="h-full w-full max-w-2xl" viewBox="0 0 600 240" fill="none">
+          <!-- Conexiones -->
+          <!-- L1 a compartidos -->
+          <line x1="160" y1="120" x2="300" y2="50" stroke="#334155" stroke-width="1.5" />
+          <line x1="160" y1="120" x2="300" y2="120" stroke="#334155" stroke-width="1.5" />
+          <line x1="160" y1="120" x2="300" y2="190" stroke="#334155" stroke-width="1.5" />
+
+          <!-- L2 a compartidos -->
+          <line x1="440" y1="120" x2="300" y2="50" stroke="#334155" stroke-width="1.5" />
+          <line x1="440" y1="120" x2="300" y2="120" stroke="#334155" stroke-width="1.5" />
+          <line x1="440" y1="120" x2="300" y2="190" stroke="#334155" stroke-width="1.5" />
+
+          <!-- Propios de L1 -->
+          <line x1="160" y1="120" x2="70" y2="70" stroke="#1e293b" stroke-width="1.5" />
+          <line x1="160" y1="120" x2="60" y2="170" stroke="#1e293b" stroke-width="1.5" />
+
+          <!-- Propios de L2 -->
+          <line x1="440" y1="120" x2="530" y2="70" stroke="#1e293b" stroke-width="1.5" />
+          <line x1="440" y1="120" x2="540" y2="170" stroke="#1e293b" stroke-width="1.5" />
+
+          <!-- Nodos Propios L1 -->
+          <circle cx="70" cy="70" r="22" fill="#0369a1" />
+          <text x="70" y="73" fill="#ffffff" font-size="9" text-anchor="middle" font-family="sans-serif">Huaraz</text>
+
+          <circle cx="60" cy="170" r="24" fill="#0369a1" />
+          <text x="60" y="173" fill="#ffffff" font-size="8" text-anchor="middle" font-family="sans-serif">Palcaraju</text>
+
+          <!-- Nodos Propios L2 -->
+          <circle cx="530" cy="70" r="22" fill="#b45309" />
+          <text x="530" y="73" fill="#ffffff" font-size="9" text-anchor="middle" font-family="sans-serif">Caraz</text>
+
+          <circle cx="540" cy="170" r="24" fill="#b45309" />
+          <text x="540" y="173" fill="#ffffff" font-size="8" text-anchor="middle" font-family="sans-serif">Huandoy</text>
+
+          <!-- Nodo Principal Laguna 1 -->
+          <circle cx="160" cy="120" r="32" fill="#0284c7" stroke="#38bdf8" stroke-width="2" />
+          <text id="node-l1" x="160" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">Palcacocha</text>
+
+          <!-- Nodo Principal Laguna 2 -->
+          <circle cx="440" cy="120" r="32" fill="#d97706" stroke="#fbbf24" stroke-width="2" />
+          <text id="node-l2" x="440" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">Parón</text>
+
+          <!-- Nodos Compartidos (En el Centro) -->
+          <circle cx="300" cy="50" r="20" fill="#047857" />
+          <text x="300" y="53" fill="#ffffff" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">Áncash</text>
+
+          <circle cx="300" cy="120" r="22" fill="#047857" />
+          <text x="300" y="123" fill="#ffffff" font-size="8" font-weight="600" text-anchor="middle" font-family="sans-serif">C. Blanca</text>
+
+          <circle cx="300" cy="190" r="20" fill="#047857" />
+          <text x="300" y="193" fill="#ffffff" font-size="8" font-weight="600" text-anchor="middle" font-family="sans-serif">Muy Alto</text>
+        </svg>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+        <span>Comparten 3 entidades: Departamento (Áncash), Cordillera (Blanca) y Nivel de Riesgo (Muy alto).</span>
+        <span class="text-slate-500">Generado a partir de tripletas curadas</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  const compL1 = document.getElementById('comp-l1') as HTMLSelectElement | null;
+  const compL2 = document.getElementById('comp-l2') as HTMLSelectElement | null;
+  const nodeL1 = document.getElementById('node-l1');
+  const nodeL2 = document.getElementById('node-l2');
+  const labelL1 = document.getElementById('label-l1');
+  const labelL2 = document.getElementById('label-l2');
+  const btnExplicar = document.getElementById('btn-explicar-diferencia');
+
+  function actualizarComparacion() {
+    const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('·')[0].trim() : 'Palcacocha';
+    const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('·')[0].trim() : 'Parón';
+
+    if (nodeL1) nodeL1.textContent = l1Nombre;
+    if (nodeL2) nodeL2.textContent = l2Nombre;
+    if (labelL1) labelL1.textContent = `${l1Nombre}:`;
+    if (labelL2) labelL2.textContent = `${l2Nombre}:`;
+  }
+
+  if (compL1) compL1.addEventListener('change', actualizarComparacion);
+  if (compL2) compL2.addEventListener('change', actualizarComparacion);
+
+  if (btnExplicar) {
+    btnExplicar.addEventListener('click', () => {
+      const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('·')[0].trim() : 'Palcacocha';
+      const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('·')[0].trim() : 'Parón';
+      
+      const chatInput = document.getElementById('chat-pregunta') as HTMLTextAreaElement | null;
+      const chatDrawer = document.getElementById('chat-drawer');
+      if (chatInput && chatDrawer) {
+        chatInput.value = `¿Cuál es la diferencia en nivel de riesgo, volumen y poblados amenazados entre la laguna ${l1Nombre} y la laguna ${l2Nombre}?`;
+        chatDrawer.classList.remove('translate-x-full');
+      }
+    });
+  }
+</script>

@@ -1,0 +1,237 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+---
+
+<!-- Botón Flotante para abrir el Asistente -->
+<div class="fixed bottom-6 right-6 z-30">
+  <button 
+    id="btn-flotante-chat"
+    type="button"
+    class="flex items-center gap-2.5 rounded-full bg-slate-900 px-5 py-3 text-xs font-bold text-white shadow-xl hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+  >
+    <svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+    <span>Consulta Técnica Documentada</span>
+  </button>
+</div>
+
+<!-- Drawer / Panel Lateral del Asistente -->
+<div 
+  id="chat-drawer" 
+  class="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-white border-l border-slate-200 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+>
+  <!-- Encabezado del Chat -->
+  <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-bold text-slate-900">Agente Enterprise Brain</h3>
+        <span class="rounded bg-emerald-100 text-emerald-800 px-1.5 py-0.5 text-[10px] font-bold">En línea</span>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-0.5">Respuestas basadas en evidencia · Cita exacta de documento y página</p>
+    </div>
+    <button 
+      id="btn-cerrar-chat" 
+      type="button" 
+      class="rounded-lg p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition"
+      title="Cerrar panel"
+    >
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Contenedor de Mensajes -->
+  <div id="chat-mensajes" class="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
+    
+    <!-- Mensaje de Bienvenida -->
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2.5">
+      <p class="font-semibold text-slate-900">Bienvenido al motor de consulta de glaciares</p>
+      <p class="text-slate-600 leading-relaxed">
+        El sistema consulta el grafo de conocimiento ({SITE_CONFIG.corpus.nodos_grafo.toLocaleString()} nodos) y {SITE_CONFIG.corpus.documentos_totales} documentos técnicos del INAIGEM, la ANA y el SENAMHI.
+      </p>
+      <div class="space-y-1.5 pt-2">
+        <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">Consultas sugeridas:</span>
+        <button type="button" class="btn-ejemplo-chat block w-full text-left rounded-lg border border-slate-200 bg-white p-2 text-[11px] text-slate-700 hover:bg-slate-100 transition">
+          ¿Qué lagunas de Áncash tienen riesgo muy alto de desborde?
+        </button>
+        <button type="button" class="btn-ejemplo-chat block w-full text-left rounded-lg border border-slate-200 bg-white p-2 text-[11px] text-slate-700 hover:bg-slate-100 transition">
+          ¿Por qué la laguna Palcacocha es considerada peligrosa?
+        </button>
+        <button type="button" class="btn-ejemplo-chat block w-full text-left rounded-lg border border-slate-200 bg-white p-2 text-[11px] text-slate-700 hover:bg-slate-100 transition">
+          ¿Qué lagunas en riesgo no tienen obras de seguridad y qué poblados amenazan?
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de razonamiento en vivo -->
+    <div id="chat-pasos-estado" class="hidden rounded-lg border border-sky-200 bg-sky-50/70 p-3 text-sky-900 space-y-1">
+      <div class="flex items-center gap-2 font-medium">
+        <span class="inline-block h-2 w-2 rounded-full bg-sky-600 animate-pulse"></span>
+        <span id="chat-pasos-texto">Consultando el grafo de conocimiento...</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Panel de Fuentes Citadas (Desplegable) -->
+  <div id="chat-panel-fuentes" class="hidden border-t border-slate-200 bg-slate-50 p-3 text-[11px] max-h-32 overflow-y-auto">
+    <div class="font-bold text-slate-700 mb-1">Fuentes y Documentos Citados:</div>
+    <ul id="chat-lista-fuentes" class="space-y-1 text-slate-600"></ul>
+  </div>
+
+  <!-- Formulario de Entrada de Pregunta -->
+  <div class="p-4 border-t border-slate-200 bg-white">
+    <form id="chat-form" class="space-y-2">
+      <div class="relative">
+        <textarea 
+          id="chat-pregunta" 
+          rows="2" 
+          placeholder="Escribe tu consulta técnica aquí..."
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 resize-none transition"
+          required
+        ></textarea>
+      </div>
+      <div class="flex items-center justify-between text-[11px]">
+        <span class="text-slate-400">Verificación estricta de evidencia activa</span>
+        <button 
+          id="chat-btn-enviar"
+          type="submit" 
+          class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white shadow-sm hover:bg-slate-800 transition disabled:opacity-50"
+        >
+          <span>Preguntar</span>
+          <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  import { SITE_CONFIG } from '../config/site.config';
+
+  const drawer = document.getElementById('chat-drawer');
+  const btnAbrirNav = document.getElementById('btn-abrir-asistente');
+  const btnAbrirFlotante = document.getElementById('btn-flotante-chat');
+  const btnCerrar = document.getElementById('btn-cerrar-chat');
+  const form = document.getElementById('chat-form') as HTMLFormElement | null;
+  const input = document.getElementById('chat-pregunta') as HTMLTextAreaElement | null;
+  const mensajes = document.getElementById('chat-mensajes');
+  const pasosEstado = document.getElementById('chat-pasos-estado');
+  const pasosTexto = document.getElementById('chat-pasos-texto');
+  const panelFuentes = document.getElementById('chat-panel-fuentes');
+  const listaFuentes = document.getElementById('chat-lista-fuentes');
+  const btnEnviar = document.getElementById('chat-btn-enviar') as HTMLButtonElement | null;
+  const botonesEjemplo = document.querySelectorAll('.btn-ejemplo-chat');
+
+  function abrirDrawer() {
+    if (drawer) drawer.classList.remove('translate-x-full');
+  }
+
+  function cerrarDrawer() {
+    if (drawer) drawer.classList.add('translate-x-full');
+  }
+
+  if (btnAbrirNav) btnAbrirNav.addEventListener('click', abrirDrawer);
+  if (btnAbrirFlotante) btnAbrirFlotante.addEventListener('click', abrirDrawer);
+  if (btnCerrar) btnCerrar.addEventListener('click', cerrarDrawer);
+
+  botonesEjemplo.forEach(b => {
+    b.addEventListener('click', () => {
+      if (input && b.textContent) {
+        input.value = b.textContent.trim();
+        form?.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    });
+  });
+
+  // Envío y lectura en streaming con Server-Sent Events
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pregunta = input?.value.trim();
+      if (!pregunta) return;
+
+      // Renderizar mensaje del usuario
+      const userBubble = document.createElement('div');
+      userBubble.className = 'ml-6 rounded-xl bg-slate-900 text-white p-3 self-end text-xs leading-relaxed';
+      userBubble.textContent = pregunta;
+      mensajes?.appendChild(userBubble);
+      if (input) input.value = '';
+      if (btnEnviar) btnEnviar.disabled = true;
+
+      // Mostrar barra de razonamiento
+      if (pasosEstado) pasosEstado.classList.remove('hidden');
+      if (pasosTexto) pasosTexto.textContent = 'Analizando consulta y entidades...';
+      mensajes?.scrollTo(0, mensajes.scrollHeight);
+
+      try {
+        const res = await fetch(`${SITE_CONFIG.apiBaseUrl}/api/preguntar/stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pregunta })
+        });
+
+        if (!res.ok) {
+          throw new Error('Servidor no disponible');
+        }
+
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'mr-4 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-800 leading-relaxed shadow-sm space-y-2';
+        mensajes?.appendChild(aiBubble);
+
+        while (reader) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lineas = buffer.split('\n\n');
+          buffer = lineas.pop() || '';
+
+          for (const linea of lineas) {
+            if (linea.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(linea.replace('data: ', ''));
+                if (data.tipo === 'paso' && pasosTexto) {
+                  pasosTexto.textContent = `Ejecutando herramienta: ${data.herramienta || 'Búsqueda semántica'}`;
+                } else if (data.tipo === 'final') {
+                  const r = data.resultado;
+                  aiBubble.innerHTML = r.respuesta.replace(/\n/g, '<br/>');
+                  
+                  // Mostrar fuentes
+                  if (r.citas && r.citas.length > 0 && listaFuentes && panelFuentes) {
+                    listaFuentes.innerHTML = '';
+                    r.citas.forEach((c: any) => {
+                      const li = document.createElement('li');
+                      li.innerHTML = `<strong>[${c.numero}]</strong> ${c.doc} (página ${c.pag})`;
+                      listaFuentes.appendChild(li);
+                    });
+                    panelFuentes.classList.remove('hidden');
+                  }
+                }
+              } catch {}
+            }
+          }
+          mensajes?.scrollTo(0, mensajes.scrollHeight);
+        }
+
+      } catch (err) {
+        // En caso de que el backend esté en proceso de arranque o sin conexión
+        const errorBubble = document.createElement('div');
+        errorBubble.className = 'rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900';
+        errorBubble.textContent = 'El agente en el servidor se encuentra iniciando su servicio o no hay conexión directa. Reintenta en unos instantes.';
+        mensajes?.appendChild(errorBubble);
+      } finally {
+        if (pasosEstado) pasosEstado.classList.add('hidden');
+        if (btnEnviar) btnEnviar.disabled = false;
+        mensajes?.scrollTo(0, mensajes.scrollHeight);
+      }
+    });
+  }
+</script>

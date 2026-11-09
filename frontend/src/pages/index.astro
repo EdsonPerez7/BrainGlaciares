@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroSection from '../components/HeroSection.astro';
+import CountryMetrics from '../components/CountryMetrics.astro';
+import ExploreCards from '../components/ExploreCards.astro';
+import SearchAndMap from '../components/SearchAndMap.astro';
+import ComparatorSection from '../components/ComparatorSection.astro';
+---
+
+<Layout>
+  <!-- 1. Hero con corte transversal interactivo y buscador -->
+  <HeroSection />
+
+  <!-- 2. El país en tres datos (Cifras auditadas con citas exactas) -->
+  <CountryMetrics />
+
+  <!-- 3. Módulos de Exploración -->
+  <ExploreCards />
+
+  <!-- 4. Búsqueda territorial y Mapa vectorial del Perú -->
+  <SearchAndMap />
+
+  <!-- 5. Compara y descubre (Barras, serie histórica de estudios y red de relaciones) -->
+  <ComparatorSection />
+</Layout>

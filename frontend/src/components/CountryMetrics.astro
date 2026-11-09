@@ -1,0 +1,127 @@
+---
+import { METRICAS_PAIS } from '../config/metrics.data';
+---
+
+<section id="panorama" class="border-b border-slate-200 bg-slate-50/60 py-12">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold tracking-tight text-slate-900">El país en tres datos</h2>
+        <p class="text-xs text-slate-500">Cifras consolidadas del inventario nacional y compendios históricos oficiales</p>
+      </div>
+      <span class="rounded bg-slate-200/80 px-2.5 py-1 text-[11px] font-medium text-slate-700">Evidencia auditable</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Dato 1: Retroceso Glaciar (Radial Gauge) -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+        <div class="flex items-start gap-4">
+          <div class="relative flex h-20 w-20 flex-shrink-0 items-center justify-center">
+            <svg class="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+              <path
+                class="text-slate-100"
+                stroke-width="3.5"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                class="text-cyan-600 transition-all duration-1000 ease-out"
+                stroke-dasharray="52, 100"
+                stroke-width="3.5"
+                stroke-linecap="round"
+                stroke="currentColor"
+                fill="none"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <span class="absolute text-base font-extrabold text-slate-900">52%</span>
+          </div>
+
+          <div class="space-y-1">
+            <h3 class="text-sm font-bold text-slate-900 leading-snug">
+              del hielo glaciar se ha perdido
+            </h3>
+            <p class="text-xs text-slate-600">
+              De {METRICAS_PAIS.hielo_perdido.superficie_1962_km2.toLocaleString()} a {METRICAS_PAIS.hielo_perdido.superficie_2016_km2.toLocaleString()} km² ({METRICAS_PAIS.hielo_perdido.periodo})
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Fuente: {METRICAS_PAIS.hielo_perdido.fuente}</span>
+          <span class="font-semibold text-slate-600">{METRICAS_PAIS.hielo_perdido.pagina}</span>
+        </div>
+      </div>
+
+      <!-- Dato 2: Lagunas en Riesgo Alto -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-slate-950">18</span>
+            <span class="text-sm font-semibold text-slate-800">lagunas en riesgo crítico</span>
+          </div>
+
+          <!-- Barra de distribución -->
+          <div class="mt-4 h-3 w-full rounded-full bg-slate-100 overflow-hidden flex">
+            <div class="bg-rose-600 h-full w-[44%]" title="8 Muy alto"></div>
+            <div class="bg-amber-500 h-full w-[56%]" title="10 Alto"></div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between text-xs text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-rose-600"></span>
+              <span>8 muy alto</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+              <span>10 alto</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+              <span class="font-medium text-slate-900">3 sin obra</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+          <span>Fuente: {METRICAS_PAIS.lagunas_riesgo.fuente}</span>
+        </div>
+      </div>
+
+      <!-- Dato 3: Histórico de Aluviones y Desbordes (Histograma por décadas) -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-3xl font-extrabold text-slate-950">100</span>
+            <span class="text-sm font-semibold text-slate-800">aluviones y desbordes</span>
+          </div>
+
+          <!-- Histograma simplificado -->
+          <div class="mt-4 flex items-end gap-2 h-12 pt-2">
+            <div class="bg-amber-300 hover:bg-amber-400 h-[30%] flex-1 rounded-t transition" title="1868-1920: 8 eventos"></div>
+            <div class="bg-amber-300 hover:bg-amber-400 h-[45%] flex-1 rounded-t transition" title="1920-1940: 12 eventos"></div>
+            <div class="bg-amber-400 hover:bg-amber-500 h-[90%] flex-1 rounded-t transition" title="1940-1960: 24 eventos"></div>
+            <div class="bg-amber-500 hover:bg-amber-600 h-[100%] flex-1 rounded-t transition" title="1960-1980: 27 eventos"></div>
+            <div class="bg-amber-400 hover:bg-amber-500 h-[55%] flex-1 rounded-t transition" title="1980-2000: 15 eventos"></div>
+            <div class="bg-amber-300 hover:bg-amber-400 h-[40%] flex-1 rounded-t transition" title="2000-2020: 11 eventos"></div>
+            <div class="bg-amber-200 hover:bg-amber-300 h-[15%] flex-1 rounded-t transition" title="2020s: 3 eventos"></div>
+          </div>
+
+          <div class="mt-1 flex justify-between text-[10px] text-slate-400 font-medium">
+            <span>1868</span>
+            <span>Por década</span>
+            <span>2020s</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Registrados en documentos oficiales</span>
+          <span class="font-medium text-slate-600">Más antiguo: 1868</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
