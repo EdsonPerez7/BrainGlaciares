@@ -1,278 +1,55 @@
 ---
-// HeroSection.astro: Travesía de la Cordillera de los Andes de Sur a Norte (100% Geología y Glaciares)
-// Cero carreteras. Recorrido aéreo continuo por la cresta andina destacando nevados del RAG y cotas
+// HeroSection.astro: Sobrevuelo Aéreo 3D de la Cordillera de los Andes (Sur a Norte)
+// Implementado en Three.js / WebGL nativo por GPU a 60 fps
+// Vuelo continuo en primera persona independiente del scroll, con relieve 3D y etiquetas cartográficas proyectadas
 ---
 
-<section class="relative overflow-hidden border-b border-slate-200 bg-[#060c18] w-full min-h-[580px] lg:min-h-[640px] xl:min-h-[680px] flex items-center">
+<section class="relative overflow-hidden border-b border-slate-200 bg-[#060c18] w-full min-h-[580px] lg:min-h-[660px] xl:min-h-[700px] flex items-center">
   
   <!-- ======================================================== -->
-  <!-- LIENZO GLACIOLÓGICO: TRAVESÍA DE SUR A NORTE (SVG 100%)   -->
+  <!-- LIENZO 3D WEBGL: SOBREVUELO CONTINUO DE LOS ANDES         -->
   <!-- ======================================================== -->
-  <div class="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none">
+  <div class="absolute inset-0 w-full h-full overflow-hidden select-none">
     
-    <!-- Cielo andino de altura con degradé astronómico -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#030611] via-[#081224] to-[#121e38]"></div>
+    <!-- Canvas de renderizado Three.js -->
+    <canvas id="canvas-sobrevuelo-andes" class="absolute inset-0 w-full h-full block"></canvas>
 
-    <!-- Puntos de estrellas en el cenit -->
-    <svg class="absolute inset-0 w-full h-full opacity-60" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="18%" cy="12%" r="1" fill="#ffffff" />
-      <circle cx="32%" cy="18%" r="1.5" fill="#bae6fd" />
-      <circle cx="48%" cy="9%" r="1.2" fill="#ffffff" />
-      <circle cx="65%" cy="15%" r="1.8" fill="#e0f2fe" />
-      <circle cx="80%" cy="10%" r="1.2" fill="#ffffff" />
-      <circle cx="92%" cy="22%" r="1.5" fill="#bae6fd" />
-      <circle cx="74%" cy="28%" r="1" fill="#ffffff" />
-      <circle cx="86%" cy="34%" r="1.3" fill="#bae6fd" />
-    </svg>
+    <!-- Capa de Etiquetas Cartográficas Proyectadas en 3D -->
+    <div id="contenedor-etiquetas-3d" class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-10">
+      <!-- Las etiquetas se inyectan y proyectan matemáticamente en tiempo real por Three.js -->
+    </div>
 
-    <!-- ESCENARIO SVG DE LA CORDILLERA (1400 x 680) -->
-    <svg id="svg-travesia" class="absolute inset-0 w-full h-full" viewBox="0 0 1400 680" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <!-- Gradientes geológicos de roca andina -->
-        <linearGradient id="roca-luz" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#475569" />
-          <stop offset="45%" stop-color="#334155" />
-          <stop offset="100%" stop-color="#1e293b" />
-        </linearGradient>
-        <linearGradient id="roca-sombra" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#1e293b" />
-          <stop offset="65%" stop-color="#0f172a" />
-          <stop offset="100%" stop-color="#020617" />
-        </linearGradient>
-
-        <!-- Nieve y hielo glaciar de alta cumbre -->
-        <linearGradient id="nieve-resplandor" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#ffffff" />
-          <stop offset="45%" stop-color="#f0f9ff" />
-          <stop offset="80%" stop-color="#bae6fd" />
-          <stop offset="100%" stop-color="#38bdf8" />
-        </linearGradient>
-
-        <!-- Espejo de laguna glaciar basal -->
-        <linearGradient id="lago-glaciar-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#38bdf8" />
-          <stop offset="50%" stop-color="#0284c7" />
-          <stop offset="100%" stop-color="#075985" />
-        </linearGradient>
-
-        <!-- Crestas morrénicas frontales -->
-        <linearGradient id="morrena-frontal" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#1e293b" />
-          <stop offset="50%" stop-color="#0f172a" />
-          <stop offset="100%" stop-color="#020617" />
-        </linearGradient>
-
-        <!-- Filtro Glow para balizas de cumbres -->
-        <filter id="glow-cumbre" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      <!-- ======================================================== -->
-      <!-- GRUPO CÁMARA DE SOBREVUELO (ANIMACIÓN DINÁMICA DE RUTA)  -->
-      <!-- ======================================================== -->
-      <g id="camara-vuelo-andino" class="transition-transform duration-1000 ease-out" style="transform-origin: 900px 340px;">
-        
-        <!-- ======================================================== -->
-        <!-- HORIZONTE LEJANO: CADENA DE PICOS ANDINOS CONTINUA      -->
-        <!-- ======================================================== -->
-        <polygon points="0,680 0,380 120,330 260,400 420,290 560,390 710,260 860,380 980,240 1120,360 1260,250 1400,340 1400,680" fill="#091224" opacity="0.75" />
-
-        <!-- ======================================================== -->
-        <!-- CRESTAS MEDIAS Y VALLES GLACIARES EN PERSPECTIVA         -->
-        <!-- ======================================================== -->
-        <polygon points="0,680 0,440 180,360 340,460 520,320 680,440 860,310 1040,440 1220,320 1400,430 1400,680" fill="#0f1a33" opacity="0.85" />
-
-        <!-- ======================================================== -->
-        <!-- COLOSOS Y MACIZOS GLACIARES DEL RAG (SUR A NORTE)        -->
-        <!-- ======================================================== -->
-        
-        <!-- SECTOR 1: SUR ANDINO (Cusco / Puno) -->
-        <g id="sector-sur-glaciares" class="transition-opacity duration-700">
-          <!-- Nevado Ausangate (6,384 m) -->
-          <g id="pico-ausangate" transform="translate(0, 0)">
-            <polygon points="620,130 460,490 620,490" fill="url(#roca-luz)" />
-            <polygon points="620,130 620,490 780,490" fill="url(#roca-sombra)" />
-            <path d="M 620,130 L 550,230 L 585,220 L 605,250 L 620,230 L 640,255 L 660,225 L 690,235 Z" fill="url(#nieve-resplandor)" />
-            <!-- Laguna glaciar a los pies -->
-            <ellipse cx="620" cy="460" rx="90" ry="24" fill="url(#lago-glaciar-grad)" opacity="0.9" />
-            <!-- Baliza de cota -->
-            <circle cx="620" cy="130" r="4.5" fill="#38bdf8" filter="url(#glow-cumbre)" />
-            <g transform="translate(515, 65)">
-              <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Nevado Ausangate</text>
-              <text x="28" y="27" fill="#94a3b8" font-size="9" font-weight="600" font-family="sans-serif">6,384 m · Cordillera Vilcanota</text>
-            </g>
-          </g>
-
-          <!-- Casquete Tropical Quelccaya (5,670 m) -->
-          <g id="pico-quelccaya">
-            <ellipse cx="880" cy="270" rx="140" ry="45" fill="url(#nieve-resplandor)" opacity="0.85" />
-            <circle cx="880" cy="245" r="4" fill="#38bdf8" filter="url(#glow-cumbre)" />
-            <g transform="translate(780, 185)">
-              <rect x="0" y="0" width="200" height="32" rx="16" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2" fill-opacity="0.9" />
-              <circle cx="15" cy="16" r="3.5" fill="#38bdf8" />
-              <text x="26" y="15" fill="#ffffff" font-size="11" font-weight="800" font-family="sans-serif">Glaciar Quelccaya</text>
-              <text x="26" y="25" fill="#94a3b8" font-size="8.5" font-weight="600" font-family="sans-serif">5,670 m · Casquete Tropical (Puno)</text>
-            </g>
-          </g>
-        </g>
-
-        <!-- SECTOR 2: CENTRO ANDINO (Junín / Lima) -->
-        <g id="sector-centro-glaciares" class="transition-opacity duration-700">
-          <!-- Nevado Huaytapallana (5,557 m) -->
-          <g id="pico-huaytapallana">
-            <polygon points="1080,180 940,490 1080,490" fill="url(#roca-luz)" />
-            <polygon points="1080,180 1080,490 1220,490" fill="url(#roca-sombra)" />
-            <path d="M 1080,180 L 1020,270 L 1050,260 L 1070,285 L 1080,270 L 1100,290 L 1120,265 L 1140,275 Z" fill="url(#nieve-resplandor)" />
-            <circle cx="1080" cy="180" r="4" fill="#10b981" filter="url(#glow-cumbre)" />
-            <g transform="translate(975, 118)">
-              <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#10b981" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Nevado Huaytapallana</text>
-              <text x="28" y="27" fill="#34d399" font-size="9" font-weight="600" font-family="sans-serif">5,557 m · Glaciar Lasuntay (Junín)</text>
-            </g>
-          </g>
-        </g>
-
-        <!-- SECTOR 3: CORDILLERA HUAYHUASH -->
-        <g id="sector-huayhuash-glaciares" class="transition-opacity duration-700">
-          <!-- Nevado Yerupajá (6,635 m) -->
-          <g id="pico-yerupaja">
-            <polygon points="760,100 580,520 760,520" fill="url(#roca-luz)" />
-            <polygon points="760,100 760,520 940,520" fill="url(#roca-sombra)" />
-            <path d="M 760,100 L 680,220 L 720,210 L 745,245 L 760,225 L 785,250 L 815,220 L 840,230 Z" fill="url(#nieve-resplandor)" />
-            <circle cx="760" cy="100" r="4.5" fill="#38bdf8" filter="url(#glow-cumbre)" />
-            <g transform="translate(655, 38)">
-              <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Nevado Yerupajá</text>
-              <text x="28" y="27" fill="#94a3b8" font-size="9" font-weight="600" font-family="sans-serif">6,635 m · 2ª cumbre del Perú</text>
-            </g>
-          </g>
-        </g>
-
-        <!-- SECTOR 4: CORDILLERA BLANCA (Áncash - Epicentro RAG) -->
-        <g id="sector-blanca-glaciares" class="transition-opacity duration-700">
-          <!-- Nevado Huascarán Sur (6,768 m) -->
-          <g id="pico-huascaran">
-            <polygon points="980,65 770,540 980,540" fill="url(#roca-luz)" />
-            <polygon points="980,65 980,540 1190,540" fill="url(#roca-sombra)" />
-            <path d="M 980,65 L 890,195 L 930,185 L 960,225 L 980,195 L 1010,230 L 1040,190 L 1070,205 Z" fill="url(#nieve-resplandor)" />
-            <circle cx="980" cy="65" r="5" fill="#38bdf8" filter="url(#glow-cumbre)" />
-            <g transform="translate(865, 8)">
-              <rect x="0" y="0" width="230" height="36" rx="18" fill="#0f172a" stroke="#38bdf8" stroke-width="2" fill-opacity="0.95" />
-              <circle cx="18" cy="18" r="4.5" fill="#38bdf8" />
-              <text x="30" y="17" fill="#ffffff" font-size="12" font-weight="900" font-family="sans-serif">Nevado Huascarán Sur</text>
-              <text x="30" y="28" fill="#38bdf8" font-size="9.5" font-weight="700" font-family="sans-serif">6,768 m · Cima más alta del Perú</text>
-            </g>
-          </g>
-
-          <!-- Nevado Hualcán & Laguna 513 (6,122 m) -->
-          <g id="pico-hualcan">
-            <polygon points="1230,120 1090,490 1230,490" fill="url(#roca-luz)" />
-            <polygon points="1230,120 1230,490 1370,490" fill="url(#roca-sombra)" />
-            <path d="M 1230,120 L 1170,215 L 1200,205 L 1220,235 L 1230,220 L 1250,240 L 1270,215 L 1290,225 Z" fill="url(#nieve-resplandor)" />
-            <!-- Laguna 513 en la base -->
-            <ellipse cx="1230" cy="460" rx="75" ry="18" fill="url(#lago-glaciar-grad)" />
-            <circle cx="1230" cy="120" r="4" fill="#10b981" filter="url(#glow-cumbre)" />
-            <g transform="translate(1125, 60)">
-              <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#10b981" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Hualcán · Laguna 513</text>
-              <text x="28" y="27" fill="#34d399" font-size="9" font-weight="600" font-family="sans-serif">6,122 m · Cordillera Blanca</text>
-            </g>
-          </g>
-
-          <!-- Nevado Palcaraju & Palcacocha (6,274 m) -->
-          <g id="pico-palcaraju">
-            <polygon points="480,140 330,510 480,510" fill="url(#roca-luz)" />
-            <polygon points="480,140 480,510 630,510" fill="url(#roca-sombra)" />
-            <path d="M 480,140 L 415,235 L 445,225 L 465,255 L 480,240 L 500,260 L 520,235 L 545,245 Z" fill="url(#nieve-resplandor)" />
-            <ellipse cx="480" cy="475" rx="80" ry="20" fill="url(#lago-glaciar-grad)" />
-            <circle cx="480" cy="140" r="4" fill="#f43f5e" filter="url(#glow-cumbre)" />
-            <g transform="translate(370, 80)">
-              <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#f43f5e" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#f43f5e" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Palcaraju · Palcacocha</text>
-              <text x="28" y="27" fill="#fb7185" font-size="9" font-weight="600" font-family="sans-serif">6,274 m · Riesgo Muy Alto</text>
-            </g>
-          </g>
-
-          <!-- Nevado Alpamayo (5,947 m) -->
-          <g id="pico-alpamayo">
-            <polygon points="760,180 620,530 760,530" fill="url(#roca-luz)" />
-            <polygon points="760,180 760,530 900,530" fill="url(#roca-sombra)" />
-            <path d="M 760,180 L 695,270 L 725,260 L 745,290 L 760,275 L 780,295 L 805,270 L 825,280 Z" fill="url(#nieve-resplandor)" />
-            <circle cx="760" cy="180" r="4" fill="#38bdf8" filter="url(#glow-cumbre)" />
-            <g transform="translate(655, 122)">
-              <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
-              <circle cx="16" cy="17" r="4" fill="#38bdf8" />
-              <text x="28" y="16" fill="#ffffff" font-size="11.5" font-weight="800" font-family="sans-serif">Nevado Alpamayo</text>
-              <text x="28" y="27" fill="#94a3b8" font-size="9" font-weight="600" font-family="sans-serif">5,947 m · Pirámide Glaciar</text>
-            </g>
-          </g>
-        </g>
-
-        <!-- ======================================================== -->
-        <!-- PRIMER PLANO: CRESTAS ROCOSAS Y MORENAS FRONTALES         -->
-        <!-- Avanzan continuamente simulando vuelo rasante            -->
-        <!-- ======================================================== -->
-        <g id="morenas-primer-plano" class="anim-flujo-morenas">
-          <polygon points="0,680 140,510 320,560 520,480 720,570 940,490 1160,580 1400,500 1400,680" fill="url(#morrena-frontal)" opacity="0.95" />
-          <polygon points="0,680 220,560 440,610 680,530 920,620 1180,540 1400,600 1400,680" fill="#030712" />
-        </g>
-
-      </g>
-      <!-- FIN GRUPO CÁMARA DE SOBREVUELO -->
-
-    </svg>
-
-    <!-- ======================================================== -->
-    <!-- ODÓMETRO GEOGRÁFICO Y CONTROL DE RUTA SUR A NORTE        -->
-    <!-- ======================================================== -->
-    <div class="absolute bottom-6 right-6 z-20 flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-950/90 backdrop-blur-md px-4 py-3 rounded-2xl border border-slate-700/80 text-xs shadow-2xl pointer-events-auto">
-      
-      <!-- Hito Geográfico Actual -->
+    <!-- Indicador HUD de Vuelo Aéreo y Rumbo (Esquina Inferior Derecha) -->
+    <div class="absolute bottom-6 right-6 z-20 flex items-center gap-3 bg-slate-950/85 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-700/70 text-xs shadow-2xl pointer-events-none">
       <div class="flex flex-col">
         <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-sky-400 animate-ping"></span>
-          <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">Travesía Andina · Rumbo Norte</span>
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">Sobrevuelo Aéreo en Vivo</span>
         </div>
-        <span id="label-hito-geografico" class="font-mono font-bold text-sky-300 text-sm">
-          Sector 4: Cordillera Blanca · Áncash (Lat 09°S)
+        <span id="hud-telemetria-vuelo" class="font-mono font-bold text-sky-300 text-xs">
+          Rumbo 355° N · Trayectoria Sur a Norte
         </span>
       </div>
-
-      <div class="hidden sm:block h-8 w-px bg-slate-800"></div>
-
-      <!-- Selector Rápido de Sector (Sur a Norte) -->
-      <div class="flex items-center gap-1.5 pt-1 sm:pt-0">
-        <button type="button" class="btn-sector-ruta px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-slate-800 text-slate-400 hover:text-white" data-sector="1">1. Sur</button>
-        <button type="button" class="btn-sector-ruta px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-slate-800 text-slate-400 hover:text-white" data-sector="2">2. Centro</button>
-        <button type="button" class="btn-sector-ruta px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-slate-800 text-slate-400 hover:text-white" data-sector="3">3. Huayhuash</button>
-        <button type="button" class="btn-sector-ruta px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-sky-500 text-slate-950 shadow-xs" data-sector="4">4. Blanca</button>
+      <div class="h-8 w-px bg-slate-800"></div>
+      <div class="flex flex-col text-[11px] font-mono text-slate-300">
+        <span class="text-slate-500 text-[9px] uppercase">Altitud Vuelo</span>
+        <span class="text-emerald-400 font-bold">5,800 m</span>
       </div>
-
     </div>
 
   </div>
 
   <!-- ======================================================== -->
-  <!-- MÁSCARA GRADUAL DE DIFUMINADO (BLANCO A CORDILLERA)      -->
+  <!-- MÁSCARA GRADUAL DE DIFUMINADO (BLANCO A ALTA MONTAÑA)     -->
   <!-- ======================================================== -->
-  <div class="absolute inset-y-0 left-0 w-full lg:w-[65%] xl:w-[58%] 2xl:w-[52%] bg-gradient-to-r from-white via-white via-70% to-transparent pointer-events-none z-10 hidden lg:block"></div>
-  <div class="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white via-white/90 to-transparent pointer-events-none z-10 lg:hidden"></div>
+  <div class="absolute inset-y-0 left-0 w-full lg:w-[65%] xl:w-[58%] 2xl:w-[50%] bg-gradient-to-r from-white via-white via-70% to-transparent pointer-events-none z-20 hidden lg:block"></div>
+  <div class="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white via-white/90 to-transparent pointer-events-none z-20 lg:hidden"></div>
 
   <!-- ======================================================== -->
   <!-- CONTENIDO FRONTAL (IZQUIERDA): PREGUNTA Y BUSCADOR        -->
+  <!-- En fondo blanco puro institucional                       -->
   <!-- ======================================================== -->
-  <div class="relative z-20 w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 lg:py-16">
+  <div class="relative z-30 w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 lg:py-16">
     <div class="max-w-xl xl:max-w-2xl bg-white/95 lg:bg-transparent p-6 sm:p-8 lg:p-0 rounded-3xl lg:rounded-none shadow-xl lg:shadow-none border border-slate-200/80 lg:border-none backdrop-blur-md lg:backdrop-blur-none space-y-6">
       
       <!-- Pastilla Institucional -->
@@ -334,110 +111,315 @@
 </section>
 
 <!-- ======================================================== -->
-<!-- ESTILOS Y ANIMACIONES CSS DE VUELO GLACIOLÓGICO          -->
+<!-- SCRIPT DE SIMULACIÓN THREE.JS (SOBREVUELO SUR A NORTE)   -->
 <!-- ======================================================== -->
-<style>
-  /* Ondulación sutil de morenas en primer plano */
-  @keyframes flujoMorenas {
-    0%, 100% {
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-    50% {
-      transform: translate3d(-10px, 6px, 0) scale(1.01);
-    }
-  }
-
-  .anim-flujo-morenas {
-    animation: flujoMorenas 6s ease-in-out infinite;
-    transform-origin: 700px 600px;
-  }
-</style>
-
 <script>
-  // ========================================================
-  // CONTROLADOR DE TRAVESÍA DE SUR A NORTE
-  // ========================================================
-  const camara = document.getElementById('camara-vuelo-andino');
-  const labelHito = document.getElementById('label-hito-geografico');
-  const btnsSector = document.querySelectorAll('.btn-sector-ruta');
+  import * as THREE from 'three';
 
-  // Sectores de la ruta Sur a Norte
-  const SECTORES_RUTA: Record<number, { transform: string; label: string }> = {
-    1: {
-      // Sector 1: Sur Andino (Vilcanota y Quelccaya)
-      transform: "scale(1.22) translate(140px, -40px)",
-      label: "Sector 1: Cordillera Vilcanota · Cusco/Puno (Lat 14°S)"
-    },
-    2: {
-      // Sector 2: Centro Andino (Huaytapallana y Pariacaca)
-      transform: "scale(1.18) translate(-120px, -30px)",
-      label: "Sector 2: Cordillera Huaytapallana · Junín (Lat 11.5°S)"
-    },
-    3: {
-      // Sector 3: Cordillera Huayhuash (Yerupajá)
-      transform: "scale(1.25) translate(80px, -20px)",
-      label: "Sector 3: Cordillera Huayhuash · Huánuco/Áncash (Lat 10.2°S)"
-    },
-    4: {
-      // Sector 4: Cordillera Blanca (Huascarán, Hualcán, Palcaraju, Alpamayo)
-      transform: "scale(1.05) translate(0px, 0px)",
-      label: "Sector 4: Cordillera Blanca · Áncash (Lat 09°S)"
-    }
-  };
+  // Elementos DOM
+  const canvas = document.getElementById('canvas-sobrevuelo-andes') as HTMLCanvasElement;
+  const containerEtiquetas = document.getElementById('contenedor-etiquetas-3d') as HTMLDivElement;
+  const hudTelemetria = document.getElementById('hud-telemetria-vuelo') as HTMLSpanElement;
 
-  let sectorActual = 4;
-  let timerTravesia: any = null;
+  if (canvas && containerEtiquetas) {
+    
+    // 1. Configuración de Escena y Renderizador WebGL
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#050b17');
+    scene.fog = new THREE.FogExp2('#050b17', 0.0016);
 
-  function aplicarSector(num: number) {
-    sectorActual = num;
-    const cfg = SECTORES_RUTA[num] || SECTORES_RUTA[4];
+    const camera = new THREE.PerspectiveCamera(52, canvas.clientWidth / canvas.clientHeight, 1, 2200);
+    
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-    if (camara) {
-      camara.style.transform = cfg.transform;
-    }
+    // 2. Iluminación Andina de Alta Montaña (Sombras facetadas y nieve reflectiva)
+    const ambientLight = new THREE.AmbientLight('#2a3c5a', 1.2);
+    scene.add(ambientLight);
 
-    if (labelHito) {
-      labelHito.style.opacity = '0';
-      setTimeout(() => {
-        labelHito.textContent = cfg.label;
-        labelHito.style.opacity = '1';
-      }, 200);
-    }
+    // Sol andino bajo (luz direccional lateral que modela aristas y vertientes)
+    const sunLight = new THREE.DirectionalLight('#e0f2fe', 2.8);
+    sunLight.position.set(-200, 300, -100);
+    scene.add(sunLight);
 
-    btnsSector.forEach(btn => {
-      const s = Number(btn.getAttribute('data-sector'));
-      if (s === num) {
-        btn.classList.remove('bg-slate-800', 'text-slate-400');
-        btn.classList.add('bg-sky-500', 'text-slate-950', 'shadow-xs');
-      } else {
-        btn.classList.remove('bg-sky-500', 'text-slate-950', 'shadow-xs');
-        btn.classList.add('bg-slate-800', 'text-slate-400');
+    const rimLight = new THREE.DirectionalLight('#38bdf8', 1.2);
+    rimLight.position.set(200, 150, 200);
+    scene.add(rimLight);
+
+    // 3. Catálogo de Nevados y Cumbres del RAG (Sur a Norte en el eje Z)
+    // Coordenadas mundiales: Trayectoria de vuelo de Z = 0 a Z = -2800
+    const NEVADOS_RAG = [
+      {
+        id: 'ausangate',
+        nombre: 'NEVADO AUSANGATE',
+        cota: '6,384 m s. n. m.',
+        cordillera: 'Cordillera Vilcanota · Cusco',
+        pos: new THREE.Vector3(-75, 115, -340),
+        colorPunto: '#38bdf8'
+      },
+      {
+        id: 'quelccaya',
+        nombre: 'GLACIAR QUELCCAYA',
+        cota: '5,670 m s. n. m.',
+        cordillera: 'Casquete Tropical · Puno',
+        pos: new THREE.Vector3(85, 96, -650),
+        colorPunto: '#38bdf8'
+      },
+      {
+        id: 'huaytapallana',
+        nombre: 'NEVADO HUAYTAPALLANA',
+        cota: '5,557 m s. n. m.',
+        cordillera: 'Glaciar Lasuntay · Junín',
+        pos: new THREE.Vector3(-70, 98, -1050),
+        colorPunto: '#10b981'
+      },
+      {
+        id: 'yerupaja',
+        nombre: 'NEVADO YERUPAJÁ',
+        cota: '6,635 m s. n. m.',
+        cordillera: 'Cordillera Huayhuash · 2ª Cumbre',
+        pos: new THREE.Vector3(75, 126, -1450),
+        colorPunto: '#38bdf8'
+      },
+      {
+        id: 'huascaran',
+        nombre: 'NEVADO HUASCARÁN SUR',
+        cota: '6,768 m s. n. m.',
+        cordillera: 'Máxima Cumbre del Perú · Áncash',
+        pos: new THREE.Vector3(-85, 138, -1880),
+        colorPunto: '#38bdf8'
+      },
+      {
+        id: 'hualcan',
+        nombre: 'NEVADO HUALCÁN',
+        cota: '6,122 m s. n. m.',
+        cordillera: 'Cabecera Laguna 513 · Áncash',
+        pos: new THREE.Vector3(75, 114, -2200),
+        colorPunto: '#10b981'
+      },
+      {
+        id: 'palcaraju',
+        nombre: 'NEVADO PALCARAJU',
+        cota: '6,274 m s. n. m.',
+        cordillera: 'Cabecera Laguna Palcacocha',
+        pos: new THREE.Vector3(-65, 118, -2480),
+        colorPunto: '#f43f5e'
+      },
+      {
+        id: 'alpamayo',
+        nombre: 'NEVADO ALPAMAYO',
+        cota: '5,947 m s. n. m.',
+        cordillera: 'Pirámide Glaciar · Cordillera Blanca',
+        pos: new THREE.Vector3(65, 106, -2760),
+        colorPunto: '#38bdf8'
       }
+    ];
+
+    // Crear elementos DOM de las etiquetas flotantes
+    const etiquetasDOM = NEVADOS_RAG.map(n => {
+      const el = document.createElement('div');
+      el.className = 'absolute top-0 left-0 transition-opacity duration-300 flex flex-col items-center pointer-events-none opacity-0';
+      el.innerHTML = `
+        <div class="flex flex-col items-center">
+          <div class="bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-1.5 shadow-2xl backdrop-blur-md flex flex-col items-center text-center">
+            <span class="text-[10px] tracking-wider font-extrabold text-white uppercase">${n.nombre}</span>
+            <span class="text-[11px] font-mono font-bold text-sky-400">${n.cota}</span>
+            <span class="text-[9px] text-slate-400 font-medium">${n.cordillera}</span>
+          </div>
+          <div class="w-0.5 h-6 bg-gradient-to-b from-sky-400 to-transparent"></div>
+          <div class="w-2.5 h-2.5 rounded-full" style="background-color: ${n.colorPunto}; box-shadow: 0 0 10px ${n.colorPunto};"></div>
+        </div>
+      `;
+      containerEtiquetas.appendChild(el);
+      return { data: n, dom: el };
     });
-  }
 
-  // Avance automático continuo de la travesía (Sur a Norte en loop: 1 -> 2 -> 3 -> 4)
-  function iniciarCicloTravesia() {
-    if (timerTravesia) clearInterval(timerTravesia);
-    timerTravesia = setInterval(() => {
-      const siguiente = sectorActual < 4 ? sectorActual + 1 : 1;
-      aplicarSector(siguiente);
-    }, 5500);
-  }
+    // 4. Generación Procedural del Terreno Andino Tridimensional
+    const LONGITUD_TOTAL = 3200;
+    const ANCHO_CORREDOR = 520;
+    const SEG_X = 110;
+    const SEG_Z = 340;
 
-  // Clic directo en sectores
-  btnsSector.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const target = e.currentTarget as HTMLElement;
-      const num = Number(target.getAttribute('data-sector')) || 4;
-      aplicarSector(num);
-      iniciarCicloTravesia(); // Reinicia el temporizador
+    const terrainGeo = new THREE.PlaneGeometry(ANCHO_CORREDOR, LONGITUD_TOTAL, SEG_X, SEG_Z);
+    terrainGeo.rotateX(-Math.PI / 2);
+
+    const posAttr = terrainGeo.attributes.position;
+    const colors: number[] = [];
+
+    // Función de elevación matemática para esculpir los Andes
+    function getElevation(x: number, z: number): number {
+      const distCentro = Math.abs(x);
+      
+      // Valle central por donde vuela el avión
+      const factorValle = Math.min(1.0, Math.pow(distCentro / 40, 1.8));
+      
+      // Ruido fractal de cadenas montañosas (crestas, quebradas y aristas)
+      let h = Math.sin(x * 0.02) * Math.cos(z * 0.015) * 22;
+      h += Math.sin(x * 0.05 + 1.2) * Math.cos(z * 0.035) * 14;
+      h += Math.sin(x * 0.1) * Math.cos(z * 0.08) * 8;
+      
+      // Elevación base de los flancos montañosos
+      let elevation = 12 + factorValle * 48 + h;
+
+      // Modelar los 8 picos clave del RAG en sus coordenadas exactas
+      for (const n of NEVADOS_RAG) {
+        const dx = x - n.pos.x;
+        const dz = z - n.pos.z;
+        const distSq = dx * dx + dz * dz;
+        const radio = 80;
+        if (distSq < radio * radio) {
+          const factorPico = 1 - Math.sqrt(distSq) / radio;
+          elevation += Math.pow(factorPico, 1.6) * (n.pos.y - 40);
+        }
+      }
+
+      return Math.max(0, elevation);
+    }
+
+    // Coloración geológica por cota: Roca oscura -> Talud morrénico -> Nieve glaciar
+    const cValle = new THREE.Color('#0a1324');
+    const cRoca = new THREE.Color('#1e293b');
+    const cTalud = new THREE.Color('#334155');
+    const cHielo = new THREE.Color('#7dd3fc');
+    const cNieve = new THREE.Color('#ffffff');
+
+    for (let i = 0; i < posAttr.count; i++) {
+      const x = posAttr.getX(i);
+      const z = posAttr.getZ(i);
+      const y = getElevation(x, z);
+      posAttr.setY(i, y);
+
+      const vertexColor = new THREE.Color();
+      if (y < 28) {
+        vertexColor.copy(cValle).lerp(cRoca, y / 28);
+      } else if (y < 65) {
+        vertexColor.copy(cRoca).lerp(cTalud, (y - 28) / 37);
+      } else if (y < 95) {
+        vertexColor.copy(cTalud).lerp(cHielo, (y - 65) / 30);
+      } else {
+        vertexColor.copy(cHielo).lerp(cNieve, Math.min(1.0, (y - 95) / 30));
+      }
+      colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
+    }
+
+    terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    terrainGeo.computeVertexNormals();
+
+    const terrainMat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 0.88,
+      metalness: 0.12,
+      flatShading: true
     });
-  });
 
-  // Inicialización
-  aplicarSector(4);
-  iniciarCicloTravesia();
+    const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+    terrainMesh.position.set(0, 0, -LONGITUD_TOTAL / 2);
+    scene.add(terrainMesh);
+
+    // Malla gemela para bucle infinito perfecto
+    const terrainMesh2 = terrainMesh.clone();
+    terrainMesh2.position.set(0, 0, -LONGITUD_TOTAL / 2 - LONGITUD_TOTAL);
+    scene.add(terrainMesh2);
+
+    // 5. Configuración de Cámara y Bucle de Vuelo Aéreo
+    const ALTURA_CRUCERO = 68;
+    const VELOCIDAD_AVION = 42; // unidades por segundo
+    let posCamZ = 0;
+    const clock = new THREE.Clock();
+
+    function resize() {
+      if (!canvas) return;
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (canvas.width !== w || canvas.height !== h) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+    }
+
+    // 6. Ciclo de Animación a 60 FPS (Completamente Desacoplado del Scroll)
+    function animate() {
+      requestAnimationFrame(animate);
+      resize();
+
+      const delta = Math.min(clock.getDelta(), 0.1);
+      
+      // Avance constante de la aeronave hacia el Norte (Z negativo)
+      posCamZ -= VELOCIDAD_AVION * delta;
+      
+      // Posición de la cámara en el aire
+      const swayX = Math.sin(posCamZ * 0.003) * 16;
+      const swayY = Math.cos(posCamZ * 0.004) * 4;
+      camera.position.set(swayX, ALTURA_CRUCERO + swayY, posCamZ);
+      
+      // Mirar hacia adelante en el horizonte andino
+      camera.lookAt(swayX * 0.6, ALTURA_CRUCERO * 0.85, posCamZ - 200);
+
+      // Reciclaje infinito del terreno continuo
+      if (posCamZ < -LONGITUD_TOTAL) {
+        posCamZ += LONGITUD_TOTAL;
+      }
+
+      // Proyección matemática de etiquetas de nevados (3D -> 2D pantalla)
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+
+      for (const item of etiquetasDOM) {
+        const peakPos = item.data.pos.clone();
+        
+        // Ajustar posición con respecto al ciclo de vuelo
+        const distZ = camera.position.z - peakPos.z;
+
+        // Comportamiento de aproximación y paso de las montañas
+        if (distZ > 15 && distZ < 680) {
+          // Proyectar coordenadas mundiales 3D a coordenadas de pantalla (X, Y)
+          const proj = peakPos.clone().project(camera);
+          
+          // Verificar si está dentro del frustum visible
+          if (proj.z < 1.0 && proj.x >= -1.2 && proj.x <= 1.2 && proj.y >= -1.2 && proj.y <= 1.2) {
+            const screenX = (proj.x * 0.5 + 0.5) * w;
+            const screenY = (-proj.y * 0.5 + 0.5) * h;
+
+            // Opacidad gradual según proximidad
+            let opacidad = 0;
+            if (distZ > 450) {
+              opacidad = (680 - distZ) / 230; // Aparece en la lejanía
+            } else if (distZ > 80) {
+              opacidad = 1.0; // 100% visible mientras nos aproximamos
+            } else {
+              opacidad = (distZ - 15) / 65; // Se desvanece al quedar atrás
+            }
+
+            item.dom.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) translate(-50%, -100%)`;
+            item.dom.style.opacity = String(Math.max(0, Math.min(1, opacidad)));
+
+            // Actualizar HUD si es el nevado más cercano al frente
+            if (distZ > 80 && distZ < 300 && hudTelemetria) {
+              hudTelemetria.textContent = `Aproximación: ${item.data.nombre} (${item.data.cota})`;
+            }
+          } else {
+            item.dom.style.opacity = '0';
+          }
+        } else {
+          item.dom.style.opacity = '0';
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // Iniciar el sobrevuelo
+    animate();
+
+    // Redimensionamiento responsive
+    window.addEventListener('resize', resize);
+  }
 
   // Buscador sugerencias
   const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
