@@ -1,40 +1,323 @@
 ---
-import { LAGUNAS_ESCENAS } from '../config/scenes.data';
+// HeroSection.astro: Recorrido Infinito Vectorial de Cordilleras y Nevados del Perú
+// 100% SVG + CSS Keyframes a 60fps con paralaje y difuminado blanco a alta montaña
 ---
 
-<section class="relative overflow-hidden border-b border-slate-200 bg-slate-50/60 py-8 lg:py-12 w-full">
-  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-8">
+<section class="relative overflow-hidden border-b border-slate-200 bg-[#060c18] w-full min-h-[560px] lg:min-h-[620px] xl:min-h-[660px] flex items-center">
+  
+  <!-- ======================================================== -->
+  <!-- FONDO Y RECORRIDO INFINITO VECTORIAL EN SVG (DERECHA)     -->
+  <!-- ======================================================== -->
+  <div class="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none">
     
-    <!-- ======================================================== -->
-    <!-- CABECERA PRINCIPAL: TÍTULO INSTITUCIONAL + BUSCADOR       -->
-    <!-- Espacioso, a lo ancho, sin asfixiar la cordillera        -->
-    <!-- ======================================================== -->
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-slate-200/80 pb-6">
-      
-      <!-- Título y propuesta de valor -->
-      <div class="max-w-3xl space-y-3">
-        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 text-xs text-slate-700 shadow-sm">
-          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="font-semibold text-slate-900">398 Informes oficiales digitalizados</span>
-          <span class="text-slate-300">|</span>
-          <span>Evidencia glaciológica con trazabilidad científica</span>
-        </div>
+    <!-- Cielo estrellado y gradiente astronómico -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#030611] via-[#091224] to-[#121e38]"></div>
 
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-[1.12]">
-          ¿Hay riesgo de desborde donde vives?
+    <!-- Puntos de estrellas fijas de fondo -->
+    <svg class="absolute inset-0 w-full h-full opacity-60" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="15%" cy="12%" r="1" fill="#ffffff" />
+      <circle cx="28%" cy="20%" r="1.5" fill="#bae6fd" />
+      <circle cx="42%" cy="8%" r="1" fill="#ffffff" />
+      <circle cx="58%" cy="15%" r="1.8" fill="#e0f2fe" />
+      <circle cx="72%" cy="22%" r="1.2" fill="#ffffff" />
+      <circle cx="85%" cy="10%" r="1.5" fill="#bae6fd" />
+      <circle cx="93%" cy="25%" r="1" fill="#ffffff" />
+      <circle cx="35%" cy="28%" r="1.2" fill="#bae6fd" />
+      <circle cx="65%" cy="32%" r="1" fill="#ffffff" />
+      <circle cx="80%" cy="38%" r="1.5" fill="#bae6fd" />
+    </svg>
+
+    <!-- CAPA 1: Siluetas Lejanas de la Cordillera (Velocidad Lenta: 75s) -->
+    <div class="track-paralaje-lenta absolute bottom-0 left-0 h-[480px] w-[4800px] flex">
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 480" preserveAspectRatio="none">
+        <polygon points="0,480 80,310 240,390 420,250 580,380 750,220 920,360 1120,240 1280,380 1480,210 1660,370 1850,230 2050,390 2240,260 2400,380 2400,480" fill="#0b1428" opacity="0.6" />
+      </svg>
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 480" preserveAspectRatio="none">
+        <polygon points="0,480 80,310 240,390 420,250 580,380 750,220 920,360 1120,240 1280,380 1480,210 1660,370 1850,230 2050,390 2240,260 2400,380 2400,480" fill="#0b1428" opacity="0.6" />
+      </svg>
+    </div>
+
+    <!-- CAPA 2: Cordillera Intermedia con Aristas Rocosas (Velocidad Media: 45s) -->
+    <div class="track-paralaje-media absolute bottom-0 left-0 h-[500px] w-[4800px] flex">
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 500" preserveAspectRatio="none">
+        <polygon points="0,500 120,360 290,440 500,280 670,410 860,260 1060,420 1260,270 1440,430 1640,270 1830,420 2040,280 2230,420 2400,340 2400,500" fill="#111d36" opacity="0.8" />
+      </svg>
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 500" preserveAspectRatio="none">
+        <polygon points="0,500 120,360 290,440 500,280 670,410 860,260 1060,420 1260,270 1440,430 1640,270 1830,420 2040,280 2230,420 2400,340 2400,500" fill="#111d36" opacity="0.8" />
+      </svg>
+    </div>
+
+    <!-- CAPA 3: GRANDES NEVADOS Y ETIQUETAS NOMINALES (Velocidad Principal: 32s) -->
+    <!-- Contiene Huascarán, Alpamayo, Yerupajá, Ausangate, Hualcán y Palcaraju -->
+    <div id="track-cordillera-principal" class="track-paralaje-nevados absolute bottom-0 left-0 h-[560px] w-[4800px] flex pointer-events-auto">
+      
+      <!-- CICLO 1 (2400px de longitud) -->
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 560" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="pico-luz-h" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#475569" />
+            <stop offset="50%" stop-color="#334155" />
+            <stop offset="100%" stop-color="#1e293b" />
+          </linearGradient>
+          <linearGradient id="pico-sombra-h" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1e293b" />
+            <stop offset="60%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#020617" />
+          </linearGradient>
+          <linearGradient id="nieve-h" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="45%" stop-color="#f0f9ff" />
+            <stop offset="85%" stop-color="#bae6fd" />
+            <stop offset="100%" stop-color="#38bdf8" />
+          </linearGradient>
+          <linearGradient id="lago-turq-h" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#0369a1" />
+          </linearGradient>
+          <filter id="glow-badge" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+          </filter>
+        </defs>
+
+        <!-- 1. NEVADO HUASCARÁN SUR (6,768 m) - Coloso del Perú -->
+        <g id="pico-huascaran" class="cursor-pointer group">
+          <!-- Vertientes -->
+          <polygon points="340,70 130,560 340,560" fill="url(#pico-luz-h)" />
+          <polygon points="340,70 340,560 550,560" fill="url(#pico-sombra-h)" />
+          <!-- Casquete glaciar y seracs -->
+          <path d="M 340,70 L 250,195 L 290,185 L 320,225 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="url(#nieve-h)" />
+          <path d="M 340,70 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="#0284c7" opacity="0.35" />
+          <!-- Grietas del hielo -->
+          <line x1="315" y1="130" x2="330" y2="160" stroke="#0284c7" stroke-width="1.5" />
+          <line x1="355" y1="125" x2="345" y2="155" stroke="#0284c7" stroke-width="1.5" />
+          <!-- Línea conector a la etiqueta -->
+          <line x1="340" y1="70" x2="340" y2="40" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="340" cy="70" r="3" fill="#38bdf8" />
+          <!-- Etiqueta Flotante -->
+          <g transform="translate(230, 8)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Huascarán</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,768 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <!-- 2. NEVADO ALPAMAYO (5,947 m) - Pirámide Glaciar Emblemática -->
+        <g id="pico-alpamayo" class="cursor-pointer group">
+          <polygon points="740,140 580,560 740,560" fill="url(#pico-luz-h)" />
+          <polygon points="740,140 740,560 900,560" fill="url(#pico-sombra-h)" />
+          <path d="M 740,140 L 670,240 L 705,230 L 725,260 L 740,240 L 760,265 L 780,235 L 810,245 Z" fill="url(#nieve-h)" />
+          <!-- Estrías de fluting alpino -->
+          <line x1="720" y1="180" x2="695" y2="230" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
+          <line x1="740" y1="170" x2="735" y2="235" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
+          <line x1="760" y1="180" x2="775" y2="230" stroke="#0284c7" stroke-width="1.5" opacity="0.8" />
+          <line x1="740" y1="140" x2="740" y2="105" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="740" cy="140" r="3" fill="#38bdf8" />
+          <!-- Etiqueta Flotante -->
+          <g transform="translate(635, 72)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Alpamayo</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">5,947 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <!-- 3. NEVADO YERUPAJÁ (6,635 m) - Cordillera Huayhuash -->
+        <g id="pico-yerupaja" class="cursor-pointer group">
+          <polygon points="1150,95 940,560 1150,560" fill="url(#pico-luz-h)" />
+          <polygon points="1150,95 1150,560 1350,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1150,95 L 1060,210 L 1100,200 L 1130,235 L 1150,215 L 1180,245 L 1210,210 L 1240,220 Z" fill="url(#nieve-h)" />
+          <line x1="1150" y1="95" x2="1150" y2="60" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1150" cy="95" r="3" fill="#38bdf8" />
+          <!-- Etiqueta Flotante -->
+          <g transform="translate(1040, 28)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Yerupajá</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,635 m · Cord. Huayhuash</text>
+          </g>
+        </g>
+
+        <!-- 4. NEVADO AUSANGATE (6,384 m) - Cordillera Vilcanota (Cusco) -->
+        <g id="pico-ausangate" class="cursor-pointer group">
+          <polygon points="1560,115 1360,560 1560,560" fill="url(#pico-luz-h)" />
+          <polygon points="1560,115 1560,560 1760,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1560,115 L 1480,220 L 1520,210 L 1545,245 L 1560,225 L 1585,250 L 1615,220 L 1640,230 Z" fill="url(#nieve-h)" />
+          <!-- Laguna turquesa de pie de glaciar -->
+          <ellipse cx="1470" cy="480" rx="90" ry="22" fill="url(#lago-turq-h)" opacity="0.9" />
+          <line x1="1560" y1="115" x2="1560" y2="80" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1560" cy="115" r="3" fill="#38bdf8" />
+          <!-- Etiqueta Flotante -->
+          <g transform="translate(1450, 48)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Ausangate</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,384 m · Cord. Vilcanota</text>
+          </g>
+        </g>
+
+        <!-- 5. NEVADO HUALCÁN (6,122 m) & LAGUNA 513 -->
+        <g id="pico-hualcan" class="cursor-pointer group">
+          <polygon points="1960,120 1770,560 1960,560" fill="url(#pico-luz-h)" />
+          <polygon points="1960,120 1960,560 2160,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1960,120 L 1880,225 L 1920,215 L 1945,250 L 1960,230 L 1985,255 L 2015,225 L 2040,235 Z" fill="url(#nieve-h)" />
+          <!-- Espejo de Laguna 513 -->
+          <ellipse cx="1960" cy="460" rx="80" ry="20" fill="url(#lago-turq-h)" />
+          <line x1="1960" y1="120" x2="1960" y2="85" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1960" cy="120" r="3" fill="#10b981" />
+          <!-- Etiqueta Flotante -->
+          <g transform="translate(1850, 52)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#10b981" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Hualcán · Laguna 513</text>
+            <text x="28" y="27" fill="#34d399" font-size="9.5" font-weight="600" font-family="sans-serif">6,122 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <!-- Arista de enlace final hacia x=2400 -->
+        <polygon points="2280,130 2120,560 2280,560" fill="url(#pico-luz-h)" />
+        <polygon points="2280,130 2280,560 2400,320 2400,560" fill="url(#pico-sombra-h)" />
+      </svg>
+
+      <!-- CICLO 2 (Duplicado idéntico de 2400px para bucle infinito perfecto) -->
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 560" preserveAspectRatio="none">
+        <!-- Replicación exacta para seamless loop -->
+        <g id="pico-huascaran-dup" class="cursor-pointer group">
+          <polygon points="340,70 130,560 340,560" fill="url(#pico-luz-h)" />
+          <polygon points="340,70 340,560 550,560" fill="url(#pico-sombra-h)" />
+          <path d="M 340,70 L 250,195 L 290,185 L 320,225 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="url(#nieve-h)" />
+          <path d="M 340,70 L 340,195 L 370,230 L 400,190 L 430,205 Z" fill="#0284c7" opacity="0.35" />
+          <line x1="315" y1="130" x2="330" y2="160" stroke="#0284c7" stroke-width="1.5" />
+          <line x1="355" y1="125" x2="345" y2="155" stroke="#0284c7" stroke-width="1.5" />
+          <line x1="340" y1="70" x2="340" y2="40" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="340" cy="70" r="3" fill="#38bdf8" />
+          <g transform="translate(230, 8)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Huascarán</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,768 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <g id="pico-alpamayo-dup" class="cursor-pointer group">
+          <polygon points="740,140 580,560 740,560" fill="url(#pico-luz-h)" />
+          <polygon points="740,140 740,560 900,560" fill="url(#pico-sombra-h)" />
+          <path d="M 740,140 L 670,240 L 705,230 L 725,260 L 740,240 L 760,265 L 780,235 L 810,245 Z" fill="url(#nieve-h)" />
+          <line x1="720" y1="180" x2="695" y2="230" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
+          <line x1="740" y1="170" x2="735" y2="235" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" />
+          <line x1="760" y1="180" x2="775" y2="230" stroke="#0284c7" stroke-width="1.5" opacity="0.8" />
+          <line x1="740" y1="140" x2="740" y2="105" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="740" cy="140" r="3" fill="#38bdf8" />
+          <g transform="translate(635, 72)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="210" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Alpamayo</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">5,947 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <g id="pico-yerupaja-dup" class="cursor-pointer group">
+          <polygon points="1150,95 940,560 1150,560" fill="url(#pico-luz-h)" />
+          <polygon points="1150,95 1150,560 1350,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1150,95 L 1060,210 L 1100,200 L 1130,235 L 1150,215 L 1180,245 L 1210,210 L 1240,220 Z" fill="url(#nieve-h)" />
+          <line x1="1150" y1="95" x2="1150" y2="60" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1150" cy="95" r="3" fill="#38bdf8" />
+          <g transform="translate(1040, 28)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Yerupajá</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,635 m · Cord. Huayhuash</text>
+          </g>
+        </g>
+
+        <g id="pico-ausangate-dup" class="cursor-pointer group">
+          <polygon points="1560,115 1360,560 1560,560" fill="url(#pico-luz-h)" />
+          <polygon points="1560,115 1560,560 1760,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1560,115 L 1480,220 L 1520,210 L 1545,245 L 1560,225 L 1585,250 L 1615,220 L 1640,230 Z" fill="url(#nieve-h)" />
+          <ellipse cx="1470" cy="480" rx="90" ry="22" fill="url(#lago-turq-h)" opacity="0.9" />
+          <line x1="1560" y1="115" x2="1560" y2="80" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1560" cy="115" r="3" fill="#38bdf8" />
+          <g transform="translate(1450, 48)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#38bdf8" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Nevado Ausangate</text>
+            <text x="28" y="27" fill="#94a3b8" font-size="9.5" font-weight="600" font-family="sans-serif">6,384 m · Cord. Vilcanota</text>
+          </g>
+        </g>
+
+        <g id="pico-hualcan-dup" class="cursor-pointer group">
+          <polygon points="1960,120 1770,560 1960,560" fill="url(#pico-luz-h)" />
+          <polygon points="1960,120 1960,560 2160,560" fill="url(#pico-sombra-h)" />
+          <path d="M 1960,120 L 1880,225 L 1920,215 L 1945,250 L 1960,230 L 1985,255 L 2015,225 L 2040,235 Z" fill="url(#nieve-h)" />
+          <ellipse cx="1960" cy="460" rx="80" ry="20" fill="url(#lago-turq-h)" />
+          <line x1="1960" y1="120" x2="1960" y2="85" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.8" />
+          <circle cx="1960" cy="120" r="3" fill="#10b981" />
+          <g transform="translate(1850, 52)" filter="url(#glow-badge)">
+            <rect x="0" y="0" width="220" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="1.5" fill-opacity="0.9" />
+            <circle cx="16" cy="17" r="4" fill="#10b981" />
+            <text x="28" y="16" fill="#ffffff" font-size="12" font-weight="800" font-family="sans-serif">Hualcán · Laguna 513</text>
+            <text x="28" y="27" fill="#34d399" font-size="9.5" font-weight="600" font-family="sans-serif">6,122 m · Cordillera Blanca</text>
+          </g>
+        </g>
+
+        <polygon points="2280,130 2120,560 2280,560" fill="url(#pico-luz-h)" />
+        <polygon points="2280,130 2280,560 2400,320 2400,560" fill="url(#pico-sombra-h)" />
+      </svg>
+
+    </div>
+
+    <!-- CAPA 4: Morenas Frontales en Primer Plano (Velocidad Más Dinámica: 20s) -->
+    <div class="track-paralaje-cercana absolute bottom-0 left-0 h-[380px] w-[4800px] flex">
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 380" preserveAspectRatio="none">
+        <polygon points="0,380 90,320 280,360 480,290 690,360 920,280 1140,360 1380,290 1620,360 1860,300 2100,370 2400,310 2400,380" fill="#040813" opacity="0.85" />
+      </svg>
+      <svg class="h-full w-[2400px] shrink-0" viewBox="0 0 2400 380" preserveAspectRatio="none">
+        <polygon points="0,380 90,320 280,360 480,290 690,360 920,280 1140,360 1380,290 1620,360 1860,300 2100,370 2400,310 2400,380" fill="#040813" opacity="0.85" />
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- CAPA DE DIFUMINADO / MÁSCARA GRADUAL                     -->
+  <!-- Pasa suavemente de Blanco Sólido a la Cordillera Azul   -->
+  <!-- ======================================================== -->
+  <div class="absolute inset-y-0 left-0 w-full lg:w-[65%] xl:w-[58%] 2xl:w-[52%] bg-gradient-to-r from-white via-white via-70% to-transparent pointer-events-none z-10 hidden lg:block"></div>
+  <!-- Versión móvil (difuminado de arriba a abajo) -->
+  <div class="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-white via-white/90 to-transparent pointer-events-none z-10 lg:hidden"></div>
+
+  <!-- ======================================================== -->
+  <!-- CONTENIDO FRONTAL (IZQUIERDA): PREGUNTA Y BUSCADOR        -->
+  <!-- En fondo blanco puro, sobrio, institucional y limpio     -->
+  <!-- ======================================================== -->
+  <div class="relative z-20 w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 lg:py-16">
+    <div class="max-w-xl xl:max-w-2xl bg-white/95 lg:bg-transparent p-6 sm:p-8 lg:p-0 rounded-3xl lg:rounded-none shadow-xl lg:shadow-none border border-slate-200/80 lg:border-none backdrop-blur-md lg:backdrop-blur-none space-y-6">
+      
+      <!-- Pastilla Institucional -->
+      <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-xs text-slate-700 shadow-xs">
+        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-semibold text-slate-900">398 Informes oficiales</span>
+        <span class="text-slate-300">|</span>
+        <span>Evidencia con trazabilidad científica</span>
+      </div>
+
+      <!-- Título de impacto -->
+      <div class="space-y-3">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-black tracking-tight text-slate-950 leading-[1.12]">
+          ¿Hay riesgo donde vives?
         </h1>
-        <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
-          Escribe tu pueblo, departamento o una laguna: te mostramos qué glaciares hay aguas arriba, qué eventos históricos ocurrieron y de qué documento técnico proviene cada evidencia.
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
+          Escribe tu pueblo, departamento o una laguna: te mostramos qué glaciares hay aguas arriba, qué pasó antes y de qué informe técnico oficial proviene cada dato.
         </p>
       </div>
 
-      <!-- Buscador institucional ágil -->
-      <div class="w-full lg:max-w-md xl:max-w-lg space-y-2.5">
-        <div class="relative">
+      <!-- Buscador Institucional con Icono -->
+      <div class="space-y-3">
+        <div class="relative max-w-lg">
           <input 
             id="hero-search-input"
             type="text" 
-            placeholder="Escribe tu pueblo, departamento o laguna..." 
+            placeholder="Escribe tu pueblo, departamento o una laguna..." 
             class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 pl-11 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-950/10 transition"
           />
           <svg class="absolute left-3.5 top-4 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,715 +325,141 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
           </svg>
         </div>
 
-        <!-- Sugerencias directas -->
-        <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
-          <span class="font-medium text-slate-400">Consultas rápidas:</span>
-          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-xs">Huaraz</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-xs">Laguna 513</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-xs">Parón</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-white px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-xs">Cusco</button>
+        <!-- Consultas rápidas recomendadas -->
+        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <span class="font-medium text-slate-400">O prueba con:</span>
+          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs">Huaraz</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs">Laguna 513</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs">Parón</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700 hover:bg-slate-100 transition shadow-2xs">Cusco</button>
         </div>
+      </div>
+
+      <!-- Enlace directo al simulador de cuencas -->
+      <div class="pt-2 flex items-center gap-3">
+        <a 
+          href="#simulador-cordillera" 
+          class="inline-flex items-center gap-2 text-xs font-bold text-slate-800 hover:text-sky-600 bg-slate-100 hover:bg-slate-200/80 px-3.5 py-2 rounded-xl transition border border-slate-200 shadow-2xs"
+        >
+          <span>Ver anatomía de un aluvión en 5 escenas</span>
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+        </a>
       </div>
 
     </div>
-
-    <!-- ======================================================== -->
-    <!-- ESCENARIO WIDESCREEN: SIMULADOR DE ALTA MONTAÑA (100%)    -->
-    <!-- Diseño cinematográfico, espacioso y ultra dinámico      -->
-    <!-- ======================================================== -->
-    <div class="w-full rounded-3xl border border-slate-900/60 bg-[#060c18] shadow-2xl overflow-hidden flex flex-col text-white">
-      
-      <!-- Barra superior: Selector de Lagunas Críticas + Indicadores de Fase -->
-      <div class="px-4 py-3.5 sm:px-6 bg-[#081020] border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
-        
-        <!-- Pestañas de Lagunas -->
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-          {Object.values(LAGUNAS_ESCENAS).map((l, idx) => (
-            <button 
-              type="button" 
-              class={`tab-laguna-escena whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all flex items-center gap-2 ${idx === 0 ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/20' : 'bg-slate-900/90 text-slate-400 hover:text-white hover:bg-slate-800'}`}
-              data-laguna-id={l.id}
-            >
-              <span class={`h-2 w-2 rounded-full ${l.id === '513' ? 'bg-emerald-400' : l.id === 'upiscocha' ? 'bg-amber-400' : 'bg-rose-500'}`}></span>
-              <span>{l.nombre.startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`} {l.anoEvento ? `· ${l.anoEvento}` : ''}</span>
-            </button>
-          ))}
-        </div>
-
-        <!-- Indicador de Fase y Telemetría activa -->
-        <div class="flex items-center gap-3 text-xs">
-          <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700/70 text-slate-300">
-            <span class="h-2 w-2 rounded-full bg-sky-400 animate-pulse"></span>
-            <span id="badge-fase-indicador" class="font-bold text-sky-300 uppercase tracking-wider text-[11px]">Fase 1: El Hielo</span>
-          </div>
-          <span class="hidden sm:inline text-slate-500 text-xs font-mono">100% Pantalla Widescreen</span>
-        </div>
-
-      </div>
-
-      <!-- Lienzo SVG Cinemático: 1400x680 con Profundidad y Cámara -->
-      <div id="contenedor-cinematico" class="relative h-[440px] sm:h-[500px] lg:h-[580px] xl:h-[640px] 2xl:h-[680px] w-full bg-[#060c18] overflow-hidden flex items-center justify-center select-none cursor-crosshair">
-        
-        <svg id="svg-cordillera" class="h-full w-full" viewBox="0 0 1400 680" preserveAspectRatio="xMidYMid slice">
-          <defs>
-            <!-- Cielo de alta montaña con gradiente astronómico -->
-            <linearGradient id="sky-grad-wide" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#030712" />
-              <stop offset="40%" stop-color="#0a1224" />
-              <stop offset="75%" stop-color="#121e3a" />
-              <stop offset="100%" stop-color="#1e293b" />
-            </linearGradient>
-
-            <!-- Relieve: Cara Iluminada (Oeste) -->
-            <linearGradient id="pico-luz-wide" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#475569" />
-              <stop offset="35%" stop-color="#334155" />
-              <stop offset="100%" stop-color="#1e293b" />
-            </linearGradient>
-
-            <!-- Relieve: Cara Sombreada (Este) -->
-            <linearGradient id="pico-sombra-wide" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1e293b" />
-              <stop offset="60%" stop-color="#0f172a" />
-              <stop offset="100%" stop-color="#020617" />
-            </linearGradient>
-
-            <!-- Hielo Glaciar de Alta Cumbre -->
-            <linearGradient id="hielo-corona-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="40%" stop-color="#f0f9ff" />
-              <stop offset="75%" stop-color="#bae6fd" />
-              <stop offset="100%" stop-color="#38bdf8" />
-            </linearGradient>
-
-            <!-- Espejo de Agua Turquesa Glacial -->
-            <linearGradient id="lago-turquesa-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#38bdf8" />
-              <stop offset="35%" stop-color="#0284c7" />
-              <stop offset="80%" stop-color="#0369a1" />
-              <stop offset="100%" stop-color="#082f49" />
-            </linearGradient>
-
-            <!-- Cañón Inferior y Torrente Aluvial -->
-            <linearGradient id="canyon-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#1e293b" />
-              <stop offset="60%" stop-color="#0f172a" />
-              <stop offset="100%" stop-color="#020617" />
-            </linearGradient>
-
-            <!-- Filtro de Resplandor Neón para el Dique y SAT -->
-            <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          <!-- Fondo Cielo Estrellado -->
-          <rect width="1400" height="680" fill="url(#sky-grad-wide)" />
-
-          <!-- Campo de Estrellas y Constelaciones de Altitud -->
-          <g id="estrellas" opacity="0.65">
-            <circle cx="80" cy="50" r="1.2" fill="#ffffff" />
-            <circle cx="180" cy="80" r="1" fill="#bae6fd" />
-            <circle cx="270" cy="35" r="1.5" fill="#ffffff" />
-            <circle cx="390" cy="110" r="1" fill="#bae6fd" />
-            <circle cx="510" cy="45" r="1.8" fill="#ffffff" />
-            <circle cx="640" cy="25" r="1.2" fill="#bae6fd" />
-            <circle cx="780" cy="65" r="1.5" fill="#ffffff" />
-            <circle cx="890" cy="40" r="1" fill="#bae6fd" />
-            <circle cx="1020" cy="90" r="1.6" fill="#ffffff" />
-            <circle cx="1150" cy="30" r="1.2" fill="#bae6fd" />
-            <circle cx="1280" cy="75" r="1.5" fill="#ffffff" />
-            <circle cx="1350" cy="120" r="1.1" fill="#bae6fd" />
-          </g>
-
-          <!-- Niebla y Nubes Glaciares Drifting (Fondo lejano) -->
-          <g id="nubes-fondo" opacity="0.25">
-            <path d="M -200,160 Q 200,110 600,150 T 1400,140 L 1400,240 L -200,240 Z" fill="#94a3b8">
-              <animateTransform attributeName="transform" type="translate" from="0,0" to="200,0" dur="25s" repeatCount="indefinite" />
-            </path>
-          </g>
-
-          <!-- ======================================================== -->
-          <!-- GRUPO CÁMARA CINEMÁTICA INTERACTIVA                      -->
-          <!-- Realiza Zoom in, Pullback, Inclinación y Sacudida        -->
-          <!-- ======================================================== -->
-          <g id="camara-escena" class="origin-center transition-all duration-1000 ease-out" style="transform-origin: 700px 340px;">
-            
-            <!-- CAPA 1: Cordillera Lejana / Horizonte Andino (siluetas oscuras) -->
-            <polygon points="0,680 0,380 90,320 220,410 350,260 480,390 620,240 700,270 820,210 960,370 1090,260 1240,390 1330,310 1400,360 1400,680" fill="#0b1325" opacity="0.75" />
-
-            <!-- CAPA 2: Cordillera Intermedia con aristas rocosas -->
-            <polygon points="0,680 0,440 140,340 280,450 450,290 600,430 700,320 840,430 1020,270 1180,440 1320,330 1400,420 1400,680" fill="#111d38" opacity="0.9" />
-
-            <!-- ======================================================== -->
-            <!-- CAÑÓN INFERIOR, QUEBRADA Y VALLE (Revelado en Escena 4)  -->
-            <!-- ======================================================== -->
-            <g id="capa-valle-abajo" opacity="0.35" class="transition-opacity duration-1000">
-              <!-- Paredes del cañón rocoso -->
-              <path d="M 520,440 L 360,680 L 1040,680 L 880,440 Z" fill="url(#canyon-grad)" />
-              
-              <!-- Río / Torrente Aluvial descolgándose en zig-zag -->
-              <path id="cauce-rio-aluvion" d="M 700,440 Q 640,510 710,560 Q 770,610 680,680" fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
-                <animate attributeName="stroke-dashoffset" values="60;0" dur="1.8s" repeatCount="indefinite" stroke-dasharray="20 10" />
-              </path>
-
-              <!-- Cono aluvial y zona urbana / poblados en el fondo -->
-              <g id="cono-aluvial-poblado" transform="translate(680, 620)">
-                <ellipse cx="0" cy="40" rx="220" ry="25" fill="#020617" opacity="0.9" />
-                <path d="M -120,40 L 120,40" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 4" />
-                <!-- Callout flotante del valle -->
-                <rect x="-110" y="8" width="220" height="26" rx="13" fill="#0f172a" stroke="#334155" stroke-width="1" />
-                <text x="0" y="25" fill="#e2e8f0" font-size="11" font-weight="800" text-anchor="middle" font-family="sans-serif">Quebrada hacia Poblado / Valle</text>
-              </g>
-            </g>
-
-            <!-- ======================================================== -->
-            <!-- MONTAÑA PRINCIPAL (COLOSO ANDINO CENTRAL)                -->
-            <!-- Base majestuosa de 1400px con arista central afilada     -->
-            <!-- ======================================================== -->
-            <!-- Vertiente Izquierda (Luz del atardecer/amanecer) -->
-            <polygon points="700,70 280,560 700,560" fill="url(#pico-luz-wide)" />
-            <!-- Vertiente Derecha (Sombra profunda) -->
-            <polygon points="700,70 700,560 1120,560" fill="url(#pico-sombra-wide)" />
-
-            <!-- Estratos geológicos y aristas rocosas -->
-            <path d="M 700,70 L 610,240 L 520,380 L 400,530" stroke="#1e293b" stroke-width="3" opacity="0.5" fill="none" />
-            <path d="M 700,70 L 780,220 L 890,390 L 1020,540" stroke="#090d16" stroke-width="3" opacity="0.7" fill="none" />
-
-            <!-- ======================================================== -->
-            <!-- CORONA GLACIAR Y SERACS DE NIEVE ETERNA                  -->
-            <!-- Enfoque épico en Escena 1: El Hielo                      -->
-            <!-- ======================================================== -->
-            <g id="casquete-nieve-glaciar" class="transition-all duration-1000">
-              <!-- Casquete Glaciar Principal -->
-              <path d="M 700,70 L 590,190 L 630,180 L 660,220 L 700,195 L 740,225 L 780,185 L 820,205 Z" fill="url(#hielo-corona-grad)" filter="drop-shadow(0 4px 12px rgba(56,189,248,0.25))" />
-              <!-- Sombra facetada del hielo oriental -->
-              <path d="M 700,70 L 700,195 L 740,225 L 780,185 L 820,205 Z" fill="#0284c7" opacity="0.35" />
-
-              <!-- Grietas de tensión y seracs colgantes -->
-              <g stroke="#0369a1" stroke-width="2" stroke-linecap="round" opacity="0.75">
-                <line x1="675" y1="130" x2="690" y2="160" />
-                <line x1="720" y1="125" x2="710" y2="155" />
-                <line x1="630" y1="160" x2="655" y2="175" />
-                <line x1="750" y1="155" x2="775" y2="170" />
-              </g>
-
-              <!-- EFECTO DINÁMICO: DESHIELO Y CASCADAS DE FUSIÓN (Escena 1) -->
-              <g id="fx-deshielo-gotas" class="opacity-90">
-                <line x1="660" y1="220" x2="660" y2="330" stroke="#bae6fd" stroke-width="2.5" stroke-dasharray="4 8">
-                  <animate attributeName="stroke-dashoffset" values="0;36" dur="0.9s" repeatCount="indefinite" />
-                </line>
-                <line x1="740" y1="225" x2="740" y2="330" stroke="#bae6fd" stroke-width="2.5" stroke-dasharray="4 8">
-                  <animate attributeName="stroke-dashoffset" values="0;36" dur="1.1s" repeatCount="indefinite" />
-                </line>
-                <line x1="700" y1="195" x2="700" y2="310" stroke="#e0f2fe" stroke-width="1.5" stroke-dasharray="3 6">
-                  <animate attributeName="stroke-dashoffset" values="0;27" dur="0.7s" repeatCount="indefinite" />
-                </line>
-              </g>
-            </g>
-
-            <!-- ======================================================== -->
-            <!-- CIRCO GLACIAR Y VASO DE LA LAGUNA                        -->
-            <!-- Enfoque en Escena 2: La Laguna                           -->
-            <!-- ======================================================== -->
-            <g id="vaso-laguna-completo" class="transition-all duration-1000">
-              
-              <!-- Morrena frontal de contención (Dique morrénico natural de roca) -->
-              <path d="M 460,400 Q 700,280 940,400 Q 700,500 460,400 Z" fill="#090f1d" stroke="#1e293b" stroke-width="2" />
-              <path id="borde-morrena-roca" d="M 500,410 Q 700,480 900,410" fill="none" stroke="#b45309" stroke-width="10" stroke-linecap="round" opacity="0.9" />
-
-              <!-- Espejo de Agua Glacial Turquesa Profunda -->
-              <ellipse id="elipse-lago-profundo" cx="700" cy="405" rx="180" ry="46" fill="#075985" />
-              <ellipse id="elipse-lago-superficie" cx="700" cy="402" rx="172" ry="40" fill="url(#lago-turquesa-grad)">
-                <animate attributeName="ry" values="39;42;39" dur="3.5s" repeatCount="indefinite" />
-              </ellipse>
-
-              <!-- Anillos de batimetría y ondas de profundidad (Escena 2) -->
-              <ellipse cx="700" cy="405" rx="115" ry="24" fill="none" stroke="#e0f2fe" stroke-width="1.5" opacity="0.4">
-                <animate attributeName="rx" values="100;130;100" dur="4s" repeatCount="indefinite" />
-              </ellipse>
-              <ellipse cx="700" cy="406" rx="60" ry="12" fill="#082f49" opacity="0.7" />
-
-              <!-- ======================================================== -->
-              <!-- DINÁMICA DE IMPACTO, AVALANCHA Y OLA DE TSUNAMI (Escena 3) -->
-              <!-- ======================================================== -->
-              <g id="fx-aluvion-dinamico" class="hidden">
-                <!-- Bloque de cornisa de hielo precipitándose -->
-                <polygon points="685,240 715,225 730,260 695,275" fill="#f8fafc" stroke="#38bdf8" stroke-width="2">
-                  <animate attributeName="transform" type="translate" values="0,-60; 0,130" dur="1s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0.9;0" dur="1s" repeatCount="indefinite" />
-                </polygon>
-
-                <!-- Estela de polvo y caída de roca -->
-                <line x1="705" y1="230" x2="705" y2="380" stroke="#f8fafc" stroke-width="3" stroke-dasharray="6 6" opacity="0.6">
-                  <animate attributeName="stroke-dashoffset" values="0;24" dur="0.5s" repeatCount="indefinite" />
-                </line>
-
-                <!-- Ola gigante de desplazamiento (Tsunami lacustre de 28m) -->
-                <ellipse cx="700" cy="400" rx="90" ry="28" fill="none" stroke="#ffffff" stroke-width="4">
-                  <animate attributeName="rx" values="30;200" dur="1.2s" repeatCount="indefinite" />
-                  <animate attributeName="ry" values="8;54" dur="1.2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0" dur="1.2s" repeatCount="indefinite" />
-                </ellipse>
-
-                <!-- Desborde violento sobre la morrena -->
-                <path d="M 660,425 Q 700,490 740,425 Z" fill="#38bdf8" opacity="0.95" filter="url(#neon-glow)">
-                  <animate attributeName="d" values="M 670,425 Q 700,450 730,425 Z; M 650,425 Q 700,520 750,425 Z; M 670,425 Q 700,450 730,425 Z" dur="0.9s" repeatCount="indefinite" />
-                </path>
-
-                <!-- Círculo de advertencia de ruptura en la morrena -->
-                <circle cx="700" cy="445" r="22" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.9">
-                  <animate attributeName="r" values="15;35" dur="0.8s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0" dur="0.8s" repeatCount="indefinite" />
-                </circle>
-              </g>
-
-              <!-- ======================================================== -->
-              <!-- INGENIERÍA DE MITIGACIÓN Y SISTEMA SAT (Escena 5)        -->
-              <!-- ======================================================== -->
-              <g id="fx-obra-seguridad" class="hidden">
-                <!-- Dique de Concreto Reforzado en Verde Esmeralda -->
-                <rect x="650" y="435" width="100" height="22" rx="6" fill="#10b981" filter="url(#neon-glow)" />
-                <line x1="665" y1="446" x2="735" y2="446" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
-                <text x="700" y="450" fill="#ffffff" font-size="9" font-weight="900" text-anchor="middle" font-family="sans-serif" letter-spacing="1">DIQUE REFORZADO</text>
-
-                <!-- Compuerta / Bocatoma de desagüe seguro -->
-                <circle cx="700" cy="465" r="5" fill="#047857" stroke="#34d399" stroke-width="2" />
-
-                <!-- Torre SAT con Ondas de Alerta Temprana -->
-                <line x1="860" y1="400" x2="860" y2="355" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
-                <polygon points="852,360 868,360 860,350" fill="#10b981" />
-                <circle cx="860" cy="350" r="4" fill="#34d399" />
-                
-                <!-- Ondas de radio radar del SAT -->
-                <circle cx="860" cy="350" r="10" fill="none" stroke="#34d399" stroke-width="2">
-                  <animate attributeName="r" values="6;30" dur="1.6s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0" dur="1.6s" repeatCount="indefinite" />
-                </circle>
-                <circle cx="860" cy="350" r="20" fill="none" stroke="#34d399" stroke-width="1.5">
-                  <animate attributeName="r" values="10;45" dur="1.6s" begin="0.4s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0" dur="1.6s" begin="0.4s" repeatCount="indefinite" />
-                </circle>
-              </g>
-
-            </g>
-
-            <!-- ======================================================== -->
-            <!-- PASTILLAS GEOLÓGICAS FLOTANTES (Conectadas al relieve)   -->
-            <!-- ======================================================== -->
-            <!-- Pastilla Cumbre / Glaciar de Cabecera -->
-            <g id="badge-pico" transform="translate(850, 75)" class="transition-transform duration-700">
-              <rect x="0" y="0" width="160" height="42" rx="21" fill="#ffffff" filter="drop-shadow(0 10px 20px rgba(0,0,0,0.6))" />
-              <text id="lbl-nombre-pico" x="80" y="26" fill="#0f172a" font-size="14" font-weight="900" text-anchor="middle" font-family="sans-serif">Hualcán</text>
-            </g>
-
-            <!-- Pastilla Laguna -->
-            <g id="badge-laguna" transform="translate(410, 310)" class="transition-transform duration-700">
-              <rect x="0" y="0" width="180" height="44" rx="22" fill="#0284c7" fill-opacity="0.95" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))" />
-              <text id="lbl-nombre-laguna" x="90" y="27" fill="#ffffff" font-size="14" font-weight="900" text-anchor="middle" font-family="sans-serif">Laguna 513</text>
-            </g>
-
-          </g>
-          <!-- FIN DEL GRUPO CÁMARA CINEMÁTICA -->
-
-        </svg>
-
-        <!-- Callouts flotantes HUD en esquinas del lienzo -->
-        <div class="absolute bottom-5 left-6 flex items-center gap-3 bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-700/70 text-xs shadow-xl">
-          <span class="h-2.5 w-2.5 rounded-full bg-sky-400 animate-ping"></span>
-          <span id="callout-cota-texto" class="font-bold text-slate-100 font-mono tracking-tight">ENFOQUE: GLACIAR DE CABECERA (6,122 M)</span>
-        </div>
-
-        <div class="hidden sm:flex absolute top-5 right-6 items-center gap-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300 font-mono">
-          <span class="text-sky-400">●</span>
-          <span>Modelo Morfométrico UNMSM</span>
-        </div>
-
-      </div>
-
-      <!-- ======================================================== -->
-      <!-- PANEL NARRATIVO Y CONTROLES DE LAS 5 ESCENAS             -->
-      <!-- ======================================================== -->
-      <div class="p-5 sm:p-7 bg-[#070e1c] border-t border-slate-800/90 space-y-4">
-        
-        <!-- Barra de progreso segmentada de 5 escenas interactiva con etiquetas -->
-        <div class="grid grid-cols-5 gap-2 sm:gap-3">
-          {[
-            { n: 1, label: "1. El hielo" },
-            { n: 2, label: "2. La laguna" },
-            { n: 3, label: "3. El aluvión" },
-            { n: 4, label: "4. Aguas abajo" },
-            { n: 5, label: "5. Hoy y SAT" },
-          ].map(fase => (
-            <button 
-              type="button" 
-              class="btn-escena-seg group flex flex-col gap-1.5 focus:outline-none text-left"
-              data-escena-index={fase.n}
-              title={`Ir a Escena ${fase.n}: ${fase.label}`}
-            >
-              <div class="bar-indicador h-2 w-full rounded-full transition-all duration-300 bg-slate-800 group-hover:bg-slate-700"></div>
-              <span class="lbl-fase hidden sm:inline text-[11px] font-bold text-slate-500 group-hover:text-slate-300 transition-colors uppercase tracking-wider">{fase.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <!-- Encabezado de la escena actual -->
-        <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-sky-400 pt-1">
-          <span id="txt-escena-subtitulo">Laguna 513, Áncash. Escena 1 de 5: el hielo</span>
-          <span id="txt-escena-alerta" class="hidden text-amber-400 font-semibold text-xs flex items-center gap-1.5">
-            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
-            <span>Pieza que falta en los documentos oficiales</span>
-          </span>
-        </div>
-
-        <!-- Texto explicativo de alto impacto -->
-        <p id="txt-escena-cuerpo" class="text-base sm:text-xl font-bold text-slate-100 leading-snug min-h-[56px] transition-opacity duration-200">
-          El deshielo de Hualcán alimenta la laguna 513. En todo el Perú ya se perdió el 52 % del hielo (1962-2016).
-        </p>
-
-        <!-- Pie de la escena: Cita del documento oficial + Controles cinemáticos + Ver Ficha -->
-        <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs border-t border-slate-800/80">
-          <div class="flex items-center gap-2">
-            <span class="text-slate-500 font-mono">EVIDENCIA:</span>
-            <span id="txt-escena-fuente" class="text-slate-300 font-medium bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">Fuente: INAIGEM 2017 · p. 9</span>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <!-- Controles Cinemáticos [ ◀ ] [ || ] [ ▶ ] -->
-            <div class="flex items-center gap-1 bg-slate-900 rounded-xl p-1 border border-slate-700/80 shadow-inner">
-              <button id="ctrl-prev" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena anterior">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
-              </button>
-              <button id="ctrl-playpause" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Pausar / Reproducir">
-                <svg id="icon-pause" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
-                <svg id="icon-play" class="h-4 w-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-              <button id="ctrl-next" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena siguiente">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-
-            <!-- Botón Ver Ficha -->
-            <a 
-              id="btn-ver-ficha"
-              href="#comparar" 
-              class="whitespace-nowrap rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2.5 font-bold text-xs transition shadow-md flex items-center gap-1.5"
-            >
-              <span>Ver ficha técnica</span>
-              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
   </div>
+
+  <!-- ======================================================== -->
+  <!-- CONTROL DISCRETO DE ANIMACIÓN DE LA CORDILLERA (HUD)     -->
+  <!-- ======================================================== -->
+  <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-700/60 text-[11px] text-slate-300 shadow-xl">
+    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span class="font-mono font-medium">Recorrido Andino Infinito</span>
+    <button id="btn-toggle-paralaje" type="button" class="ml-1 text-slate-400 hover:text-white transition" title="Pausar / Reanudar recorrido">
+      <svg id="icon-pause-loop" class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+      <svg id="icon-play-loop" class="h-3.5 w-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+  </div>
+
 </section>
 
+<!-- ======================================================== -->
+<!-- ESTILOS CSS DE ANIMACIÓN INFINITA A 60 FPS               -->
+<!-- ======================================================== -->
 <style>
-  /* Animación de temblor sísmico e impacto de aluvión en Escena 3 */
-  @keyframes temblorAluvion {
-    0% { transform: scale(1.48) translate(30px, 15px); }
-    15% { transform: scale(1.49) translate(36px, 10px); }
-    30% { transform: scale(1.47) translate(24px, 20px); }
-    50% { transform: scale(1.49) translate(34px, 12px); }
-    70% { transform: scale(1.48) translate(26px, 18px); }
-    85% { transform: scale(1.49) translate(32px, 14px); }
-    100% { transform: scale(1.48) translate(30px, 15px); }
+  /* Desplazamiento seamless a 60fps con transform3d (acelerado por GPU) */
+  @keyframes loopCordilleraLenta {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-2400px, 0, 0); }
   }
-  .anim-sacudida {
-    animation: temblorAluvion 0.35s ease-in-out infinite alternate !important;
+  @keyframes loopCordilleraMedia {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-2400px, 0, 0); }
+  }
+  @keyframes loopCordilleraNevados {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-2400px, 0, 0); }
+  }
+  @keyframes loopCordilleraCercana {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-2400px, 0, 0); }
+  }
+
+  .track-paralaje-lenta {
+    animation: loopCordilleraLenta 85s linear infinite;
+    will-change: transform;
+  }
+  .track-paralaje-media {
+    animation: loopCordilleraMedia 55s linear infinite;
+    will-change: transform;
+  }
+  .track-paralaje-nevados {
+    animation: loopCordilleraNevados 38s linear infinite;
+    will-change: transform;
+  }
+  .track-paralaje-cercana {
+    animation: loopCordilleraCercana 24s linear infinite;
+    will-change: transform;
+  }
+
+  /* Efecto al posar el ratón: desaceleración suave para leer con calma */
+  .track-paralaje-nevados:hover {
+    animation-play-state: paused;
+  }
+
+  /* Estado pausado manual */
+  .paralaje-paused {
+    animation-play-state: paused !important;
   }
 </style>
 
 <script>
-  import { LAGUNAS_ESCENAS } from '../config/scenes.data';
+  // Control de Pausa / Reanudar el recorrido
+  const btnToggle = document.getElementById('btn-toggle-paralaje');
+  const iconPause = document.getElementById('icon-pause-loop');
+  const iconPlay = document.getElementById('icon-play-loop');
+  const tracks = document.querySelectorAll('[class*="track-paralaje-"]');
+  let isMoving = true;
 
-  let lagunaActivaId = "513";
-  let escenaActual = 1; // 1 a 5
-  let timerAutoPlay: any = null;
-  let isPlaying = true;
-
-  // Elementos DOM
-  const tabsLaguna = document.querySelectorAll('.tab-laguna-escena');
-  const segmentos = document.querySelectorAll('.btn-escena-seg');
-  const txtSubtitulo = document.getElementById('txt-escena-subtitulo');
-  const txtAlerta = document.getElementById('txt-escena-alerta');
-  const txtCuerpo = document.getElementById('txt-escena-cuerpo');
-  const txtFuente = document.getElementById('txt-escena-fuente');
-  const btnFicha = document.getElementById('btn-ver-ficha');
-  const badgeFase = document.getElementById('badge-fase-indicador');
-  const calloutCota = document.getElementById('callout-cota-texto');
-  
-  // Elementos SVG y Cámara
-  const contenedorCinematico = document.getElementById('contenedor-cinematico');
-  const camara = document.getElementById('camara-escena');
-  const lblPico = document.getElementById('lbl-nombre-pico');
-  const lblLaguna = document.getElementById('lbl-nombre-laguna');
-  const svgAluvion = document.getElementById('fx-aluvion-dinamico');
-  const svgDique = document.getElementById('fx-obra-seguridad');
-  const capaValle = document.getElementById('capa-valle-abajo');
-  const fxDeshielo = document.getElementById('fx-deshielo-gotas');
-
-  // Controles
-  const btnPrev = document.getElementById('ctrl-prev');
-  const btnNext = document.getElementById('ctrl-next');
-  const btnPlayPause = document.getElementById('ctrl-playpause');
-  const iconPause = document.getElementById('icon-pause');
-  const iconPlay = document.getElementById('icon-play');
-
-  // ========================================================
-  // MATRIZ DE TRANSFORMACIONES CINEMÁTICAS DE CÁMARA (WIDESCREEN 1400x680)
-  // Origin: 700px 340px
-  // ========================================================
-  const POSICIONES_CAMARA: Record<number, { transform: string; cota: string; fase: string; sacudida?: boolean }> = {
-    1: {
-      // Escena 1: El Hielo -> Zoom dramático cercano en la cumbre nevada, seracs y fusión
-      transform: "scale(1.85) translate(0px, 160px)",
-      cota: "ENFOQUE: GLACIAR DE CABECERA · COTA 6,122 M",
-      fase: "Fase 1: El Hielo"
-    },
-    2: {
-      // Escena 2: La Laguna -> Retroceso y ángulo descendente hacia el vaso lacustre
-      transform: "scale(1.3) translate(0px, -25px)",
-      cota: "ENFOQUE: VASO Y PROFUNDIDAD · COTA 4,431 M",
-      fase: "Fase 2: La Laguna"
-    },
-    3: {
-      // Escena 3: El día que pasó -> Enfoque medio tenso en la morrena con temblor sísmico y ola
-      transform: "scale(1.48) translate(30px, 15px)",
-      cota: "EVENTO CRÍTICO: RUPTURA Y OLA DE ALURIÓN",
-      fase: "Fase 3: Aluvión",
-      sacudida: true
-    },
-    4: {
-      // Escena 4: Aguas abajo -> Retroceso panorámico total (revela el cañón inferior y valle)
-      transform: "scale(0.82) translate(0px, -115px)",
-      cota: "PERSPECTIVA: CAÑÓN, QUEBRADA Y VALLE URBANO",
-      fase: "Fase 4: Aguas abajo"
-    },
-    5: {
-      // Escena 5: Hoy -> Vista equilibrada de mitigación, dique y alerta temprana SAT
-      transform: "scale(1.1) translate(0px, -20px)",
-      cota: "SEGURIDAD ACTIVA: DIQUE REFORZADO Y SAT 24/7",
-      fase: "Fase 5: Mitigación actual"
-    }
-  };
-
-  function renderizarEscena() {
-    const dataLaguna = LAGUNAS_ESCENAS[lagunaActivaId] || LAGUNAS_ESCENAS["513"];
-    const escena = dataLaguna.escenas.find(e => e.numero === escenaActual) || dataLaguna.escenas[0];
-    const camCfg = POSICIONES_CAMARA[escenaActual] || POSICIONES_CAMARA[1];
-
-    const nombreLimpio = dataLaguna.nombre.startsWith('Laguna') ? dataLaguna.nombre : `Laguna ${dataLaguna.nombre}`;
-
-    // 1. Textos
-    if (txtSubtitulo) {
-      txtSubtitulo.textContent = `${nombreLimpio}, ${dataLaguna.departamento}. Escena ${escena.numero} de 5: ${escena.tituloFase}`;
-    }
-    if (txtCuerpo) {
-      txtCuerpo.style.opacity = '0';
-      setTimeout(() => {
-        if (txtCuerpo) {
-          txtCuerpo.textContent = escena.texto;
-          txtCuerpo.style.opacity = '1';
-        }
-      }, 150);
-    }
-    if (txtFuente) txtFuente.textContent = escena.fuente;
-    if (badgeFase) badgeFase.textContent = camCfg.fase;
-    if (calloutCota) calloutCota.textContent = camCfg.cota;
-    
-    if (btnFicha) {
-      btnFicha.innerHTML = `<span>Ver ficha de ${nombreLimpio}</span> <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>`;
-      btnFicha.setAttribute('href', `#comparar`);
-    }
-
-    // Alerta de pieza que falta en los documentos
-    if (txtAlerta) {
-      if (escena.alertaFalta) {
-        txtAlerta.textContent = `○ ${escena.alertaFalta}`;
-        txtAlerta.classList.remove('hidden');
+  btnToggle?.addEventListener('click', () => {
+    isMoving = !isMoving;
+    tracks.forEach(track => {
+      if (isMoving) {
+        track.classList.remove('paralaje-paused');
       } else {
-        txtAlerta.classList.add('hidden');
-      }
-    }
-
-    // 2. Barra de progreso de 5 segmentos
-    segmentos.forEach((seg, idx) => {
-      const segNum = idx + 1;
-      const bar = seg.querySelector('.bar-indicador');
-      const lbl = seg.querySelector('.lbl-fase');
-      
-      if (bar) {
-        bar.classList.remove('bg-sky-400', 'bg-slate-400', 'bg-slate-800');
-        if (segNum < escenaActual) {
-          bar.classList.add('bg-slate-400');
-        } else if (segNum === escenaActual) {
-          bar.classList.add('bg-sky-400');
-        } else {
-          bar.classList.add('bg-slate-800');
-        }
-      }
-
-      if (lbl) {
-        lbl.classList.remove('text-sky-300', 'text-slate-300', 'text-slate-500');
-        if (segNum === escenaActual) {
-          lbl.classList.add('text-sky-300');
-        } else if (segNum < escenaActual) {
-          lbl.classList.add('text-slate-300');
-        } else {
-          lbl.classList.add('text-slate-500');
-        }
+        track.classList.add('paralaje-paused');
       }
     });
 
-    // 3. Etiquetas SVG
-    if (lblPico) lblPico.textContent = dataLaguna.glaciarCabecera;
-    if (lblLaguna) lblLaguna.textContent = nombreLimpio;
-
-    // 4. ANIMACIÓN DINÁMICA DE CÁMARA (Zoom, Retroceso y Perspectiva)
-    if (camara) {
-      camara.classList.remove('anim-sacudida');
-      camara.style.transform = camCfg.transform;
-      
-      if (camCfg.sacudida) {
-        setTimeout(() => {
-          camara.classList.add('anim-sacudida');
-        }, 250);
-      }
-    }
-
-    // 5. Visibilidad dinámica de elementos geológicos
-    if (capaValle) {
-      capaValle.style.opacity = escenaActual === 4 ? '1' : '0.35';
-    }
-
-    if (fxDeshielo) {
-      fxDeshielo.style.opacity = escenaActual === 1 ? '1' : '0.4';
-    }
-
-    if (svgAluvion) {
-      if (escena.svgVisual.tieneOla) {
-        svgAluvion.classList.remove('hidden');
-      } else {
-        svgAluvion.classList.add('hidden');
-      }
-    }
-
-    if (svgDique) {
-      if (escena.svgVisual.tieneDique) {
-        svgDique.classList.remove('hidden');
-      } else {
-        svgDique.classList.add('hidden');
-      }
-    }
-  }
-
-  function avanzarEscena() {
-    escenaActual = escenaActual < 5 ? escenaActual + 1 : 1;
-    renderizarEscena();
-  }
-
-  function retrocederEscena() {
-    escenaActual = escenaActual > 1 ? escenaActual - 1 : 5;
-    renderizarEscena();
-  }
-
-  function reiniciarAutoPlay() {
-    if (timerAutoPlay) clearInterval(timerAutoPlay);
-    if (isPlaying) {
-      timerAutoPlay = setInterval(avanzarEscena, 5500);
-    }
-  }
-
-  // Parallax interactivo sutil al mover el ratón sobre la cordillera
-  if (contenedorCinematico && camara) {
-    contenedorCinematico.addEventListener('mousemove', (e) => {
-      const rect = contenedorCinematico.getBoundingClientRect();
-      const xRel = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 a 0.5
-      const yRel = (e.clientY - rect.top) / rect.height - 0.5;
-      
-      const camCfg = POSICIONES_CAMARA[escenaActual] || POSICIONES_CAMARA[1];
-      if (!camCfg.sacudida) {
-        camara.style.transform = `${camCfg.transform} translate(${xRel * 16}px, ${yRel * 10}px)`;
-      }
-    });
-
-    contenedorCinematico.addEventListener('mouseleave', () => {
-      const camCfg = POSICIONES_CAMARA[escenaActual] || POSICIONES_CAMARA[1];
-      camara.style.transform = camCfg.transform;
-    });
-  }
-
-  // Event Listeners: Pestañas de Lagunas
-  tabsLaguna.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const target = e.currentTarget as HTMLElement;
-      tabsLaguna.forEach(t => {
-        t.classList.remove('bg-white', 'text-slate-950', 'shadow-md', 'ring-2', 'ring-white/20');
-        t.classList.add('bg-slate-900/90', 'text-slate-400');
-      });
-      target.classList.add('bg-white', 'text-slate-950', 'shadow-md', 'ring-2', 'ring-white/20');
-      target.classList.remove('bg-slate-900/90', 'text-slate-400');
-
-      lagunaActivaId = target.getAttribute('data-laguna-id') || "513";
-      escenaActual = 1;
-      renderizarEscena();
-      reiniciarAutoPlay();
-    });
-  });
-
-  // Event Listeners: Clic directo en segmentos de progreso
-  segmentos.forEach((seg, idx) => {
-    seg.addEventListener('click', () => {
-      escenaActual = idx + 1;
-      renderizarEscena();
-      reiniciarAutoPlay();
-    });
-  });
-
-  // Controles Cinemáticos
-  btnPrev?.addEventListener('click', () => {
-    retrocederEscena();
-    reiniciarAutoPlay();
-  });
-
-  btnNext?.addEventListener('click', () => {
-    avanzarEscena();
-    reiniciarAutoPlay();
-  });
-
-  btnPlayPause?.addEventListener('click', () => {
-    isPlaying = !isPlaying;
-    if (isPlaying) {
+    if (isMoving) {
       iconPause?.classList.remove('hidden');
       iconPlay?.classList.add('hidden');
-      reiniciarAutoPlay();
     } else {
       iconPause?.classList.add('hidden');
       iconPlay?.classList.remove('hidden');
-      if (timerAutoPlay) clearInterval(timerAutoPlay);
     }
   });
 
-  // Inicializar
-  renderizarEscena();
-  reiniciarAutoPlay();
-
-  // Buscador sugerencias
+  // Buscador sugerencias directas
   const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
   const sugerencias = document.querySelectorAll('.btn-sugerencia');
   sugerencias.forEach(btn => {
     btn.addEventListener('click', () => {
       if (searchInput && btn.textContent) {
         searchInput.value = btn.textContent.trim();
+        window.location.hash = 'buscar';
+      }
+    });
+  });
+
+  // Clic en los picos de la cordillera para navegar o filtrar
+  const picos = document.querySelectorAll('[id^="pico-"]');
+  picos.forEach(p => {
+    p.addEventListener('click', () => {
+      const id = p.getAttribute('id') || '';
+      if (id.includes('hualcan') || id.includes('513')) {
+        window.location.hash = 'simulador-cordillera';
+      } else {
         window.location.hash = 'buscar';
       }
     });

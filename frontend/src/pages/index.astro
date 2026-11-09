@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroSection from '../components/HeroSection.astro';
+import CordilleraSimulatorSection from '../components/CordilleraSimulatorSection.astro';
 import CountryMetrics from '../components/CountryMetrics.astro';
 import ExploreCards from '../components/ExploreCards.astro';
 import SearchAndMap from '../components/SearchAndMap.astro';
@@ -8,18 +9,21 @@ import ComparatorSection from '../components/ComparatorSection.astro';
 ---
 
 <Layout>
-  <!-- 1. Hero con corte transversal interactivo y buscador -->
+  <!-- 1. Hero con recorrido infinito vectorial (SVG), difuminado y buscador institucional -->
   <HeroSection />
 
-  <!-- 2. El país en tres datos (Cifras auditadas con citas exactas) -->
+  <!-- 2. Simulador morfodinámico en 5 escenas (Cámara dinámica, aluvión y SAT) -->
+  <CordilleraSimulatorSection />
+
+  <!-- 3. El país en tres datos (Cifras auditadas con citas exactas) -->
   <CountryMetrics />
 
-  <!-- 3. Módulos de Exploración -->
+  <!-- 4. Módulos de Exploración -->
   <ExploreCards />
 
-  <!-- 4. Búsqueda territorial y Mapa vectorial del Perú -->
+  <!-- 5. Búsqueda territorial y Mapa vectorial del Perú -->
   <SearchAndMap />
 
-  <!-- 5. Compara y descubre (Barras, serie histórica de estudios y red de relaciones) -->
+  <!-- 6. Compara y descubre (Barras, serie histórica de estudios y red de relaciones) -->
   <ComparatorSection />
 </Layout>
