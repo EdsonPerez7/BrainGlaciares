@@ -20,7 +20,7 @@ export const SITE_CONFIG = {
   // Navegación principal (Sobria e institucional)
   navigation: [
     { label: "Inicio", href: "/" },
-    { label: "Buscar", href: "/#buscar" },
+    { label: "Buscar", href: "/buscar" },
     { label: "Comparar", href: "/#comparar" },
     { label: "Panorama", href: "/#panorama" },
     { label: "Informes", href: "/#informes" },

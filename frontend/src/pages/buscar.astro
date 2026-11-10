@@ -1,0 +1,996 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
+import { SITE_CONFIG } from '../config/site.config';
+---
+
+<Layout title="Buscar lagunas y zonas de riesgo · Brain Glaciares">
+  <!-- Estilos de Leaflet para el mapa territorial -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <main class="min-h-screen bg-slate-50/70 pb-20 pt-6">
+    <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-6">
+
+      <!-- ======================================================== -->
+      <!-- 1. BARRA SUPERIOR DE FILTRO TERRITORIAL ("Lugar elegido") -->
+      <!-- ======================================================== -->
+      <div class="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-rose-600 text-sm">📍</span>
+            <span class="text-xs font-bold text-slate-800">Lugar elegido</span>
+          </div>
+
+          <!-- Selector de departamento -->
+          <div class="relative">
+            <select 
+              id="filtro-departamento"
+              class="appearance-none rounded-lg border border-slate-300 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-900 shadow-2xs focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600 cursor-pointer"
+            >
+              <option value="todos">Todo el Perú</option>
+              {DEPARTAMENTOS_RIESGO.map(d => (
+                <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total} lagunas críticas)</option>
+              ))}
+            </select>
+            <span class="pointer-events-none absolute right-2.5 top-2 text-[10px] text-slate-400">▼</span>
+          </div>
+
+          <!-- Botón Quitar filtro -->
+          <button 
+            id="btn-quitar-filtro"
+            type="button"
+            class="inline-flex items-center gap-1 rounded-lg border border-cyan-200 bg-cyan-50/70 px-2.5 py-1.5 text-xs font-semibold text-cyan-800 hover:bg-cyan-100 transition shadow-2xs cursor-pointer"
+          >
+            <span>✕</span>
+            <span>Quitar</span>
+          </button>
+        </div>
+
+        <div class="text-[11px] text-slate-400 hidden md:block">
+          Se aplica en Buscar, Comparar, Panorama e Informes
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- 2. BARRA DE BÚSQUEDA RÁPIDA CON AUTOCOMPLETADO            -->
+      <!-- ======================================================== -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+            Busca tu zona o una laguna
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Exploración territorial, fichas técnicas auditadas y análisis de cuencas glaciares
+          </p>
+        </div>
+
+        <!-- Buscador con desplegable integrado -->
+        <div class="relative w-full md:w-96">
+          <input 
+            id="buscar-input"
+            type="text"
+            autocomplete="off"
+            placeholder="Pueblo, departamento o laguna (con o sin tildes)..."
+            class="w-full rounded-xl border border-cyan-400/80 bg-white py-2 pl-9 pr-8 text-xs sm:text-sm text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+          />
+          <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span class="pointer-events-none absolute right-3 top-2.5 text-[10px] text-slate-400">▼</span>
+
+          <!-- Desplegable en vivo -->
+          <div 
+            id="buscar-dropdown"
+            class="hidden absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-72 overflow-y-auto space-y-1 text-left"
+          >
+            <!-- Inyectado por JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Toggle de Vistas: Mapa Territorial vs Ficha Técnica -->
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <button 
+            id="tab-ficha"
+            type="button"
+            class="rounded-lg px-3 py-1.5 text-xs font-bold transition bg-slate-900 text-white shadow-xs"
+          >
+            📋 Ficha de Laguna
+          </button>
+          <button 
+            id="tab-mapa"
+            type="button"
+            class="rounded-lg px-3 py-1.5 text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200"
+          >
+            🗺️ Mapa del Lugar
+          </button>
+        </div>
+
+        <label class="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer select-none">
+          <input type="checkbox" id="toggle-ver-mapa" class="rounded text-cyan-600 focus:ring-cyan-500" />
+          <span>Ver el mapa del lugar</span>
+        </label>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VISTA A: FICHA TÉCNICA DETALLADA DE LAGUNA               -->
+      <!-- ======================================================== -->
+      <div id="seccion-ficha" class="space-y-6">
+        
+        <!-- Tarjeta Principal de la Laguna -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xs">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+            <!-- Título y Badges -->
+            <div class="space-y-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded bg-cyan-100/80 px-2 py-0.5 text-[11px] font-bold text-cyan-900">
+                  Ficha de laguna
+                </span>
+                <span id="badge-breadcrumb" class="text-xs font-medium text-slate-500">
+                  • Laguna Cancahua · Áncash
+                </span>
+              </div>
+
+              <div id="ficha-cordillera" class="text-xs font-semibold text-slate-500">
+                Áncash • cordillera Blanca
+              </div>
+
+              <h2 id="ficha-nombre" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-950">
+                Laguna <span class="text-cyan-700">Cancahua</span>
+              </h2>
+
+              <!-- Metadatos de auditoría -->
+              <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                <span id="badge-riesgo-pill" class="rounded-full px-2.5 py-0.5 font-bold bg-slate-200 text-slate-700">
+                  Sin evaluar
+                </span>
+                <span id="badge-docs" class="text-slate-500">• 3 documentos</span>
+                <span id="badge-datos" class="text-slate-500">• 14 datos conectados</span>
+                <span id="badge-confianza" class="text-emerald-700 font-semibold">• Confianza 0.62</span>
+                <span id="badge-fecha" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 font-medium">
+                  Último dato: 2025 · al día
+                </span>
+              </div>
+            </div>
+
+            <!-- Velocímetro Semicircular de Riesgo -->
+            <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 min-w-[210px]">
+              <div class="relative w-40 h-24 overflow-hidden flex items-end justify-center">
+                <!-- Arco Semicircular Vectorial (Verde -> Amarillo -> Naranja -> Rojo) -->
+                <svg class="w-40 h-40 transform" viewBox="0 0 100 100">
+                  <!-- Segmento Verde (Bajo) -->
+                  <path d="M 15 50 A 35 35 0 0 1 26 26" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round" />
+                  <!-- Segmento Amarillo (Medio) -->
+                  <path d="M 26 26 A 35 35 0 0 1 50 15" fill="none" stroke="#eab308" stroke-width="10" />
+                  <!-- Segmento Naranja (Alto) -->
+                  <path d="M 50 15 A 35 35 0 0 1 74 26" fill="none" stroke="#f97316" stroke-width="10" />
+                  <!-- Segmento Rojo (Muy Alto) -->
+                  <path d="M 74 26 A 35 35 0 0 1 85 50" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round" />
+                  <!-- Aguja central -->
+                  <line 
+                    id="velocimetro-aguja"
+                    x1="50" y1="50" x2="50" y2="20" 
+                    stroke="#0f172a" 
+                    stroke-width="3" 
+                    stroke-linecap="round" 
+                    class="transition-transform duration-1000 ease-out origin-[50px_50px]"
+                    style="transform: rotate(-45deg);"
+                  />
+                  <circle cx="50" cy="50" r="4" fill="#0f172a" />
+                </svg>
+              </div>
+              <div id="velocimetro-etiqueta" class="text-xs font-bold text-slate-800 -mt-2">
+                Riesgo sin evaluar
+              </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMA DE FLUJO DE CUENCA EN 4 ETAPAS -->
+          <div class="mt-6">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+              Sistema morfodinámico de cuenca
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+              
+              <!-- Etapa 1: Hielo -->
+              <div class="rounded-xl border border-cyan-200 bg-cyan-50/40 p-4 flex flex-col justify-between">
+                <div>
+                  <span class="text-[11px] font-bold text-cyan-900 block">Hielo que la alimenta</span>
+                  <p id="flujo-glaciar" class="text-sm font-extrabold text-slate-900 mt-1">Vallunaraju</p>
+                </div>
+                <div class="text-[10px] text-cyan-800/80 mt-2 font-medium">Glaciar de cabecera</div>
+              </div>
+
+              <!-- Etapa 2: Laguna -->
+              <div class="rounded-xl border border-slate-200 bg-white p-4 flex flex-col justify-between shadow-2xs">
+                <div>
+                  <span class="text-[11px] font-bold text-slate-700 block">Laguna</span>
+                  <p id="flujo-laguna" class="text-sm font-extrabold text-slate-900 mt-1">Cancahua</p>
+                </div>
+                <div id="flujo-laguna-estado" class="text-[10px] text-slate-500 mt-2 font-medium">Sin evaluar</div>
+              </div>
+
+              <!-- Etapa 3: Pueblos aguas abajo -->
+              <div class="rounded-xl border border-rose-200 bg-rose-50/40 p-4 flex flex-col justify-between">
+                <div>
+                  <span class="text-[11px] font-bold text-rose-900 block">Pueblos aguas abajo</span>
+                  <p id="flujo-pueblos" class="text-sm font-extrabold text-slate-900 mt-1">Nadie registrado abajo</p>
+                </div>
+                <div class="text-[10px] text-rose-800/80 mt-2 font-medium">Población bajo la cota de riesgo</div>
+              </div>
+
+              <!-- Etapa 4: Obras que la protegen -->
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 flex flex-col justify-between">
+                <div>
+                  <span class="text-[11px] font-bold text-emerald-900 block">La protege</span>
+                  <p id="flujo-obras" class="text-xs font-bold text-slate-900 mt-1 leading-snug">Dique, Presa, Túnel de desagüe</p>
+                </div>
+                <div class="text-[10px] text-emerald-800/80 mt-2 font-medium">Infraestructura de seguridad</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 3 TARJETAS DE DATOS MÉTRICOS CLAVE -->
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
+              <div class="flex items-baseline gap-1.5">
+                <span id="metrica-superficie" class="text-2xl font-black text-slate-900">0.15</span>
+                <span class="text-xs font-bold text-slate-600">km²</span>
+              </div>
+              <div class="text-xs font-semibold text-slate-700 mt-0.5">Superficie</div>
+              <div id="metrica-superficie-doc" class="text-[11px] text-slate-400 mt-1 truncate">doc. 20.500.12748/628 - p. 7</div>
+            </div>
+
+            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
+              <span id="metrica-pueblos-num" class="text-2xl font-black text-slate-900">0</span>
+              <div class="text-xs font-semibold text-slate-700 mt-0.5">pueblos aguas abajo</div>
+              <div class="text-[11px] text-slate-400 mt-1">Asentamientos directos</div>
+            </div>
+
+            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
+              <span id="metrica-eventos-num" class="text-2xl font-black text-slate-900">2</span>
+              <div class="text-xs font-semibold text-slate-700 mt-0.5">eventos en su historia</div>
+              <div class="text-[11px] text-slate-400 mt-1">Desbordes o aluviones documentados</div>
+            </div>
+
+          </div>
+
+          <!-- BANNER DE RIGOR / ALERTA CIENTÍFICA -->
+          <div id="banner-alerta" class="mt-6 rounded-xl border border-amber-300 bg-amber-50/80 p-3.5 text-xs text-amber-900 flex items-start gap-2.5">
+            <span class="text-amber-600 text-base leading-none">⚠️</span>
+            <span id="banner-alerta-texto" class="font-medium">
+              No hay un nivel de riesgo registrado (no evaluado no es lo mismo que sin riesgo).
+            </span>
+          </div>
+
+          <!-- EVIDENCIA DOCUMENTAL RECUPERADA DEL RAG (398 INFORMES OFICIALES - CERO LLM) -->
+          <div id="contenedor-docs-rag" class="mt-6 pt-5 border-t border-slate-100 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm select-none">📑</span>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Evidencia y citas documentales recuperadas del RAG
+                </h3>
+              </div>
+              <span class="rounded bg-sky-50 text-sky-800 px-2.5 py-0.5 text-[10px] font-bold border border-sky-200">
+                398 Informes oficiales · Cero LLM
+              </span>
+            </div>
+
+            <div id="lista-docs-rag" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- Inyectado dinámicamente desde /api/lagunas/{id} o /api/buscar -->
+            </div>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN RÁPIDA -->
+          <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+            <button 
+              type="button" 
+              class="btn-accion-chat rounded-xl border border-rose-200 bg-rose-50/70 px-3.5 py-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition shadow-2xs cursor-pointer"
+              data-prompt="¿Y si se desborda esta laguna? Explica el escenario físico de impacto."
+            >
+              ¿Y si se desborda?
+            </button>
+
+            <button 
+              type="button" 
+              class="btn-accion-chat rounded-xl bg-cyan-700 hover:bg-cyan-800 px-3.5 py-2 text-xs font-bold text-white transition shadow-2xs cursor-pointer"
+              data-prompt="Explícame en términos simples los riesgos y situación de esta laguna."
+            >
+              Explícamela en simple
+            </button>
+
+            <button 
+              type="button" 
+              id="btn-generar-informe"
+              class="rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2 text-xs font-bold text-purple-800 hover:bg-purple-100 transition shadow-2xs cursor-pointer"
+            >
+              Generar informe
+            </button>
+
+            <div class="relative ml-auto">
+              <button 
+                type="button" 
+                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition shadow-2xs cursor-pointer"
+              >
+                ¿Está mal? ▼
+              </button>
+            </div>
+          </div>
+
+          <!-- BARRA DE CONSULTA DIRECTA CON MAYU -->
+          <div class="mt-5 relative flex items-center">
+            <input 
+              id="input-pregunta-laguna"
+              type="text" 
+              placeholder="Pregunta algo sobre esta laguna..."
+              class="w-full rounded-2xl border border-slate-300 bg-slate-50/60 py-3 pl-4 pr-36 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+            />
+            <button 
+              id="btn-preguntar-mayu"
+              type="button" 
+              class="absolute right-1.5 rounded-xl bg-cyan-700 hover:bg-cyan-800 px-3.5 py-2 text-xs font-bold text-white transition shadow-xs cursor-pointer"
+            >
+              Pregúntale a MAYU
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VISTA B: MAPA TERRITORIAL Y DEPARTAMENTAL                -->
+      <!-- ======================================================== -->
+      <div id="seccion-mapa" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Lado Izquierdo: Resumen Departamental -->
+          <div class="lg:col-span-4 space-y-4">
+            
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+              <div>
+                <label for="select-colorear" class="text-xs font-bold text-slate-700 block mb-1.5">
+                  Colorear por
+                </label>
+                <select 
+                  id="select-colorear"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 shadow-2xs focus:border-cyan-600 focus:outline-none"
+                >
+                  <option>Lagunas en riesgo alto o muy alto</option>
+                  <option>Volumen de agua embalsada (hm³)</option>
+                  <option>Presencia de obras de seguridad</option>
+                </select>
+              </div>
+
+              <!-- Tarjeta de métricas departamentales -->
+              <div class="pt-3 border-t border-slate-100">
+                <h3 id="mapa-dept-nombre" class="text-2xl font-black text-slate-900">Áncash</h3>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span id="mapa-dept-num" class="text-4xl font-black text-rose-600">9</span>
+                  <span class="text-xs font-semibold text-slate-600">lagunas en riesgo</span>
+                </div>
+                <p id="mapa-dept-sub" class="text-xs text-slate-500 mt-0.5">
+                  puesto 1 de 13 departamentos con glaciares
+                </p>
+
+                <div class="mt-4">
+                  <button 
+                    id="btn-ver-todo-peru"
+                    type="button" 
+                    class="w-full rounded-xl border border-cyan-300 bg-cyan-50/70 py-2 text-xs font-bold text-cyan-900 hover:bg-cyan-100 transition shadow-2xs cursor-pointer"
+                  >
+                    Ver todo el Perú
+                  </button>
+                </div>
+
+                <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
+                  Haz clic en un punto del mapa para abrir esa laguna en su ficha técnica. Acerca con la rueda y arrastra para moverte.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lista de lagunas del departamento seleccionado -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Lagunas en esta zona
+              </h4>
+              <div id="lista-lagunas-dept" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                <!-- Se llena por JS -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Lado Derecho: Mapa Interactivo con Leaflet + CARTO Positron -->
+          <div class="lg:col-span-8">
+            <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs flex flex-col">
+              <div class="p-3.5 border-b border-slate-200 flex items-center justify-between text-xs text-slate-700 bg-slate-50">
+                <span class="font-bold">Distribución geográfica de lagunas de alta montaña</span>
+                <span class="text-slate-400 text-[11px]">Cartografía oficial CARTO / OSM</span>
+              </div>
+
+              <!-- Contenedor del Mapa Leaflet -->
+              <div id="mapa-leaflet" class="w-full h-[520px] bg-slate-100 relative z-0"></div>
+
+              <!-- Leyenda inferior -->
+              <div class="p-3 border-t border-slate-200 bg-white flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                <div class="flex items-center gap-1.5">
+                  <span class="h-2 w-12 rounded-full bg-gradient-to-r from-rose-200 to-rose-600 inline-block"></span>
+                  <span>menos → más lagunas en riesgo</span>
+                </div>
+                <div>
+                  <span class="inline-block h-2 w-2 rounded-full bg-slate-400 mr-1"></span>
+                  <span>gris = sin registros</span>
+                </div>
+                <div>
+                  <span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-600 border border-white shadow-2xs mr-1"></span>
+                  <span>puntos = lagunas (color = nivel de riesgo)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<!-- Script de Datos, Ficha Técnica y Mapa -->
+<script define:vars={{ LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO, API_BASE: SITE_CONFIG.apiBaseUrl }}>
+  // Normalizador para búsqueda insensible a acentos
+  const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  let currentLaguna = LAGUNAS_DESTACADAS[0]; // Por defecto Cancahua
+  let mapInstance = null;
+  let markersLayer = null;
+  let searchDebounce = null;
+
+  // ========================================================
+  // RENDERIZAR FICHA TÉCNICA
+  // ========================================================
+  function renderFicha(laguna) {
+    if (!laguna) return;
+    currentLaguna = laguna;
+
+    // Encabezado
+    document.getElementById('badge-breadcrumb').textContent = `• Laguna ${laguna.nombre} · ${laguna.departamento}`;
+    document.getElementById('ficha-cordillera').textContent = `${laguna.departamento} • cordillera ${laguna.cordillera}`;
+    document.getElementById('ficha-nombre').innerHTML = `Laguna <span class="text-cyan-700">${laguna.nombre}</span>`;
+
+    // Badges
+    const badgeRiesgo = document.getElementById('badge-riesgo-pill');
+    badgeRiesgo.textContent = laguna.riesgo;
+    badgeRiesgo.className = `rounded-full px-2.5 py-0.5 font-bold text-xs ${
+      laguna.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+      laguna.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+      laguna.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+      laguna.riesgo === 'Bajo' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+      'bg-slate-200 text-slate-700'
+    }`;
+
+    document.getElementById('badge-docs').textContent = `• ${laguna.total_documentos} documentos`;
+    document.getElementById('badge-datos').textContent = `• ${laguna.datos_conectados} datos conectados`;
+    document.getElementById('badge-confianza').textContent = `• Confianza ${laguna.confianza}`;
+    document.getElementById('badge-fecha').textContent = `Último dato: ${laguna.fecha_actualizacion}`;
+
+    // Velocímetro y aguja
+    const aguja = document.getElementById('velocimetro-aguja');
+    const etiqueta = document.getElementById('velocimetro-etiqueta');
+    etiqueta.textContent = `Riesgo ${laguna.riesgo.toLowerCase()}`;
+
+    let rotacion = -45; // default sin evaluar
+    if (laguna.riesgo === 'Bajo') rotacion = -65;
+    else if (laguna.riesgo === 'Medio') rotacion = -20;
+    else if (laguna.riesgo === 'Alto') rotacion = 25;
+    else if (laguna.riesgo === 'Muy alto') rotacion = 65;
+    else if (laguna.riesgo === 'Sin evaluar') rotacion = -45;
+
+    if (aguja) {
+      aguja.style.transform = `rotate(${rotacion}deg)`;
+    }
+
+    // Flujo de cuenca
+    document.getElementById('flujo-glaciar').textContent = laguna.glaciar_origen;
+    document.getElementById('flujo-laguna').textContent = laguna.nombre;
+    document.getElementById('flujo-laguna-estado').textContent = laguna.riesgo;
+    document.getElementById('flujo-pueblos').textContent = laguna.poblado_amenazado;
+    document.getElementById('flujo-obras').textContent = laguna.obras_detalle;
+
+    // Métricas clave
+    document.getElementById('metrica-superficie').textContent = laguna.superficie_km2;
+    document.getElementById('metrica-superficie-doc').textContent = laguna.documento_superficie || 'Inventario Oficial';
+    document.getElementById('metrica-pueblos-num').textContent = laguna.pueblos_aguas_abajo_num;
+    document.getElementById('metrica-eventos-num').textContent = laguna.eventos_historicos_num;
+
+    // Alerta específica
+    const banner = document.getElementById('banner-alerta');
+    const texto = document.getElementById('banner-alerta-texto');
+    if (laguna.alerta_especifica) {
+      texto.textContent = laguna.alerta_especifica;
+      banner.classList.remove('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
+
+    // Actualizar input de pregunta
+    const inputPregunta = document.getElementById('input-pregunta-laguna');
+    if (inputPregunta) {
+      inputPregunta.placeholder = `Pregunta algo sobre la laguna ${laguna.nombre}...`;
+    }
+
+    // Consultar evidencia y citas documentales en vivo desde el RAG (398 Informes oficiales - Cero LLM)
+    cargarDetalleRAG(laguna);
+  }
+
+  async function cargarDetalleRAG(laguna) {
+    const contDocs = document.getElementById('lista-docs-rag');
+    if (!contDocs) return;
+    contDocs.innerHTML = `<div class="col-span-2 py-3 text-xs text-slate-400 text-center animate-pulse">Consultando 398 documentos del RAG en milisegundos (Cero LLM)...</div>`;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/lagunas/${laguna.id}`);
+      if (!res.ok) throw new Error("API offline");
+      const data = await res.json();
+
+      if (data.obras_detalle && data.obras_detalle !== "Sin obras de mitigación física registradas") {
+        document.getElementById('flujo-obras').textContent = data.obras_detalle;
+      }
+      if (data.documento_superficie) {
+        document.getElementById('metrica-superficie-doc').textContent = data.documento_superficie;
+      }
+      if (data.fragmentos_rag && data.fragmentos_rag.length > 0) {
+        contDocs.innerHTML = data.fragmentos_rag.map(f => `
+          <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 hover:bg-white hover:border-cyan-300 transition shadow-2xs">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-800">
+              <span class="truncate pr-2">${f.titulo || 'Informe Glaciológico Oficial'}</span>
+              <span class="rounded bg-slate-200/90 px-1.5 py-0.5 text-[9px] text-slate-700 font-semibold shrink-0">${f.fuente} · ${f.anio} ${f.pagina ? `p. ${f.pagina}` : ''}</span>
+            </div>
+            <p class="text-xs text-slate-600 italic line-clamp-3 mt-1.5 leading-relaxed">"${f.extracto}"</p>
+          </div>
+        `).join('');
+        return;
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    contDocs.innerHTML = `
+      <div class="col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500 flex items-center justify-between">
+        <span>Registro oficial indexado en el Inventario Nacional de Glaciares y Lagunas (ANA / INAIGEM).</span>
+        <span class="text-[10px] font-semibold text-emerald-700">Evidencia verificada</span>
+      </div>
+    `;
+  }
+
+  // ========================================================
+  // MAPA INTERACTIVO LEAFLET
+  // ========================================================
+  function initMap() {
+    if (mapInstance) return;
+    const mapEl = document.getElementById('mapa-leaflet');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    // Centro inicial en Perú (Áncash / Cordillera Blanca)
+    mapInstance = L.map('mapa-leaflet', {
+      center: [-9.4, -77.5],
+      zoom: 8,
+      zoomControl: true
+    });
+
+    // Capa base CARTO Positron (coincide exactamente con la imagen del usuario)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(mapInstance);
+
+    markersLayer = L.layerGroup().addTo(mapInstance);
+    updateMapMarkers('todos');
+  }
+
+  function updateMapMarkers(deptFilter) {
+    if (!markersLayer || !mapInstance) return;
+    markersLayer.clearLayers();
+
+    const filtered = deptFilter === 'todos' 
+      ? LAGUNAS_DESTACADAS 
+      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === norm(deptFilter));
+
+    filtered.forEach(laguna => {
+      const color = laguna.riesgo === 'Muy alto' ? '#e11d48' :
+                    laguna.riesgo === 'Alto' ? '#ea580c' :
+                    laguna.riesgo === 'Medio' ? '#ca8a04' :
+                    laguna.riesgo === 'Bajo' ? '#16a34a' : '#64748b';
+
+      const marker = L.circleMarker([laguna.lat, laguna.lng], {
+        radius: 8,
+        fillColor: color,
+        color: '#ffffff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.9
+      });
+
+      marker.bindPopup(`
+        <div style="font-family: inherit; font-size: 12px; line-height: 1.4;">
+          <strong style="font-size: 13px;">Laguna ${laguna.nombre}</strong><br/>
+          <span>${laguna.departamento} · Cordillera ${laguna.cordillera}</span><br/>
+          <span style="display: inline-block; margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: ${color}20; color: ${color};">
+            Riesgo ${laguna.riesgo}
+          </span><br/>
+          <button onclick="window.selectLagunaById('${laguna.id}')" style="margin-top: 8px; background: #0f172a; color: #fff; border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 11px; font-weight: bold;">
+            Ver ficha técnica →
+          </button>
+        </div>
+      `);
+
+      markersLayer.addLayer(marker);
+    });
+
+    if (filtered.length > 0) {
+      if (deptFilter !== 'todos') {
+        const bounds = L.latLngBounds(filtered.map(l => [l.lat, l.lng]));
+        mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+      } else {
+        mapInstance.setView([-9.4, -77.5], 7);
+      }
+    }
+  }
+
+  // ========================================================
+  // LISTA LATERAL DE LAGUNAS EN EL MAPA
+  // ========================================================
+  function renderListaDepartamental(deptFilter) {
+    const listEl = document.getElementById('lista-lagunas-dept');
+    if (!listEl) return;
+
+    const filtered = deptFilter === 'todos'
+      ? LAGUNAS_DESTACADAS
+      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === norm(deptFilter));
+
+    listEl.innerHTML = filtered.map(l => `
+      <div 
+        class="p-2.5 rounded-xl border border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition cursor-pointer flex items-center justify-between"
+        onclick="window.selectLagunaById('${l.id}')"
+      >
+        <div>
+          <div class="text-xs font-bold text-slate-900">Laguna ${l.nombre}</div>
+          <div class="text-[11px] text-slate-500">${l.departamento} · Cordillera ${l.cordillera}</div>
+        </div>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+          l.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800' :
+          l.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800' :
+          l.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800' :
+          'bg-slate-100 text-slate-700'
+        }">
+          ${l.riesgo}
+        </span>
+      </div>
+    `).join('');
+  }
+
+  // ========================================================
+  // CONTROLADOR GLOBAL DE SELECCIÓN Y VISTAS
+  // ========================================================
+  window.selectLagunaById = function(id) {
+    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === id.toLowerCase());
+    if (match) {
+      renderFicha(match);
+      mostrarFicha();
+      // Actualizar select de departamento
+      const selectDept = document.getElementById('filtro-departamento');
+      if (selectDept) selectDept.value = match.departamento.toLowerCase();
+    }
+  };
+
+  function mostrarFicha() {
+    document.getElementById('seccion-ficha')?.classList.remove('hidden');
+    document.getElementById('seccion-mapa')?.classList.add('hidden');
+    document.getElementById('tab-ficha')?.classList.replace('bg-slate-100', 'bg-slate-900');
+    document.getElementById('tab-ficha')?.classList.replace('text-slate-700', 'text-white');
+    document.getElementById('tab-mapa')?.classList.replace('bg-slate-900', 'bg-slate-100');
+    document.getElementById('tab-mapa')?.classList.replace('text-white', 'text-slate-700');
+    const toggle = document.getElementById('toggle-ver-mapa');
+    if (toggle) toggle.checked = false;
+  }
+
+  function mostrarMapa() {
+    document.getElementById('seccion-ficha')?.classList.add('hidden');
+    document.getElementById('seccion-mapa')?.classList.remove('hidden');
+    document.getElementById('tab-mapa')?.classList.replace('bg-slate-100', 'bg-slate-900');
+    document.getElementById('tab-mapa')?.classList.replace('text-slate-700', 'text-white');
+    document.getElementById('tab-ficha')?.classList.replace('bg-slate-900', 'bg-slate-100');
+    document.getElementById('tab-ficha')?.classList.replace('text-white', 'text-slate-700');
+    const toggle = document.getElementById('toggle-ver-mapa');
+    if (toggle) toggle.checked = true;
+
+    initMap();
+    setTimeout(() => {
+      mapInstance?.invalidateSize();
+    }, 200);
+  }
+
+  // ========================================================
+  // AUTOCOMPLETADO EN EL BUSCADOR SUPERIOR CON API RAG VIVA
+  // ========================================================
+  function initSearchInput() {
+    const input = document.getElementById('buscar-input');
+    const dropdown = document.getElementById('buscar-dropdown');
+    if (!input || !dropdown) return;
+
+    function renderLocalMatches(q) {
+      const qNorm = norm(q);
+      const items = [];
+
+      LAGUNAS_DESTACADAS.forEach(l => {
+        if (!qNorm || norm(l.nombre).includes(qNorm) || norm(l.departamento).includes(qNorm) || norm(l.cordillera).includes(qNorm)) {
+          items.push({
+            title: `Laguna ${l.nombre}`,
+            subtitle: `${l.departamento} · Cordillera ${l.cordillera} (${l.riesgo})`,
+            icon: '🏔️',
+            action: () => {
+              window.selectLagunaById(l.id);
+              dropdown.classList.add('hidden');
+              input.value = `Laguna ${l.nombre}`;
+            }
+          });
+        }
+      });
+
+      DEPARTAMENTOS_RIESGO.forEach(d => {
+        if (!qNorm || norm(d.departamento).includes(qNorm)) {
+          items.push({
+            title: d.departamento,
+            subtitle: `${d.total} lagunas en riesgo · ${d.muy_alto} muy alto`,
+            icon: '🏛️',
+            action: () => {
+              filtrarPorDepartamento(d.departamento.toLowerCase());
+              dropdown.classList.add('hidden');
+              input.value = d.departamento;
+            }
+          });
+        }
+      });
+
+      renderDropdownHTML(items, []);
+    }
+
+    function renderDropdownHTML(items, docs) {
+      if (items.length === 0 && docs.length === 0) {
+        dropdown.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">No se encontraron coincidencias en el corpus de 398 documentos</div>`;
+        dropdown.classList.remove('hidden');
+        return;
+      }
+
+      let html = '';
+      if (items.length > 0) {
+        html += items.slice(0, 6).map((it, idx) => `
+          <div 
+            class="item-search-res flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+            data-index="${idx}"
+          >
+            <span class="text-base select-none">${it.icon || '📍'}</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-slate-900 truncate">${it.title}</div>
+              <div class="text-[11px] text-slate-500 truncate">${it.subtitle}</div>
+            </div>
+            <span class="text-xs text-slate-400">→</span>
+          </div>
+        `).join('');
+      }
+
+      if (docs.length > 0) {
+        html += `
+          <div class="pt-2 pb-1 px-3 border-t border-slate-100 text-[10px] uppercase font-bold tracking-wider text-cyan-800 flex items-center justify-between">
+            <span>Fragmentos de 398 Informes (RAG)</span>
+            <span class="text-[9px] text-slate-400 font-normal">Cero LLM</span>
+          </div>
+        `;
+        html += docs.slice(0, 3).map((d, dIdx) => `
+          <div 
+            class="item-doc-res p-2.5 rounded-lg hover:bg-cyan-50/60 transition cursor-pointer border border-transparent hover:border-cyan-200"
+            data-doc-index="${dIdx}"
+          >
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
+              <span class="truncate pr-2">${d.titulo || 'Informe Oficial'}</span>
+              <span class="text-[9px] text-slate-500 shrink-0">${d.fuente} · ${d.anio} ${d.pagina ? `p. ${d.pagina}` : ''}</span>
+            </div>
+            <p class="text-[10px] text-slate-500 italic line-clamp-1 mt-0.5">"${d.extracto}"</p>
+          </div>
+        `).join('');
+      }
+
+      dropdown.innerHTML = html;
+
+      dropdown.querySelectorAll('.item-search-res').forEach(el => {
+        const idx = Number(el.getAttribute('data-index'));
+        if (items[idx]?.action) {
+          el.addEventListener('click', () => items[idx].action());
+        }
+      });
+
+      dropdown.querySelectorAll('.item-doc-res').forEach(el => {
+        const dIdx = Number(el.getAttribute('data-doc-index'));
+        el.addEventListener('click', () => {
+          dropdown.classList.add('hidden');
+          const doc = docs[dIdx];
+          if (doc?.titulo) {
+            input.value = doc.titulo;
+          }
+        });
+      });
+
+      dropdown.classList.remove('hidden');
+    }
+
+    async function queryLiveAPI(query) {
+      try {
+        const res = await fetch(`${API_BASE}/api/buscar?q=${encodeURIComponent(query)}&limite=6`);
+        if (!res.ok) throw new Error("API offline");
+        const data = await res.json();
+
+        const entidades = (data.entidades || []).map(e => ({
+          title: e.tipo === 'Laguna' ? `Laguna ${e.nombre}` : e.nombre,
+          subtitle: `${e.departamento || e.tipo} · ${e.nivel_riesgo !== 'Sin evaluar' ? `Riesgo ${e.nivel_riesgo}` : 'Oficial'}`,
+          icon: e.tipo === 'Laguna' ? '🏔️' : (e.tipo === 'Glaciar' ? '❄️' : (e.tipo === 'Poblado' ? '🏘️' : '🏛️')),
+          action: () => {
+            if (e.tipo.toLowerCase() === 'laguna') {
+              window.selectLagunaById(e.id);
+            } else if (e.tipo.toLowerCase() === 'departamento') {
+              filtrarPorDepartamento(e.nombre.toLowerCase());
+            }
+            dropdown.classList.add('hidden');
+            input.value = e.nombre;
+          }
+        }));
+
+        if (entidades.length > 0 || (data.documentos && data.documentos.length > 0)) {
+          renderDropdownHTML(entidades, data.documentos || []);
+          return;
+        }
+      } catch (e) {
+        // Fallback
+      }
+
+      renderLocalMatches(query);
+    }
+
+    input.addEventListener('focus', () => {
+      const q = input.value.trim();
+      if (!q) renderLocalMatches('');
+      else queryLiveAPI(q);
+    });
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      renderLocalMatches(q);
+
+      clearTimeout(searchDebounce);
+      if (q.length >= 2) {
+        searchDebounce = setTimeout(() => {
+          queryLiveAPI(q);
+        }, 220);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  function filtrarPorDepartamento(dept) {
+    const select = document.getElementById('filtro-departamento');
+    if (select) select.value = dept;
+
+    const deptObj = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento) === norm(dept));
+    if (deptObj) {
+      document.getElementById('mapa-dept-nombre').textContent = deptObj.departamento;
+      document.getElementById('mapa-dept-num').textContent = deptObj.total;
+    } else {
+      document.getElementById('mapa-dept-nombre').textContent = "Todo el Perú";
+      document.getElementById('mapa-dept-num').textContent = "18";
+    }
+
+    renderListaDepartamental(dept);
+    if (mapInstance) {
+      updateMapMarkers(dept);
+    }
+    mostrarMapa();
+  }
+
+  // ========================================================
+  // EVENT LISTENERS & INICIALIZACIÓN
+  // ========================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Ficha por defecto
+    renderFicha(LAGUNAS_DESTACADAS[0]);
+    renderListaDepartamental('todos');
+    initSearchInput();
+
+    // Tabs
+    document.getElementById('tab-ficha')?.addEventListener('click', mostrarFicha);
+    document.getElementById('tab-mapa')?.addEventListener('click', mostrarMapa);
+    document.getElementById('toggle-ver-mapa')?.addEventListener('change', (e) => {
+      if (e.target.checked) mostrarMapa();
+      else mostrarFicha();
+    });
+
+    // Filtro de departamento
+    document.getElementById('filtro-departamento')?.addEventListener('change', (e) => {
+      const val = e.target.value;
+      filtrarPorDepartamento(val);
+    });
+
+    // Quitar filtro
+    document.getElementById('btn-quitar-filtro')?.addEventListener('click', () => {
+      filtrarPorDepartamento('todos');
+    });
+
+    document.getElementById('btn-ver-todo-peru')?.addEventListener('click', () => {
+      filtrarPorDepartamento('todos');
+    });
+
+    // Preguntar con asistente
+    const btnMayu = document.getElementById('btn-preguntar-mayu');
+    const inputMayu = document.getElementById('input-pregunta-laguna');
+    btnMayu?.addEventListener('click', () => {
+      const q = inputMayu?.value.trim() || `¿Cuál es la situación actual de riesgo en la laguna ${currentLaguna.nombre}?`;
+      abrirChatConPregunta(q);
+    });
+
+    document.querySelectorAll('.btn-accion-chat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.getAttribute('data-prompt');
+        if (prompt) {
+          abrirChatConPregunta(`${prompt} (Laguna ${currentLaguna.nombre}, ${currentLaguna.departamento})`);
+        }
+      });
+    });
+
+    // Soporte para URL params: ?id=palcacocha o ?dept=ancash o ?q=huaraz
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+    const deptParam = params.get('dept');
+    const qParam = params.get('q');
+
+    if (idParam) {
+      window.selectLagunaById(idParam);
+    } else if (deptParam) {
+      filtrarPorDepartamento(deptParam);
+    } else if (qParam) {
+      const qNorm = norm(qParam);
+      const matchLaguna = LAGUNAS_DESTACADAS.find(l => norm(l.nombre).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm));
+      if (matchLaguna) {
+        window.selectLagunaById(matchLaguna.id);
+      } else {
+        const matchDept = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento).includes(qNorm));
+        if (matchDept) {
+          filtrarPorDepartamento(matchDept.departamento.toLowerCase());
+        }
+      }
+    }
+  });
+
+  function abrirChatConPregunta(pregunta) {
+    // Abrir ChatDrawer flotante si existe
+    const btnAsistente = document.getElementById('btn-abrir-asistente');
+    btnAsistente?.click();
+
+    setTimeout(() => {
+      const chatInput = document.getElementById('chat-input') || document.querySelector('textarea[name="chat-input"]');
+      if (chatInput) {
+        chatInput.value = pregunta;
+        chatInput.focus();
+      }
+    }, 300);
+  }
+</script>

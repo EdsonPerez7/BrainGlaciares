@@ -1,8 +1,5 @@
 ---
-// HeroSection.astro: Sobrevuelo Aéreo 3D Cinematográfico de los Andes Peruanos (Sur a Norte)
-// 100% Full-bleed (sin difuminado blanco), estética fotorrealista basada en la referencia visual:
-// Cielo alpino diurno, crestas afiladas (ridged multifractal), nieve en neveros y canales rocosos,
-// iluminación solar con sombras nítidas y consola de búsqueda flotante con glassmorphism.
+import { SITE_CONFIG } from '../config/site.config';
 ---
 
 <section class="relative overflow-hidden bg-[#78b6eb] w-full min-h-[640px] lg:min-h-[720px] xl:min-h-[780px] flex items-center">
@@ -73,21 +70,30 @@
           <input 
             id="hero-search-input"
             type="text" 
+            autocomplete="off"
             placeholder="Escribe tu pueblo, departamento o una laguna..." 
             class="w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3.5 pl-11 text-sm text-white shadow-inner placeholder:text-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition backdrop-blur-md"
           />
-          <svg class="absolute left-3.5 top-4 h-4 w-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="absolute left-3.5 top-4 h-4 w-4 text-slate-300 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
+
+          <!-- Menú desplegable flotante de autocompletado inteligente -->
+          <div 
+            id="hero-search-dropdown" 
+            class="hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-white/20 bg-slate-950/95 p-2 shadow-2xl backdrop-blur-xl max-h-80 overflow-y-auto space-y-1 text-left"
+          >
+            <!-- Contenido inyectado dinámicamente -->
+          </div>
         </div>
 
         <!-- Consultas rápidas recomendadas -->
         <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
           <span class="font-medium text-slate-400">O prueba con:</span>
-          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm">Huaraz</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm">Laguna 513</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm">Parón</button>
-          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm">Cusco</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm" data-href="/buscar?q=Huaraz">Huaraz</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm" data-href="/buscar?id=513">Laguna 513</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm" data-href="/buscar?id=paron">Parón</button>
+          <button type="button" class="btn-sugerencia rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-slate-200 hover:bg-white/20 hover:text-white transition shadow-2xs backdrop-blur-sm" data-href="/buscar?dept=cusco">Cusco</button>
         </div>
       </div>
 
@@ -106,748 +112,743 @@
 
   </div>
 
+  <!-- ======================================================== -->
+  <!-- ======================================================== -->
+  <!-- PANEL INTERACTIVO DE CALIBRACIÓN PROCEDURAL (OPCIONAL)   -->
+  <!-- ======================================================== -->
+  <div class="absolute bottom-6 left-6 z-30 pointer-events-auto flex flex-wrap items-center gap-2.5">
+    <!-- Botón Toggle de Calibración -->
+    <button 
+      id="btn-toggle-config-panel"
+      type="button"
+      class="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-slate-950/80 px-3.5 py-2 text-xs font-semibold text-sky-300 backdrop-blur-md shadow-xl hover:bg-slate-900 transition hover:border-sky-400/40"
+    >
+      <svg class="w-4 h-4 text-sky-400 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Calibrar Cordilleras 3D</span>
+    </button>
+
+    <!-- Botón Toggle de Etiquetas Cartográficas 3D -->
+    <button 
+      id="btn-toggle-labels-3d"
+      type="button"
+      class="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-slate-950/80 px-3.5 py-2 text-xs font-semibold text-emerald-300 backdrop-blur-md shadow-xl hover:bg-slate-900 transition hover:border-emerald-400/40 cursor-pointer"
+      title="Mostrar / Ocultar etiquetas de nevados y lagunas conectadas del RAG"
+    >
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span id="txt-toggle-labels">Etiquetas RAG: Activas</span>
+    </button>
+  </div>
+
+  <!-- Panel Flotante Desplegable (Posicionado fijamente debajo de la barra de navegación superior) -->
+  <div 
+    id="panel-config-cordilleras" 
+    class="hidden fixed top-20 left-4 sm:left-6 w-88 max-h-[calc(100vh-6rem)] overflow-y-auto bg-slate-950/95 border border-white/20 rounded-2xl p-5 shadow-2xl backdrop-blur-xl text-white space-y-4 ring-1 ring-white/10 z-50 pointer-events-auto"
+  >
+    <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+      <div>
+        <span class="text-xs font-mono font-bold uppercase text-sky-400">Mountain Studio</span>
+        <p class="text-[10px] text-slate-300">Calibración en vivo de topografía y perspectiva</p>
+      </div>
+      <button id="btn-cerrar-config-panel" type="button" class="text-slate-400 hover:text-white text-sm px-1.5 py-0.5 rounded hover:bg-white/10 cursor-pointer">✕</button>
+    </div>
+
+      <!-- SECCIÓN 1: PERSPECTIVA Y CÁMARA -->
+      <div class="space-y-2.5 border-b border-white/10 pb-3">
+        <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>Perspectiva de la Vista</span>
+        </span>
+
+        <!-- Inclinación vertical (Pitch) -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Inclinación (Pitch / Arriba-Abajo)</span>
+            <span id="val-pitch" class="font-mono text-sky-300">+30°</span>
+          </div>
+          <input id="slider-pitch" type="range" min="-30" max="55" step="1" value="30" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Orientación horizontal (Yaw) -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Giro de mirada (Yaw / Izq-Der)</span>
+            <span id="val-yaw" class="font-mono text-sky-300">-30°</span>
+          </div>
+          <input id="slider-yaw" type="range" min="-60" max="60" step="1" value="-30" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Campo de visión (FOV) -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Campo de visión (FOV / Zoom)</span>
+            <span id="val-fov" class="font-mono text-sky-300">95°</span>
+          </div>
+          <input id="slider-fov" type="range" min="30" max="110" step="1" value="95" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Altura de vuelo -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Cota de crucero (Altura)</span>
+            <span id="val-flight-altitude" class="font-mono text-sky-300">340 m</span>
+          </div>
+          <input id="slider-flight-altitude" type="range" min="150" max="550" step="5" value="340" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Trayectoria lateral X -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Posición en el macizo (Eje lateral)</span>
+            <span id="val-xoffset" class="font-mono text-sky-300">64</span>
+          </div>
+          <input id="slider-xoffset" type="range" min="-200" max="120" step="2" value="64" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: RELIEVE Y TOPOGRAFÍA -->
+      <div class="space-y-2.5 border-b border-white/10 pb-3">
+        <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <span>Topografía & Wireframe</span>
+        </span>
+
+        <!-- Modo Visual -->
+        <div class="space-y-1">
+          <label class="block text-[11px] text-slate-300">Modo de Renderizado</label>
+          <div class="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-lg border border-white/10 text-[10px]">
+            <button id="btn-mode-hybrid" type="button" class="btn-visual-mode py-1 rounded text-center font-medium text-slate-400 hover:text-white transition cursor-pointer">Híbrido</button>
+            <button id="btn-mode-natural" type="button" class="btn-visual-mode py-1 rounded text-center font-medium bg-sky-500/20 text-sky-300 border border-sky-400/30 transition cursor-pointer">Natural</button>
+            <button id="btn-mode-wireframe" type="button" class="btn-visual-mode py-1 rounded text-center font-medium text-slate-400 hover:text-white transition cursor-pointer">Wireframe</button>
+          </div>
+        </div>
+
+        <!-- Modo Diagnóstico Topográfico -->
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300 hover:text-white transition py-0.5 select-none">
+          <input id="chk-diagnostic-mode" type="checkbox" class="accent-sky-400 rounded cursor-pointer" />
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+            Modo Diagnóstico (Auditoría de Terreno)
+          </span>
+        </label>
+
+        <!-- Conmutador de Etiquetas Cartográficas 3D -->
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] text-slate-300 hover:text-white transition py-0.5 select-none">
+          <input id="chk-labels-mode" type="checkbox" checked class="accent-sky-400 rounded cursor-pointer" />
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block"></span>
+            Etiquetas Cartográficas 3D y Conexiones RAG
+          </span>
+        </label>
+
+        <!-- Altura de los nevados -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Altura de los nevados</span>
+            <span id="val-altitude" class="font-mono text-sky-300">350 m</span>
+          </div>
+          <input id="slider-altitude" type="range" min="100" max="400" value="350" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Irregularidad de crestas -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Irregularidad de crestas</span>
+            <span id="val-ridge" class="font-mono text-sky-300">2.40</span>
+          </div>
+          <input id="slider-ridge" type="range" min="0.4" max="3.0" step="0.05" value="2.40" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Intensidad Wireframe -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Intensidad Wireframe</span>
+            <span id="val-wireframe" class="font-mono text-sky-300">34%</span>
+          </div>
+          <input id="slider-wireframe" type="range" min="0.0" max="1.0" step="0.02" value="0.34" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Velocidad de vuelo -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Velocidad de vuelo</span>
+            <span id="val-speed" class="font-mono text-sky-300">80</span>
+          </div>
+          <input id="slider-speed" type="range" min="10" max="100" step="1" value="80" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Rugosidad -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Rugosidad geológica</span>
+            <span id="val-roughness" class="font-mono text-sky-300">0.10</span>
+          </div>
+          <input id="slider-roughness" type="range" min="0.05" max="2.0" step="0.05" value="0.10" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Suavizado de Normales -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Suavizado de superficies</span>
+            <span id="val-smoothness" class="font-mono text-sky-300">100%</span>
+          </div>
+          <input id="slider-smoothness" type="range" min="0.0" max="1.0" step="0.02" value="1.00" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Cobertura de Nieve -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Manto de nieve andina</span>
+            <span id="val-snow" class="font-mono text-sky-300">80%</span>
+          </div>
+          <input id="slider-snow" type="range" min="0.4" max="1.8" step="0.05" value="0.80" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Afloramiento de Roca -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Afloramiento rocoso</span>
+            <span id="val-rock" class="font-mono text-sky-300">180%</span>
+          </div>
+          <input id="slider-rock" type="range" min="0.4" max="2.0" step="0.05" value="1.80" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: ECOSISTEMA GLACIAR (LAGUNAS Y GLACIARES) -->
+      <div class="space-y-2.5 border-b border-white/10 pb-3">
+        <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+          <span>Ecosistema Glaciar</span>
+        </span>
+
+        <!-- Tono de Agua Glaciar -->
+        <div class="space-y-1">
+          <label for="select-lake-color" class="block text-[11px] text-slate-300">Tonalidad Lagunas</label>
+          <select id="select-lake-color" class="w-full text-[11px] bg-slate-800 border border-white/10 rounded px-2 py-1 text-cyan-300 cursor-pointer">
+            <option value="#0891b2">Azul Parón Profundo (#0891b2)</option>
+            <option value="#06b6d4" selected>Turquesa Harina Glaciar (#06b6d4)</option>
+            <option value="#14b8a6">Esmeralda Cordillera (#14b8a6)</option>
+            <option value="#0284c7">Azul Alpamayo (#0284c7)</option>
+          </select>
+        </div>
+
+        <!-- Tono de Hielo Glaciar -->
+        <div class="space-y-1">
+          <label for="select-ice-color" class="block text-[11px] text-slate-300">Hielo Glaciares</label>
+          <select id="select-ice-color" class="w-full text-[11px] bg-slate-800 border border-white/10 rounded px-2 py-1 text-sky-300 cursor-pointer">
+            <option value="#0284c7">Azul Profundo de Grietas (#0284c7)</option>
+            <option value="#38bdf8" selected>Azul Hielo Crystalline (#38bdf8)</option>
+            <option value="#7dd3fc">Azul Glaciar Claro (#7dd3fc)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: ILUMINACIÓN & ATMÓSFERA -->
+      <div class="space-y-2.5">
+        <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Iluminación & Atmósfera</span>
+        </span>
+
+        <!-- Intensidad Solar -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Sol alpino lateral</span>
+            <span id="val-sun" class="font-mono text-amber-300">2.6</span>
+          </div>
+          <input id="slider-sun" type="range" min="1.0" max="6.0" step="0.1" value="2.6" class="w-full accent-amber-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Cobertura de Nubes -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Nubes andinas dinámicas</span>
+            <span id="val-clouds" class="font-mono text-sky-300">46%</span>
+          </div>
+          <input id="slider-clouds" type="range" min="0.0" max="0.95" step="0.02" value="0.46" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+
+        <!-- Bruma / Niebla -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px]">
+            <span class="text-slate-300">Bruma diurna</span>
+            <span id="val-fog" class="font-mono text-sky-300">0.00096</span>
+          </div>
+          <input id="slider-fog" type="range" min="0.00010" max="0.00150" step="0.00002" value="0.00096" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg" />
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-between border-t border-white/10 gap-2">
+        <button id="btn-reset-config" type="button" class="text-[11px] px-2.5 py-1 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 transition">
+          Restablecer
+        </button>
+        <button id="btn-copy-config" type="button" class="text-[11px] px-2.5 py-1 rounded-lg bg-sky-500/20 border border-sky-400/30 text-sky-300 hover:bg-sky-500/30 transition">
+          Copiar config
+        </button>
+      </div>
+    </div>
+
 </section>
 
 <!-- ======================================================== -->
 <!-- SCRIPT DE SIMULACIÓN THREE.JS (CORDILLERA FOTORREALISTA) -->
 <!-- ======================================================== -->
 <script>
-  import * as THREE from 'three';
+  import { initMountainEngine } from './mountainEngine/main';
+  import { DEFAULT_CONFIG } from './mountainEngine/config';
 
   const canvas = document.getElementById('canvas-sobrevuelo-andes') as HTMLCanvasElement;
-  const containerEtiquetas = document.getElementById('contenedor-etiquetas-3d') as HTMLDivElement;
   const hudTelemetria = document.getElementById('hud-telemetria-vuelo') as HTMLSpanElement;
+  const containerEtiquetas = document.getElementById('contenedor-etiquetas-3d') as HTMLElement;
+  const heroSection = canvas ? (canvas.closest('section') as HTMLElement) : null;
 
-  if (canvas && containerEtiquetas) {
-    
-    // 1. Escena y Niebla Atmosférica Diurna Alpina (25% cielo / 75% cordillera)
-    const scene = new THREE.Scene();
-    const skyColor = new THREE.Color('#6ba5e7');
-    const fogColor = new THREE.Color('#b6daf5');
-    scene.background = skyColor;
-    scene.fog = new THREE.FogExp2(fogColor, 0.00062);
+  if (canvas) {
+    const engine = initMountainEngine(canvas, hudTelemetria, heroSection, undefined, containerEtiquetas);
 
-    // Bóveda celeste diurna con degradado atmosférico
-    const vertexSky = `
-      varying vec3 vWorldPosition;
-      void main() {
-        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = worldPosition.xyz;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    // ========================================================
+    // CONMUTADOR DE ETIQUETAS CARTOGRÁFICAS 3D Y CONEXIONES RAG
+    // ========================================================
+    const btnToggleLabels = document.getElementById('btn-toggle-labels-3d');
+    const txtToggleLabels = document.getElementById('txt-toggle-labels');
+    const chkLabels = document.getElementById('chk-labels-mode') as HTMLInputElement | null;
+    let labelsActive = true;
+
+    function setLabelsState(active: boolean) {
+      labelsActive = active;
+      engine.toggleAnnotations(active);
+      if (txtToggleLabels) {
+        txtToggleLabels.textContent = active ? 'Etiquetas RAG: Activas' : 'Etiquetas RAG: Ocultas';
       }
-    `;
-    const fragmentSky = `
-      uniform vec3 topColor;
-      uniform vec3 bottomColor;
-      uniform float offset;
-      uniform float exponent;
-      varying vec3 vWorldPosition;
-      void main() {
-        float h = normalize(vWorldPosition + offset).y;
-        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
-      }
-    `;
-    const skyGeo = new THREE.SphereGeometry(2200, 32, 16);
-    const skyMat = new THREE.ShaderMaterial({
-      vertexShader: vertexSky,
-      fragmentShader: fragmentSky,
-      uniforms: {
-        topColor: { value: new THREE.Color('#1d4ed8') },
-        bottomColor: { value: new THREE.Color('#dbeafe') },
-        offset: { value: 25 },
-        exponent: { value: 0.52 }
-      },
-      side: THREE.BackSide
-    });
-    const skyMesh = new THREE.Mesh(skyGeo, skyMat);
-    scene.add(skyMesh);
-
-    // Cámara con FOV cinematográfico de 44°
-    const camera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 2, 3800);
-    
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-      powerPreference: 'high-performance'
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-
-    // 2. Iluminación Solar Diurna (Sol cálido y sombras orográficas de alto contraste)
-    const hemiLight = new THREE.HemisphereLight('#cbe5ff', '#334155', 1.35);
-    scene.add(hemiLight);
-
-    // Sol alpino brillante (luz direccional con tono blanco cálido)
-    const sunLight = new THREE.DirectionalLight('#fffdf5', 3.3);
-    sunLight.position.set(-240, 380, -140);
-    scene.add(sunLight);
-
-    // Luz secundaria difusa reflejada por la nieve
-    const fillLight = new THREE.DirectionalLight('#93c5fd', 1.15);
-    fillLight.position.set(220, 160, 200);
-    scene.add(fillLight);
-
-    // 3. Catálogo de Nevados Emblemáticos del RAG (Sur a Norte)
-    // Distribución alternada orgánica: flanco derecho, flanco izquierdo, centro y diagonales
-    const LONGITUD_TOTAL = 5600;
-    const ANCHO_CORREDOR = 800;
-    const SEG_X = 180;
-    const SEG_Z = 600;
-
-    const NEVADOS_RAG = [
-      {
-        id: 'ausangate',
-        nombre: 'NEVADO AUSANGATE',
-        cota: '6,384 m s. n. m.',
-        cordillera: 'Cordillera Vilcanota · Cusco',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: 85,
-        z: -350,
-        altura: 146,
-        radio: 110,
-        perfil: 'massive',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'quelccaya',
-        nombre: 'GLACIAR QUELCCAYA',
-        cota: '5,670 m s. n. m.',
-        cordillera: 'Casquete Tropical más Extenso · Puno',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: -70,
-        z: -720,
-        altura: 122,
-        radio: 130,
-        perfil: 'dome',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'salkantay',
-        nombre: 'NEVADO SALKANTAY',
-        cota: '6,271 m s. n. m.',
-        cordillera: 'Cordillera Vilcabamba · Cusco',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: 35,
-        z: -1100,
-        altura: 142,
-        radio: 115,
-        perfil: 'pyramid',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'pariacaca',
-        nombre: 'NEVADO PARIACACA',
-        cota: '5,750 m s. n. m.',
-        cordillera: 'Cordillera Central · Lima/Junín',
-        tipoLabel: 'Cuenca Monitoreada',
-        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-        x: -80,
-        z: -1480,
-        altura: 126,
-        radio: 105,
-        perfil: 'massive',
-        colorPunto: '#10b981'
-      },
-      {
-        id: 'huaytapallana',
-        nombre: 'NEVADO HUAYTAPALLANA',
-        cota: '5,557 m s. n. m.',
-        cordillera: 'Glaciar Lasuntay · Junín',
-        tipoLabel: 'Cuenca Monitoreada',
-        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-        x: 90,
-        z: -1860,
-        altura: 120,
-        radio: 100,
-        perfil: 'ridge',
-        colorPunto: '#10b981'
-      },
-      {
-        id: 'siula',
-        nombre: 'NEVADO SIULA GRANDE',
-        cota: '6,344 m s. n. m.',
-        cordillera: 'Cordillera Huayhuash · Arista Este',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: -45,
-        z: -2240,
-        altura: 144,
-        radio: 110,
-        perfil: 'pyramid',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'yerupaja',
-        nombre: 'NEVADO YERUPAJÁ',
-        cota: '6,635 m s. n. m.',
-        cordillera: 'Cordillera Huayhuash · 2ª Cumbre',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: 75,
-        z: -2620,
-        altura: 154,
-        radio: 125,
-        perfil: 'massive',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'pastoruri',
-        nombre: 'NEVADO PASTORURI',
-        cota: '5,240 m s. n. m.',
-        cordillera: 'Cordillera Blanca Sur · Áncash',
-        tipoLabel: 'Cuenca Monitoreada',
-        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-        x: -35,
-        z: -3000,
-        altura: 115,
-        radio: 95,
-        perfil: 'dome',
-        colorPunto: '#10b981'
-      },
-      {
-        id: 'palcaraju',
-        nombre: 'NEVADO PALCARAJU',
-        cota: '6,274 m s. n. m.',
-        cordillera: 'Cabecera Laguna Palcacocha',
-        tipoLabel: 'Riesgo Aluviónico GLOF',
-        badgeBg: 'bg-rose-500/25 text-rose-300 border-rose-400/40',
-        x: 85,
-        z: -3380,
-        altura: 142,
-        radio: 115,
-        perfil: 'ridge',
-        colorPunto: '#f43f5e'
-      },
-      {
-        id: 'huascaran',
-        nombre: 'NEVADO HUASCARÁN SUR',
-        cota: '6,768 m s. n. m.',
-        cordillera: 'Máxima Cumbre del Perú · Áncash',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: 10,
-        z: -3780,
-        altura: 162,
-        radio: 140,
-        perfil: 'massive',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'hualcan',
-        nombre: 'NEVADO HUALCÁN',
-        cota: '6,122 m s. n. m.',
-        cordillera: 'Cabecera Laguna 513 · Áncash',
-        tipoLabel: 'Cuenca Monitoreada',
-        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-        x: 80,
-        z: -4160,
-        altura: 138,
-        radio: 110,
-        perfil: 'ridge',
-        colorPunto: '#10b981'
-      },
-      {
-        id: 'chopicalqui',
-        nombre: 'NEVADO CHOPICALQUI',
-        cota: '6,354 m s. n. m.',
-        cordillera: 'Cordillera Blanca Central',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: -55,
-        z: -4540,
-        altura: 144,
-        radio: 115,
-        perfil: 'pyramid',
-        colorPunto: '#38bdf8'
-      },
-      {
-        id: 'artesonraju',
-        nombre: 'NEVADO ARTESONRAJU',
-        cota: '6,025 m s. n. m.',
-        cordillera: 'Cabecera Laguna Parón · Pirámide',
-        tipoLabel: 'Cuenca Monitoreada',
-        badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-        x: 65,
-        z: -4920,
-        altura: 135,
-        radio: 105,
-        perfil: 'pyramid',
-        colorPunto: '#10b981'
-      },
-      {
-        id: 'alpamayo',
-        nombre: 'NEVADO ALPAMAYO',
-        cota: '5,947 m s. n. m.',
-        cordillera: 'Pirámide Glaciar · Cordillera Blanca',
-        tipoLabel: 'Glaciar Emblemático',
-        badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-        x: -15,
-        z: -5300,
-        altura: 132,
-        radio: 100,
-        perfil: 'pyramid',
-        colorPunto: '#38bdf8'
-      }
-    ];
-
-    // Helper para mantener coordenadas Z dentro del ciclo periódico
-    function wrapZ(z: number, length: number): number {
-      const m = z % length;
-      return m <= 0 ? m : m - length;
-    }
-
-    // 4. Función de Elevación Continua y Fotorrealista del Terreno
-    function getTerrainElevation(worldX: number, worldZ: number): number {
-      const cycleZ = wrapZ(worldZ, LONGITUD_TOTAL);
-
-      // Valle central y relieve base
-      const distValle = Math.abs(worldX - 5);
-      const factorFlancos = Math.min(1.0, Math.pow(distValle / 75, 1.3));
-
-      // Armónicos ridged multifractal para crestas afiladas reales
-      const r1 = 1.0 - Math.abs(Math.sin(worldX * 0.018 + cycleZ * 0.009));
-      const r2 = 1.0 - Math.abs(Math.sin(worldX * 0.038 - cycleZ * 0.016 + 0.5));
-      const r3 = 1.0 - Math.abs(Math.cos(worldX * 0.075 + cycleZ * 0.035));
-      const r4 = 1.0 - Math.abs(Math.sin(worldX * 0.15 - cycleZ * 0.08));
-
-      // Relieve base de valles y cordones secundarios (entre 18 y 58 de altura)
-      const aristas = Math.pow(r1, 2.0) * 22 + Math.pow(r2, 1.6) * 14 + r3 * 7 + r4 * 3;
-      let elevation = 16 + factorFlancos * 26 + aristas;
-
-      // Colosos Emblemáticos del RAG con crestas piramidales y aristas dominantes
-      for (const n of NEVADOS_RAG) {
-        const dx = worldX - n.x;
-        const dz = cycleZ - n.z;
-        const distSq = dx * dx + dz * dz;
-        const rSq = n.radio * n.radio;
-
-        if (distSq < rSq) {
-          const dist = Math.sqrt(distSq);
-          const u = 1.0 - dist / n.radio;
-          const angle = Math.atan2(dz, dx);
-
-          let crestFactor = 1.0;
-          if (n.perfil === 'pyramid') {
-            // Pirámide con 4 aristas afiladas (como Alpamayo y Artesonraju)
-            const ridges = Math.pow(Math.abs(Math.cos(angle * 2)), 1.5);
-            crestFactor = 0.72 + 0.38 * ridges;
-          } else if (n.perfil === 'massive') {
-            // Macizo imponente con arista principal (como Huascarán, Yerupajá, Ausangate)
-            const ridges = Math.pow(Math.abs(Math.cos(angle * 1.5 + 0.4)), 1.3);
-            crestFactor = 0.78 + 0.32 * ridges;
-          } else if (n.perfil === 'ridge') {
-            // Cresta afilada longitudinal
-            const ridges = Math.pow(Math.abs(Math.sin(angle)), 1.6);
-            crestFactor = 0.75 + 0.35 * ridges;
-          } else {
-            // Casquete/domo glaciar
-            crestFactor = 1.0;
-          }
-
-          const shape = Math.pow(u, 1.6) * crestFactor;
-          const boost = (n.altura - elevation) * shape;
-          if (boost > 0) {
-            elevation += boost;
-          }
+      if (chkLabels) chkLabels.checked = active;
+      if (btnToggleLabels) {
+        btnToggleLabels.classList.toggle('text-emerald-300', active);
+        btnToggleLabels.classList.toggle('text-slate-400', !active);
+        const dot = btnToggleLabels.querySelector('span:first-child');
+        if (dot) {
+          dot.className = active ? 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse' : 'w-2 h-2 rounded-full bg-slate-500';
         }
       }
-
-      return Math.max(6, elevation);
     }
 
-    // 5. Balizas 3D en la Cumbre de cada Nevado
-    const beaconsGroup = new THREE.Group();
-    scene.add(beaconsGroup);
+    btnToggleLabels?.addEventListener('click', () => {
+      setLabelsState(!labelsActive);
+    });
 
-    const beaconsMeshList = NEVADOS_RAG.map(n => {
-      const bGroup = new THREE.Group();
+    chkLabels?.addEventListener('change', (e) => {
+      setLabelsState((e.target as HTMLInputElement).checked);
+    });
 
-      // Esfera luminosa de cumbre
-      const orbGeo = new THREE.SphereGeometry(1.6, 16, 16);
-      const orbMat = new THREE.MeshBasicMaterial({ color: n.colorPunto });
-      const orbMesh = new THREE.Mesh(orbGeo, orbMat);
-      bGroup.add(orbMesh);
+    // ========================================================
+    // CONEXIÓN DEL PANEL INTERACTIVO DE CALIBRACIÓN EN VIVO
+    // ========================================================
+    const btnToggle = document.getElementById('btn-toggle-config-panel');
+    const panelConfig = document.getElementById('panel-config-cordilleras');
+    const btnCerrar = document.getElementById('btn-cerrar-config-panel');
 
-      // Anillo halo horizontal de telemetría
-      const ringGeo = new THREE.RingGeometry(1.8, 2.7, 32);
-      ringGeo.rotateX(-Math.PI / 2);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: n.colorPunto,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.85
+    btnToggle?.addEventListener('click', () => {
+      panelConfig?.classList.toggle('hidden');
+    });
+
+    btnCerrar?.addEventListener('click', () => {
+      panelConfig?.classList.add('hidden');
+    });
+
+    // --- CONTROLES DE PERSPECTIVA Y CÁMARA ---
+    const sPitch = document.getElementById('slider-pitch') as HTMLInputElement | null;
+    const vPitch = document.getElementById('val-pitch');
+    sPitch?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vPitch) vPitch.textContent = `${val > 0 ? '+' : ''}${val}°`;
+      engine.updateParam('cameraPitch', val);
+    });
+
+    const sYaw = document.getElementById('slider-yaw') as HTMLInputElement | null;
+    const vYaw = document.getElementById('val-yaw');
+    sYaw?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vYaw) vYaw.textContent = `${val > 0 ? '+' : ''}${val}°`;
+      engine.updateParam('cameraYaw', val);
+    });
+
+    const sFov = document.getElementById('slider-fov') as HTMLInputElement | null;
+    const vFov = document.getElementById('val-fov');
+    sFov?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vFov) vFov.textContent = `${val}°`;
+      engine.updateParam('cameraFov', val);
+    });
+
+    const sFlightAlt = document.getElementById('slider-flight-altitude') as HTMLInputElement | null;
+    const vFlightAlt = document.getElementById('val-flight-altitude');
+    sFlightAlt?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vFlightAlt) vFlightAlt.textContent = `${val} m`;
+      engine.updateParam('flightAltitude', val);
+    });
+
+    const sXOffset = document.getElementById('slider-xoffset') as HTMLInputElement | null;
+    const vXOffset = document.getElementById('val-xoffset');
+    sXOffset?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vXOffset) vXOffset.textContent = String(val);
+      engine.updateParam('cameraXOffset', val);
+    });
+
+    // --- CONTROLES DE TOPOGRAFÍA Y RELIEVE ---
+    const sAltitude = document.getElementById('slider-altitude') as HTMLInputElement | null;
+    const vAltitude = document.getElementById('val-altitude');
+    sAltitude?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vAltitude) vAltitude.textContent = `${val} m`;
+      engine.updateParam('maxAltitude', val);
+    });
+
+    const sRidge = document.getElementById('slider-ridge') as HTMLInputElement | null;
+    const vRidge = document.getElementById('val-ridge');
+    sRidge?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vRidge) vRidge.textContent = String(val);
+      engine.updateParam('ridgeIntensity', val);
+    });
+
+    const sWireframe = document.getElementById('slider-wireframe') as HTMLInputElement | null;
+    const vWireframe = document.getElementById('val-wireframe');
+    sWireframe?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vWireframe) vWireframe.textContent = `${Math.round(val * 100)}%`;
+      engine.updateParam('wireframeIntensity', val);
+    });
+
+    const sSpeed = document.getElementById('slider-speed') as HTMLInputElement | null;
+    const vSpeed = document.getElementById('val-speed');
+    sSpeed?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vSpeed) vSpeed.textContent = String(val);
+      engine.updateParam('flightSpeed', val);
+    });
+
+    const sRoughness = document.getElementById('slider-roughness') as HTMLInputElement | null;
+    const vRoughness = document.getElementById('val-roughness');
+    sRoughness?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vRoughness) vRoughness.textContent = String(val);
+      engine.updateParam('roughness', val);
+    });
+
+    // --- REFINAMIENTO DE SUPERFICIE Y MATERIALES ---
+    const sSmoothness = document.getElementById('slider-smoothness') as HTMLInputElement | null;
+    const vSmoothness = document.getElementById('val-smoothness');
+    sSmoothness?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vSmoothness) vSmoothness.textContent = `${Math.round(val * 100)}%`;
+      engine.updateParam('normalSmoothness', val);
+    });
+
+    const sSnow = document.getElementById('slider-snow') as HTMLInputElement | null;
+    const vSnow = document.getElementById('val-snow');
+    sSnow?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vSnow) vSnow.textContent = `${Math.round(val * 100)}%`;
+      engine.updateParam('snowCoverage', val);
+    });
+
+    const sRock = document.getElementById('slider-rock') as HTMLInputElement | null;
+    const vRock = document.getElementById('val-rock');
+    sRock?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vRock) vRock.textContent = `${Math.round(val * 100)}%`;
+      engine.updateParam('rockExposure', val);
+    });
+
+    const selLakeColor = document.getElementById('select-lake-color') as HTMLSelectElement | null;
+    selLakeColor?.addEventListener('change', (e) => {
+      const val = (e.target as HTMLSelectElement).value;
+      engine.updateParam('lakeWaterColor', val);
+    });
+
+    const selIceColor = document.getElementById('select-ice-color') as HTMLSelectElement | null;
+    selIceColor?.addEventListener('change', (e) => {
+      const val = (e.target as HTMLSelectElement).value;
+      engine.updateParam('glacierIceColor', val);
+    });
+
+    // --- ILUMINACIÓN & ATMÓSFERA ---
+    const sSun = document.getElementById('slider-sun') as HTMLInputElement | null;
+    const vSun = document.getElementById('val-sun');
+    sSun?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vSun) vSun.textContent = String(val);
+      engine.updateParam('sunIntensity', val);
+    });
+
+    const sFog = document.getElementById('slider-fog') as HTMLInputElement | null;
+    const vFog = document.getElementById('val-fog');
+    sFog?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vFog) vFog.textContent = val.toFixed(5);
+      engine.updateParam('fogDensity', val);
+    });
+
+    const sClouds = document.getElementById('slider-clouds') as HTMLInputElement | null;
+    const vClouds = document.getElementById('val-clouds');
+    sClouds?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      if (vClouds) vClouds.textContent = `${Math.round(val * 100)}%`;
+      engine.updateParam('cloudCoverage', val);
+    });
+
+    // --- MODO DE RENDERIZADO VISUAL ---
+    const btnHybrid = document.getElementById('btn-mode-hybrid');
+    const btnNatural = document.getElementById('btn-mode-natural');
+    const btnWireframe = document.getElementById('btn-mode-wireframe');
+    const modeBtns = [btnHybrid, btnNatural, btnWireframe];
+
+    function setVisualModeUI(mode: 'hybrid' | 'natural' | 'wireframe') {
+      modeBtns.forEach(b => {
+        b?.classList.remove('bg-sky-500/20', 'text-sky-300', 'border', 'border-sky-400/30');
+        b?.classList.add('text-slate-400');
       });
-      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-      bGroup.add(ringMesh);
+      const activeBtn = mode === 'natural' ? btnNatural : mode === 'wireframe' ? btnWireframe : btnHybrid;
+      activeBtn?.classList.remove('text-slate-400');
+      activeBtn?.classList.add('bg-sky-500/20', 'text-sky-300', 'border', 'border-sky-400/30');
+      engine.updateParam('visualMode', mode);
+    }
 
-      // Destello láser vertical tenue que corona la cumbre
-      const beamGeo = new THREE.CylinderGeometry(0.08, 0.35, 14, 8);
-      beamGeo.translate(0, 7, 0);
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: '#ffffff',
-        transparent: true,
-        opacity: 0.45
-      });
-      const beamMesh = new THREE.Mesh(beamGeo, beamMat);
-      bGroup.add(beamMesh);
+    btnHybrid?.addEventListener('click', () => setVisualModeUI('hybrid'));
+    btnNatural?.addEventListener('click', () => setVisualModeUI('natural'));
+    btnWireframe?.addEventListener('click', () => setVisualModeUI('wireframe'));
 
-      beaconsGroup.add(bGroup);
-      return { data: n, group: bGroup, ring: ringMesh };
+    // --- MODO DIAGNÓSTICO TOPOGRÁFICO ---
+    const chkDiagnostic = document.getElementById('chk-diagnostic-mode') as HTMLInputElement | null;
+    chkDiagnostic?.addEventListener('change', (e) => {
+      const checked = (e.target as HTMLInputElement).checked;
+      engine.updateParam('diagnosticMode', checked);
     });
 
-    // 6. Elementos DOM para Etiquetas de Cumbres con Anclaje 1:1 y Badge Semántico
-    const etiquetasDOM = NEVADOS_RAG.map((n, idx) => {
-      const el = document.createElement('div');
-      el.className = 'absolute top-0 left-0 transition-opacity duration-300 flex flex-col items-center pointer-events-none opacity-0 select-none';
-      el.innerHTML = `
-        <div class="flex flex-col items-center">
-          <!-- Tarjeta HUD de telemetría cartográfica con clasificación científica -->
-          <div class="bg-slate-950/90 border border-white/20 rounded-2xl px-3.5 py-2 shadow-[0_12px_36px_rgba(0,0,0,0.65)] backdrop-blur-md flex flex-col items-center text-center ring-1 ring-white/10 min-w-[160px]">
-            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase border ${n.badgeBg} mb-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${n.colorPunto}"></span>
-              <span>${n.tipoLabel}</span>
-            </div>
-            <div class="flex items-center gap-1.5 mb-0.5">
-              <svg class="w-3 h-3 text-sky-400" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L1 21h22L12 2zm0 4.5l6.5 11.5h-13L12 6.5z"/>
-              </svg>
-              <span class="text-[10px] tracking-wider font-black text-white uppercase">${n.nombre}</span>
-            </div>
-            <span class="text-[13px] font-mono font-black text-sky-300 leading-tight">${n.cota}</span>
-            <span class="text-[9px] text-slate-300 font-medium">${n.cordillera}</span>
-          </div>
-          <!-- Pin vertical indicador conectado al punto de cumbre -->
-          <div class="w-[1.5px] h-7 bg-gradient-to-b from-sky-300 to-sky-400 shadow-[0_0_8px_#38bdf8]"></div>
-          <!-- Punto de anclaje de cumbre en pantalla -->
-          <div class="relative flex items-center justify-center">
-            <span class="absolute w-4 h-4 rounded-full border border-sky-300 animate-ping opacity-60"></span>
-            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${n.colorPunto}; box-shadow: 0 0 12px ${n.colorPunto};"></span>
-          </div>
-        </div>
-      `;
-      containerEtiquetas.appendChild(el);
-      return { data: n, dom: el, beacon: beaconsMeshList[idx] };
+    // Restablecer valores
+    document.getElementById('btn-reset-config')?.addEventListener('click', () => {
+      setVisualModeUI(DEFAULT_CONFIG.visualMode || 'natural');
+      if (chkDiagnostic) chkDiagnostic.checked = DEFAULT_CONFIG.diagnosticMode;
+      engine.updateParam('diagnosticMode', DEFAULT_CONFIG.diagnosticMode);
+
+      // Perspectiva
+      if (sPitch) { sPitch.value = String(DEFAULT_CONFIG.cameraPitch); if (vPitch) vPitch.textContent = `${DEFAULT_CONFIG.cameraPitch > 0 ? '+' : ''}${DEFAULT_CONFIG.cameraPitch}°`; }
+      if (sYaw) { sYaw.value = String(DEFAULT_CONFIG.cameraYaw); if (vYaw) vYaw.textContent = `${DEFAULT_CONFIG.cameraYaw > 0 ? '+' : ''}${DEFAULT_CONFIG.cameraYaw}°`; }
+      if (sFov) { sFov.value = String(DEFAULT_CONFIG.cameraFov); if (vFov) vFov.textContent = `${DEFAULT_CONFIG.cameraFov}°`; }
+      if (sFlightAlt) { sFlightAlt.value = String(DEFAULT_CONFIG.flightAltitude); if (vFlightAlt) vFlightAlt.textContent = `${DEFAULT_CONFIG.flightAltitude} m`; }
+      if (sXOffset) { sXOffset.value = String(DEFAULT_CONFIG.cameraXOffset); if (vXOffset) vXOffset.textContent = String(DEFAULT_CONFIG.cameraXOffset); }
+
+      // Topografía & Materiales
+      if (sAltitude) { sAltitude.value = String(DEFAULT_CONFIG.maxAltitude); if (vAltitude) vAltitude.textContent = `${DEFAULT_CONFIG.maxAltitude} m`; }
+      if (sRidge) { sRidge.value = String(DEFAULT_CONFIG.ridgeIntensity); if (vRidge) vRidge.textContent = String(DEFAULT_CONFIG.ridgeIntensity); }
+      if (sWireframe) { sWireframe.value = String(DEFAULT_CONFIG.wireframeIntensity); if (vWireframe) vWireframe.textContent = `${Math.round(DEFAULT_CONFIG.wireframeIntensity * 100)}%`; }
+      if (sSpeed) { sSpeed.value = String(DEFAULT_CONFIG.flightSpeed); if (vSpeed) vSpeed.textContent = String(DEFAULT_CONFIG.flightSpeed); }
+      if (sRoughness) { sRoughness.value = String(DEFAULT_CONFIG.roughness); if (vRoughness) vRoughness.textContent = String(DEFAULT_CONFIG.roughness); }
+      if (sSmoothness) { sSmoothness.value = String(DEFAULT_CONFIG.normalSmoothness); if (vSmoothness) vSmoothness.textContent = `${Math.round(DEFAULT_CONFIG.normalSmoothness * 100)}%`; }
+      if (sSnow) { sSnow.value = String(DEFAULT_CONFIG.snowCoverage); if (vSnow) vSnow.textContent = `${Math.round(DEFAULT_CONFIG.snowCoverage * 100)}%`; }
+      if (sRock) { sRock.value = String(DEFAULT_CONFIG.rockExposure); if (vRock) vRock.textContent = `${Math.round(DEFAULT_CONFIG.rockExposure * 100)}%`; }
+      if (sSun) { sSun.value = String(DEFAULT_CONFIG.sunIntensity); if (vSun) vSun.textContent = String(DEFAULT_CONFIG.sunIntensity); }
+      if (sClouds) { sClouds.value = String(DEFAULT_CONFIG.cloudCoverage); if (vClouds) vClouds.textContent = `${Math.round(DEFAULT_CONFIG.cloudCoverage * 100)}%`; }
+      if (sFog) { sFog.value = String(DEFAULT_CONFIG.fogDensity); if (vFog) vFog.textContent = DEFAULT_CONFIG.fogDensity.toFixed(5); }
+
+      engine.updateParam('cameraPitch', DEFAULT_CONFIG.cameraPitch);
+      engine.updateParam('cameraYaw', DEFAULT_CONFIG.cameraYaw);
+      engine.updateParam('cameraFov', DEFAULT_CONFIG.cameraFov);
+      engine.updateParam('flightAltitude', DEFAULT_CONFIG.flightAltitude);
+      engine.updateParam('cameraXOffset', DEFAULT_CONFIG.cameraXOffset);
+      engine.updateParam('maxAltitude', DEFAULT_CONFIG.maxAltitude);
+      engine.updateParam('ridgeIntensity', DEFAULT_CONFIG.ridgeIntensity);
+      engine.updateParam('wireframeIntensity', DEFAULT_CONFIG.wireframeIntensity);
+      engine.updateParam('flightSpeed', DEFAULT_CONFIG.flightSpeed);
+      engine.updateParam('roughness', DEFAULT_CONFIG.roughness);
+      engine.updateParam('normalSmoothness', DEFAULT_CONFIG.normalSmoothness);
+      engine.updateParam('snowCoverage', DEFAULT_CONFIG.snowCoverage);
+      engine.updateParam('rockExposure', DEFAULT_CONFIG.rockExposure);
+      engine.updateParam('sunIntensity', DEFAULT_CONFIG.sunIntensity);
+      engine.updateParam('cloudCoverage', DEFAULT_CONFIG.cloudCoverage);
+      engine.updateParam('fogDensity', DEFAULT_CONFIG.fogDensity);
     });
 
-    // 7. Textura Procedural de Roca Andina y Estrías Metamórficas
-    function createAlpineTexture(): THREE.CanvasTexture {
-      const texCanvas = document.createElement('canvas');
-      texCanvas.width = 1024;
-      texCanvas.height = 1024;
-      const ctx = texCanvas.getContext('2d')!;
-
-      // Base mineral de roca andina
-      ctx.fillStyle = '#443e39';
-      ctx.fillRect(0, 0, 1024, 1024);
-
-      // Estrías y canales de erosión vertical
-      for (let i = 0; i < 20000; i++) {
-        const x = Math.random() * 1024;
-        const y = Math.random() * 1024;
-        const w = Math.random() * 2.5 + 1;
-        const h = Math.random() * 26 + 6;
-        ctx.fillStyle = Math.random() > 0.45 ? 'rgba(240,248,255,0.08)' : 'rgba(25,20,16,0.12)';
-        ctx.fillRect(x, y, w, h);
-      }
-
-      const texture = new THREE.CanvasTexture(texCanvas);
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(16, 90);
-      return texture;
-    }
-
-    const alpineTexture = createAlpineTexture();
-
-    // 8. Construcción de la Geometría del Terreno (Malla Continua)
-    const terrainGeo = new THREE.PlaneGeometry(ANCHO_CORREDOR, LONGITUD_TOTAL, SEG_X, SEG_Z);
-    terrainGeo.rotateX(-Math.PI / 2);
-
-    const posAttr = terrainGeo.attributes.position;
-
-    for (let i = 0; i < posAttr.count; i++) {
-      const localX = posAttr.getX(i);
-      const localZ = posAttr.getZ(i);
-      // En world space: terrainMesh está en Z = -LONGITUD_TOTAL / 2
-      const worldZ = localZ - LONGITUD_TOTAL / 2;
-      posAttr.setY(i, getTerrainElevation(localX, worldZ));
-    }
-
-    terrainGeo.computeVertexNormals();
-
-    // 9. Coloración de Nieve y Roca según Cota y Pendiente (Fotorrealismo)
-    const normalAttr = terrainGeo.attributes.normal;
-    const colors: number[] = [];
-
-    const cRocaOscura = new THREE.Color('#2d2621'); // Granito pardo/gris oscuro
-    const cRocaMedia = new THREE.Color('#4a4038');  // Roca mineral cálida
-    const cTaludGris = new THREE.Color('#6b635b');  // Talud de morrena
-    const cHieloAzulado = new THREE.Color('#8dc8ea'); // Hielo glaciar
-    const cNievePura = new THREE.Color('#fcfdff');   // Nieve blanca brillante
-
-    for (let i = 0; i < posAttr.count; i++) {
-      const y = posAttr.getY(i);
-      const ny = normalAttr.getY(i);
-
-      const col = new THREE.Color();
-
-      if (y < 42) {
-        // Fondo del valle y morrenas bajas: roca oscura y talud mineral
-        const t = Math.max(0, Math.min(1, (y - 12) / 30));
-        col.copy(cRocaOscura).lerp(cRocaMedia, t);
-        if (ny > 0.75) {
-          col.lerp(cTaludGris, 0.35);
-        }
-      } else if (y < 85) {
-        // Zona intermedia: roca con canales de deshielo y neveros
-        const tAlt = (y - 42) / 43;
-        if (ny < 0.45) {
-          col.copy(cRocaOscura).lerp(cRocaMedia, tAlt);
-        } else if (ny < 0.68) {
-          col.copy(cRocaMedia).lerp(cTaludGris, 0.7);
-        } else {
-          col.copy(cTaludGris).lerp(cHieloAzulado, tAlt * 0.8);
-        }
-      } else {
-        // Alta montaña y cumbres glaciares (Y >= 85)
-        const tCumbre = Math.min(1.0, (y - 85) / 50);
-        if (ny < 0.32) {
-          // Paredes verticales de roca expuesta
-          col.copy(cRocaMedia).lerp(cTaludGris, 0.4);
-        } else if (ny < 0.52) {
-          // Canales mixtos de roca y hielo azul
-          col.copy(cTaludGris).lerp(cHieloAzulado, tCumbre);
-        } else {
-          // Glaciares colosales, cornisas y cumbres: blanco resplandeciente
-          const tNieve = (ny - 0.52) / 0.48;
-          col.copy(cHieloAzulado).lerp(cNievePura, Math.min(1.0, tNieve * 1.25 + tCumbre * 0.35));
-        }
-      }
-
-      // Oclusión ambiental sutil en quebradas profundas
-      const ao = Math.min(1.0, Math.max(0.40, Math.pow(y / 60, 0.35)));
-      col.multiplyScalar(ao);
-
-      colors.push(col.r, col.g, col.b);
-    }
-
-    terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-    const terrainMat = new THREE.MeshStandardMaterial({
-      vertexColors: true,
-      map: alpineTexture,
-      roughness: 0.78,
-      metalness: 0.06,
-      flatShading: false
+    // Copiar configuración
+    document.getElementById('btn-copy-config')?.addEventListener('click', () => {
+      const current = engine.getConfig();
+      navigator.clipboard?.writeText(JSON.stringify(current, null, 2));
+      alert('Configuración de perspectiva y cordilleras copiada al portapapeles');
     });
-
-    const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
-    terrainMesh.position.set(0, 0, -LONGITUD_TOTAL / 2);
-    scene.add(terrainMesh);
-
-    // Malla gemela continua para vuelo infinito
-    const terrainMesh2 = new THREE.Mesh(terrainGeo, terrainMat);
-    terrainMesh2.position.set(0, 0, -LONGITUD_TOTAL / 2 - LONGITUD_TOTAL);
-    scene.add(terrainMesh2);
-
-    // Espejos de agua de lagunas glaciares en circos de morrena
-    function createGlacialLake(x: number, y: number, z: number, w: number, h: number) {
-      const lagoGeo = new THREE.PlaneGeometry(w, h);
-      lagoGeo.rotateX(-Math.PI / 2);
-      const lagoMat = new THREE.MeshStandardMaterial({
-        color: '#13405c',
-        roughness: 0.12,
-        metalness: 0.88
-      });
-      const lake = new THREE.Mesh(lagoGeo, lagoMat);
-      lake.position.set(x, y, z);
-      scene.add(lake);
-      return lake;
-    }
-
-    createGlacialLake(15, 17, -980, 140, 190);
-    createGlacialLake(-20, 17, -3200, 160, 220);
-    createGlacialLake(25, 17, -4750, 150, 200);
-
-    // 10. Cinemática de Vuelo Aéreo con Rumbo Diagonal y Ojo Vertical Dinámico
-    const ALTURA_CRUCERO = 148; // Cota de crucero base
-    const VELOCIDAD_AVION = 42; // Unidades por segundo
-    let posCamZ = 0;
-    let currentLookY = 104; // Altura de mirada dinámica inicial (lerp suave)
-    const clock = new THREE.Clock();
-
-    function resize() {
-      if (!canvas) return;
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      if (canvas.width !== w || canvas.height !== h) {
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-      }
-    }
-
-    // 11. Ciclo de Animación a 60 FPS con Seguimiento de Cumbres Altas
-    function animate() {
-      requestAnimationFrame(animate);
-      resize();
-
-      const delta = Math.min(clock.getDelta(), 0.1);
-      posCamZ -= VELOCIDAD_AVION * delta;
-
-      // Trayectoria con rumbo diagonal hacia arriba y hacia la derecha (Rumbo 032° NNE)
-      const curvePhase = posCamZ * 0.0018;
-      // Posición de la aeronave con deriva lateral derecha para abrir campo respecto al cockpit izquierdo
-      const camX = 14 + Math.sin(curvePhase) * 16;
-      const camY = ALTURA_CRUCERO + Math.cos(curvePhase * 1.4) * 3.5;
-      camera.position.set(camX, camY, posCamZ);
-
-      // SEGUIMIENTO DINÁMICO DE MIRADA (OJO VERTICAL Y DIAGONAL):
-      // Si se aproxima un nevado prominente o coloso, elevamos la mirada para contemplar su cumbre
-      // con suficiente cielo arriba, y luego la mirada vuelve a descender al horizonte
-      let targetLookY = 104;
-      for (const item of etiquetasDOM) {
-        const n = item.data;
-        let aheadZ = (n.z - (posCamZ % LONGITUD_TOTAL)) % LONGITUD_TOTAL;
-        if (aheadZ > 0) aheadZ -= LONGITUD_TOTAL;
-        const distZ = -aheadZ;
-
-        // Zona de aproximación visual (entre 70 y 480 unidades de distancia)
-        if (distZ > 70 && distZ < 480 && n.altura > 124) {
-          const excess = n.altura - 124;
-          // Curva gaussiana suave de aproximación y alejamiento
-          const bellCurve = Math.sin(((distZ - 70) / 410) * Math.PI);
-          const elevacionOjo = excess * 0.85 * bellCurve;
-          if (elevacionOjo > (targetLookY - 104)) {
-            targetLookY = 104 + elevacionOjo;
-          }
-        }
-      }
-
-      // Interpolación suave y orgánica de la mirada vertical (sin saltos bruscos)
-      currentLookY = THREE.MathUtils.lerp(currentLookY, targetLookY, delta * 2.8);
-
-      // Punto focal hacia adelante con vector diagonal hacia arriba a la derecha
-      const lookAheadX = camX + 16 + Math.cos(curvePhase) * 8;
-      camera.lookAt(lookAheadX, currentLookY, posCamZ - 260);
-
-      // Alabeo aerodinámico natural (roll de avión en curvas suaves)
-      camera.rotation.z = -Math.cos(curvePhase) * 0.035;
-
-      // Mantener la esfera celeste acompañando la posición de la cámara
-      skyMesh.position.set(camera.position.x, 0, camera.position.z);
-
-      // Reciclaje infinito de vuelo
-      if (posCamZ < -LONGITUD_TOTAL) {
-        posCamZ += LONGITUD_TOTAL;
-      }
-
-      // 12. Proyección Matemática y Visibilidad de Etiquetas y Balizas
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      const cockpitCard = document.getElementById('hero-cockpit-card');
-      const cockpitRect = cockpitCard ? cockpitCard.getBoundingClientRect() : null;
-
-      let closestNevado: { nombre: string; cota: string; tipoLabel: string } | null = null;
-      let minDistance = Infinity;
-
-      for (const item of etiquetasDOM) {
-        const n = item.data;
-
-        // Calcular posición en el ciclo relativa a la aeronave
-        let aheadZ = (n.z - (posCamZ % LONGITUD_TOTAL)) % LONGITUD_TOTAL;
-        if (aheadZ > 0) aheadZ -= LONGITUD_TOTAL;
-        const distZ = -aheadZ; // Distancia hacia adelante (positiva)
-
-        // Posición física exacta de la cumbre en el espacio 3D
-        const summitWorldPos = new THREE.Vector3(n.x, n.altura, posCamZ + aheadZ);
-
-        // Posicionar la baliza 3D exactamente en la cumbre
-        item.beacon.group.position.copy(summitWorldPos);
-        item.beacon.ring.rotation.z += 0.02;
-
-        // Rango de visibilidad óptimo (aproximación visual de 25 a 820 unidades)
-        if (distZ >= 25 && distZ <= 820) {
-          item.beacon.group.visible = true;
-
-          // Proyección matemática 3D -> 2D
-          const proj = summitWorldPos.clone().project(camera);
-
-          // Verificar si está dentro del frustum de la cámara
-          if (proj.z < 1.0 && proj.x >= -1.05 && proj.x <= 1.05 && proj.y >= -1.05 && proj.y <= 1.05) {
-            const screenX = (proj.x * 0.5 + 0.5) * w;
-            const screenY = (-proj.y * 0.5 + 0.5) * h;
-
-            // Bounding box en pantalla
-            if (screenX > 25 && screenX < w - 25 && screenY > 30 && screenY < h - 25) {
-              
-              // Verificar si colisiona con la tarjeta de la consola cockpit en el lado izquierdo
-              let occludedByCockpit = false;
-              if (cockpitRect) {
-                if (
-                  screenX >= cockpitRect.left - 20 &&
-                  screenX <= cockpitRect.right + 20 &&
-                  screenY >= cockpitRect.top - 20 &&
-                  screenY <= cockpitRect.bottom + 20
-                ) {
-                  occludedByCockpit = true;
-                }
-              }
-
-              if (occludedByCockpit) {
-                item.dom.style.opacity = '0';
-              } else {
-                // Suavizado de opacidad por distancia de vuelo
-                let opac = 1.0;
-                if (distZ > 520) {
-                  opac = (820 - distZ) / 300;
-                } else if (distZ < 90) {
-                  opac = (distZ - 25) / 65;
-                }
-
-                item.dom.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) translate(-50%, -100%)`;
-                item.dom.style.opacity = String(Math.max(0, Math.min(1, opac)));
-
-                if (distZ < minDistance && distZ > 60) {
-                  minDistance = distZ;
-                  closestNevado = n;
-                }
-              }
-            } else {
-              item.dom.style.opacity = '0';
-            }
-          } else {
-            item.dom.style.opacity = '0';
-          }
-        } else {
-          item.beacon.group.visible = false;
-          item.dom.style.opacity = '0';
-        }
-      }
-
-      if (closestNevado && hudTelemetria && minDistance < 420) {
-        hudTelemetria.textContent = `Aproximación: ${closestNevado.nombre} (${closestNevado.cota}) · ${closestNevado.tipoLabel}`;
-      }
-
-      renderer.render(scene, camera);
-    }
-
-    animate();
-    window.addEventListener('resize', resize);
   }
 
-  // Buscador sugerencias
+  // ========================================================
+  // BUSCADOR CON DESPLEGABLE EN VIVO Y NAVEGACIÓN A /BUSCAR
+  // ========================================================
   const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
-  const sugerencias = document.querySelectorAll('.btn-sugerencia');
+  const searchDropdown = document.getElementById('hero-search-dropdown') as HTMLDivElement | null;
+  const sugerencias = document.querySelectorAll<HTMLButtonElement>('.btn-sugerencia');
+
+  // Redirección para botones de sugerencia
   sugerencias.forEach(btn => {
     btn.addEventListener('click', () => {
-      if (searchInput && btn.textContent) {
-        searchInput.value = btn.textContent.trim();
-        window.location.hash = 'buscar';
+      const href = btn.dataset.href;
+      if (href) {
+        window.location.href = href;
       }
     });
   });
+
+  if (searchInput && searchDropdown) {
+    const SEARCH_ITEMS = [
+      { type: 'laguna', title: 'Laguna Cancahua', subtitle: 'Áncash · Cordillera Blanca', icon: '🏔️', url: '/buscar?id=cancahua', tags: 'cancahua ancash blanca vallunaraju sin evaluar' },
+      { type: 'laguna', title: 'Laguna Palcacocha', subtitle: 'Áncash · Cordillera Blanca (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=palcacocha', tags: 'palcacocha ancash blanca huaraz cojup muy alto' },
+      { type: 'laguna', title: 'Laguna Parón', subtitle: 'Áncash · Cordillera Blanca (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=paron', tags: 'paron ancash caraz huandoy muy alto' },
+      { type: 'laguna', title: 'Laguna 513', subtitle: 'Áncash · Cordillera Blanca (Riesgo alto)', icon: '🏔️', url: '/buscar?id=513', tags: '513 ancash carhuaz hualcan alto' },
+      { type: 'laguna', title: 'Laguna Upiscocha', subtitle: 'Cusco · Cordillera Vilcanota (Riesgo alto)', icon: '🏔️', url: '/buscar?id=upiscocha', tags: 'upiscocha cusco vilcanota ausangate ocongate' },
+      { type: 'laguna', title: 'Laguna Gangrajanca', subtitle: 'Huánuco · Cordillera Huayhuash (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=gangrajanca', tags: 'gangrajanca huanuco huayhuash yerupaja queropalca' },
+      { type: 'departamento', title: 'Áncash', subtitle: '9 lagunas en riesgo · Puesto 1 de 13 departamentos', icon: '🏛️', url: '/buscar?dept=áncash', tags: 'ancash cordillera blanca huayhuash' },
+      { type: 'departamento', title: 'Cusco', subtitle: '2 lagunas en riesgo · Vilcanota y Urubamba', icon: '🏛️', url: '/buscar?dept=cusco', tags: 'cusco vilcanota urubamba ausangate' },
+      { type: 'departamento', title: 'Huánuco', subtitle: '3 lagunas en riesgo · Huayhuash', icon: '🏛️', url: '/buscar?dept=huánuco', tags: 'huanuco queropalca yerupaja' },
+      { type: 'departamento', title: 'Puno', subtitle: '2 lagunas en riesgo · Carabaya y Apolobamba', icon: '🏛️', url: '/buscar?dept=puno', tags: 'puno carabaya apolobamba' },
+      { type: 'pueblo', title: 'Huaraz', subtitle: 'Áncash · Amenazada por Laguna Palcacocha', icon: '🏘️', url: '/buscar?q=Huaraz', tags: 'huaraz ancash cojup palcacocha aluvion' },
+      { type: 'pueblo', title: 'Caraz', subtitle: 'Áncash · Amenazada por Laguna Parón', icon: '🏘️', url: '/buscar?q=Caraz', tags: 'caraz ancash paron' },
+      { type: 'pueblo', title: 'Carhuaz', subtitle: 'Áncash · Amenazada por Laguna 513', icon: '🏘️', url: '/buscar?q=Carhuaz', tags: 'carhuaz ancash 513' },
+      { type: 'pueblo', title: 'Queropalca', subtitle: 'Huánuco · Cuenca Yerupajá', icon: '🏘️', url: '/buscar?q=Queropalca', tags: 'queropalca huanuco gangrajanca' }
+    ];
+
+    const API_BASE = "{SITE_CONFIG.apiBaseUrl}";
+    const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    let debounceTimer: any = null;
+
+    function renderDropdown(items: any[], docs: any[] = []) {
+      if (!searchDropdown) return;
+      if (items.length === 0 && docs.length === 0) {
+        searchDropdown.innerHTML = `
+          <div class="px-3.5 py-3 text-xs text-slate-400 text-center">
+            No se encontraron coincidencias directas.<br/>
+            <span class="text-sky-300 font-medium">Presiona Enter para buscar en todo el corpus</span>
+          </div>
+        `;
+        searchDropdown.classList.remove('hidden');
+        return;
+      }
+
+      let html = '';
+      if (items.length > 0) {
+        html += items.slice(0, 6).map(item => `
+          <a 
+            href="${item.url}" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition group text-left block"
+          >
+            <span class="text-base select-none">${item.icon || '📍'}</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-white group-hover:text-sky-300 transition truncate">${item.title}</div>
+              <div class="text-[11px] text-slate-400 truncate">${item.subtitle}</div>
+            </div>
+            <span class="text-slate-500 group-hover:text-sky-300 text-xs">→</span>
+          </a>
+        `).join('');
+      }
+
+      // Si hay documentos recuperados del RAG (sin LLM)
+      if (docs.length > 0) {
+        html += `<div class="pt-2 pb-1 px-3 border-t border-white/10 text-[10px] uppercase font-bold tracking-wider text-sky-400 flex items-center justify-between">
+          <span>Evidencia RAG (398 Informes)</span>
+          <span class="text-[9px] text-slate-400 font-normal">Cero LLM</span>
+        </div>`;
+        html += docs.slice(0, 3).map(doc => `
+          <a 
+            href="/buscar?q=${encodeURIComponent(doc.titulo || searchInput.value)}" 
+            class="flex items-start gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition group text-left block"
+          >
+            <span class="text-sm select-none">📄</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-[11px] font-semibold text-slate-200 group-hover:text-sky-300 truncate">${doc.titulo}</div>
+              <div class="text-[10px] text-slate-400 truncate">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
+              <p class="text-[10px] text-slate-400 italic line-clamp-1 mt-0.5">"${doc.extracto}"</p>
+            </div>
+          </a>
+        `).join('');
+      }
+
+      searchDropdown.innerHTML = html;
+      searchDropdown.classList.remove('hidden');
+    }
+
+    async function fetchRAG(query: string) {
+      try {
+        const res = await fetch(`${API_BASE}/api/buscar?q=${encodeURIComponent(query)}&limite=6`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        
+        const entidadesMapeadas = (data.entidades || []).map((e: any) => ({
+          title: e.tipo === 'Laguna' ? `Laguna ${e.nombre}` : e.nombre,
+          subtitle: `${e.departamento || e.tipo} · ${e.nivel_riesgo !== 'Sin evaluar' ? `Riesgo ${e.nivel_riesgo}` : 'Oficial'}`,
+          icon: e.tipo === 'Laguna' ? '🏔️' : (e.tipo === 'Glaciar' ? '❄️' : (e.tipo === 'Poblado' ? '🏘️' : '🏛️')),
+          url: e.url
+        }));
+
+        if (entidadesMapeadas.length > 0 || (data.documentos && data.documentos.length > 0)) {
+          renderDropdown(entidadesMapeadas, data.documentos || []);
+          return;
+        }
+      } catch (err) {
+        // Fallback silencioso al catálogo local
+      }
+
+      // Fallback
+      const filtered = SEARCH_ITEMS.filter(it => norm(it.title).includes(norm(query)) || norm(it.tags).includes(norm(query)));
+      renderDropdown(filtered);
+    }
+
+    searchInput.addEventListener('focus', () => {
+      const q = searchInput.value.trim();
+      if (!q) {
+        renderDropdown(SEARCH_ITEMS.slice(0, 6));
+      } else {
+        fetchRAG(q);
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim();
+      if (!q) {
+        renderDropdown(SEARCH_ITEMS.slice(0, 6));
+        return;
+      }
+      // Respuesta instantánea con catálogo local mientras llega la API RAG
+      const localMatches = SEARCH_ITEMS.filter(it => norm(it.title).includes(norm(q)) || norm(it.tags).includes(norm(q)));
+      renderDropdown(localMatches);
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchRAG(q);
+      }, 200);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = searchInput.value.trim();
+        if (q) {
+          window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
+        }
+      } else if (e.key === 'Escape') {
+        searchDropdown.classList.add('hidden');
+      }
+    });
+
+    // Cerrar al hacer clic afuera
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target as Node) && !searchDropdown.contains(e.target as Node)) {
+        searchDropdown.classList.add('hidden');
+      }
+    });
+  }
 </script>
