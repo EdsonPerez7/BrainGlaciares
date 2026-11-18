@@ -443,104 +443,6 @@ def crear_app(cfg=None, servicio=None, cargar=True):
 
         return resultados
 
-    @app.get("/api/lagunas/{id}", tags=["datos"])
-    def obtener_laguna(id: str):
-        """Devuelve la ficha técnica de una laguna directamente del grafo y de los fragmentos del RAG.
-        CERO llamadas a LLM."""
-        fila_entidad = None
-        if servicio.caja is not None:
-            fila_entidad = servicio.caja._resolver(id)
-
-        obras = []
-        glaciar_origen = "Glaciar de cabecera"
-        poblados = []
-        nivel_riesgo = "Sin evaluar"
-        altitud = 4400
-        volumen = 0.0
-        superficie = 0.0
-        doc_cita = None
-
-        if servicio.grafo is not None and fila_entidad is not None:
-            try:
-                df_ficha = servicio.grafo.ficha([fila_entidad.id], limite=100)
-                if df_ficha is not None and len(df_ficha):
-                    for _, r in df_ficha.iterrows():
-                        rel = str(r.get("relacion", "")).lower()
-                        dest = str(r.get("destino", ""))
-                        doc = r.get("documento")
-                        pag = r.get("pagina")
-                        if doc and not doc_cita:
-                            doc_cita = f"{doc} (p. {pag})" if pag else str(doc)
-
-                        if "alimentadapor" in rel or "origen_glaciar" in rel:
-                            glaciar_origen = dest
-                        elif "amenazaa" in rel or "afectoa" in rel:
-                            poblados.append(dest)
-                        elif "tieneobraseguridad" in rel or "estadoobra" in rel:
-                            obras.append(dest)
-                        elif "tienenivelriesgo" in rel:
-                            nivel_riesgo = dest
-                        elif "tienealtitud" in rel:
-                            try: altitud = float(dest.split()[0])
-                            except: pass
-                        elif "tienevolumen" in rel:
-                            try: volumen = float(dest.split()[0])
-                            except: pass
-                        elif "tienearea" in rel:
-                            try: superficie = float(dest.split()[0])
-                            except: pass
-            except Exception as e:
-                log_json("ficha_grafo_error", id=id, error=str(e)[:200])
-
-        nombre = fila_entidad.nombre if fila_entidad is not None else id.capitalize()
-        dept = fila_entidad.departamentos if (fila_entidad is not None and hasattr(fila_entidad, "departamentos")) else "Áncash"
-        if isinstance(dept, list):
-            dept = dept[0] if dept else "Áncash"
-
-        # Fragmentos de documentos específicos de esta laguna desde el RAG
-        docs_fragmentos = []
-        if servicio.indice is not None:
-            try:
-                frags = servicio.indice.buscar(f"laguna {nombre}", k=3, modo="bm25")
-                for _, f in frags.iterrows():
-                    docs_fragmentos.append({
-                        "titulo": str(f.get("title", "")),
-                        "fuente": str(f.get("fuente", "")),
-                        "anio": int(f.get("year", 2024)) if pd.notna(f.get("year")) else 2024,
-                        "pagina": str(f.get("page_start", "")),
-                        "extracto": str(f.get("text", ""))[:200]
-                    })
-            except Exception:
-                pass
-
-        final_riesgo = nivel_riesgo if nivel_riesgo != "Sin evaluar" else (
-            fila_entidad.nivel_max if fila_entidad is not None and pd.notna(fila_entidad.nivel_max) else "Sin evaluar"
-        )
-
-        return {
-            "id": id,
-            "nombre": nombre,
-            "departamento": str(dept),
-            "cordillera": "Blanca" if "ancash" in norm(str(dept)) else "Andina",
-            "riesgo": final_riesgo,
-            "poblado_amenazado": ", ".join(poblados) if poblados else "Sin poblaciones registradas inmediatamente aguas abajo",
-            "tiene_obras": len(obras) > 0,
-            "obras_detalle": ", ".join(obras) if obras else "Sin obras de mitigación física registradas",
-            "volumen_hm3": volumen or 4.5,
-            "superficie_km2": superficie or 0.25,
-            "documento_superficie": doc_cita or "Inventario Nacional de Glaciares y Lagunas (ANA)",
-            "pueblos_aguas_abajo_num": len(poblados),
-            "eventos_historicos_num": 1 if final_riesgo in ("Muy alto", "Alto") else 0,
-            "altitud_msnm": altitud,
-            "glaciar_origen": glaciar_origen,
-            "total_documentos": len(docs_fragmentos) + (fila_entidad.n_docs if fila_entidad is not None and pd.notna(fila_entidad.n_docs) else 3),
-            "datos_conectados": 12 + len(obras) + len(poblados),
-            "confianza": 0.94 if final_riesgo != "Sin evaluar" else 0.65,
-            "fecha_actualizacion": "2026 · al día",
-            "fragmentos_rag": docs_fragmentos,
-            "alerta_especifica": f"Información consolidada de la red de conocimiento oficial para la laguna {nombre}."
-        }
-
     @app.get("/api/lagunas/comparar", tags=["datos"])
     def lagunas_comparar(l1: str = "palcacocha", l2: str = "paron"):
         catalogo = {
@@ -615,6 +517,30 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 "eventos_historicos": 0, "volumen_hm3": 1.4, "altitud_msnm": 4485,
                 "primer_estudio_ano": 1980, "total_estudios": 11,
                 "glaciar_origen": "Churup"
+            },
+            "tullparaju": {
+                "id": "tullparaju", "nombre": "Tullparaju", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Huaraz"],
+                "obras": "Dique de morrena y vertedero de demasías",
+                "eventos_historicos": 1, "volumen_hm3": 12.0, "altitud_msnm": 4350,
+                "primer_estudio_ano": 1978, "total_estudios": 22,
+                "glaciar_origen": "Tullparaju / San Juan"
+            },
+            "cuchillacocha": {
+                "id": "cuchillacocha", "nombre": "Cuchillacocha", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Huaraz"],
+                "obras": "Presa de gaviones y canal de desagüe deteriorado",
+                "eventos_historicos": 0, "volumen_hm3": 8.5, "altitud_msnm": 4625,
+                "primer_estudio_ano": 1982, "total_estudios": 23,
+                "glaciar_origen": "Pucaranra"
+            },
+            "artizon": {
+                "id": "artizon", "nombre": "Artizón", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Caraz"],
+                "obras": "Dique y canal de descarga en estado colapsado",
+                "eventos_historicos": 1, "volumen_hm3": 3.5, "altitud_msnm": 4250,
+                "primer_estudio_ano": 1988, "total_estudios": 15,
+                "glaciar_origen": "Santa Cruz"
             }
         }
 
@@ -726,6 +652,104 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             "elementos_compartidos": sum(1 for n in nodos if n["grupo"] == "compartido"),
             "serie_temporal": serie,
             "red_relaciones": {"nodos": nodos, "enlaces": enlaces}
+        }
+
+    @app.get("/api/lagunas/{id}", tags=["datos"])
+    def obtener_laguna(id: str):
+        """Devuelve la ficha técnica de una laguna directamente del grafo y de los fragmentos del RAG.
+        CERO llamadas a LLM."""
+        fila_entidad = None
+        if servicio.caja is not None:
+            fila_entidad = servicio.caja._resolver(id)
+
+        obras = []
+        glaciar_origen = "Glaciar de cabecera"
+        poblados = []
+        nivel_riesgo = "Sin evaluar"
+        altitud = 4400
+        volumen = 0.0
+        superficie = 0.0
+        doc_cita = None
+
+        if servicio.grafo is not None and fila_entidad is not None:
+            try:
+                df_ficha = servicio.grafo.ficha([fila_entidad.id], limite=100)
+                if df_ficha is not None and len(df_ficha):
+                    for _, r in df_ficha.iterrows():
+                        rel = str(r.get("relacion", "")).lower()
+                        dest = str(r.get("destino", ""))
+                        doc = r.get("documento")
+                        pag = r.get("pagina")
+                        if doc and not doc_cita:
+                            doc_cita = f"{doc} (p. {pag})" if pag else str(doc)
+
+                        if "alimentadapor" in rel or "origen_glaciar" in rel:
+                            glaciar_origen = dest
+                        elif "amenazaa" in rel or "afectoa" in rel:
+                            poblados.append(dest)
+                        elif "tieneobraseguridad" in rel or "estadoobra" in rel:
+                            obras.append(dest)
+                        elif "tienenivelriesgo" in rel:
+                            nivel_riesgo = dest
+                        elif "tienealtitud" in rel:
+                            try: altitud = float(dest.split()[0])
+                            except: pass
+                        elif "tienevolumen" in rel:
+                            try: volumen = float(dest.split()[0])
+                            except: pass
+                        elif "tienearea" in rel:
+                            try: superficie = float(dest.split()[0])
+                            except: pass
+            except Exception as e:
+                log_json("ficha_grafo_error", id=id, error=str(e)[:200])
+
+        nombre = fila_entidad.nombre if fila_entidad is not None else id.capitalize()
+        dept = fila_entidad.departamentos if (fila_entidad is not None and hasattr(fila_entidad, "departamentos")) else "Áncash"
+        if isinstance(dept, list):
+            dept = dept[0] if dept else "Áncash"
+
+        # Fragmentos de documentos específicos de esta laguna desde el RAG
+        docs_fragmentos = []
+        if servicio.indice is not None:
+            try:
+                frags = servicio.indice.buscar(f"laguna {nombre}", k=3, modo="bm25")
+                for _, f in frags.iterrows():
+                    docs_fragmentos.append({
+                        "titulo": str(f.get("title", "")),
+                        "fuente": str(f.get("fuente", "")),
+                        "anio": int(f.get("year", 2024)) if pd.notna(f.get("year")) else 2024,
+                        "pagina": str(f.get("page_start", "")),
+                        "extracto": str(f.get("text", ""))[:200]
+                    })
+            except Exception:
+                pass
+
+        final_riesgo = nivel_riesgo if nivel_riesgo != "Sin evaluar" else (
+            fila_entidad.nivel_max if fila_entidad is not None and pd.notna(fila_entidad.nivel_max) else "Sin evaluar"
+        )
+
+        return {
+            "id": id,
+            "nombre": nombre,
+            "departamento": str(dept),
+            "cordillera": "Blanca" if "ancash" in norm(str(dept)) else "Andina",
+            "riesgo": final_riesgo,
+            "poblado_amenazado": ", ".join(poblados) if poblados else "Sin poblaciones registradas inmediatamente aguas abajo",
+            "tiene_obras": len(obras) > 0,
+            "obras_detalle": ", ".join(obras) if obras else "Sin obras de mitigación física registradas",
+            "volumen_hm3": volumen or 4.5,
+            "superficie_km2": superficie or 0.25,
+            "documento_superficie": doc_cita or "Inventario Nacional de Glaciares y Lagunas (ANA)",
+            "pueblos_aguas_abajo_num": len(poblados),
+            "eventos_historicos_num": 1 if final_riesgo in ("Muy alto", "Alto") else 0,
+            "altitud_msnm": altitud,
+            "glaciar_origen": glaciar_origen,
+            "total_documentos": len(docs_fragmentos) + (fila_entidad.n_docs if fila_entidad is not None and pd.notna(fila_entidad.n_docs) else 3),
+            "datos_conectados": 12 + len(obras) + len(poblados),
+            "confianza": 0.94 if final_riesgo != "Sin evaluar" else 0.65,
+            "fecha_actualizacion": "2026 · al día",
+            "fragmentos_rag": docs_fragmentos,
+            "alerta_especifica": f"Información consolidada de la red de conocimiento oficial para la laguna {nombre}."
         }
 
     @app.post("/api/preguntar", tags=["agente"])

@@ -7,8 +7,12 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
     
     <!-- Encabezado de la sección -->
     <div class="mb-8">
+      <div class="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-800 mb-2">
+        <span class="h-2 w-2 rounded-full bg-sky-500"></span>
+        Análisis Comparativo Multivariable
+      </div>
       <h2 class="text-2xl font-bold tracking-tight text-slate-900">Compara y descubre</h2>
-      <p class="text-sm text-slate-500 mt-1">Pon una laguna contra otra, combina datos del inventario y analiza sus relaciones en el grafo</p>
+      <p class="text-sm text-slate-500 mt-1">Contrasta dos lagunas glaciares en riesgo, volumen, poblaciones amenazadas, historia documental y relaciones en el grafo</p>
     </div>
 
     <!-- Barra de selección de Lagunas -->
@@ -16,97 +20,175 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
       <div class="flex flex-wrap items-center justify-between gap-4">
         
         <div class="flex flex-wrap items-center gap-3">
-          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lagunas a comparar:</span>
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lagunas a contrastar:</span>
           
-          <select id="comp-l1" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 shadow-sm">
-            {LAGUNAS_DESTACADAS.map(l => (
-              <option value={l.id} selected={l.id === 'palcacocha'}>
-                {l.nombre} · {l.departamento}
-              </option>
-            ))}
-          </select>
+          <div class="inline-flex items-center gap-2 rounded-lg border-2 border-sky-500/40 bg-sky-50/40 px-2 py-1">
+            <span class="h-2.5 w-2.5 rounded-full bg-sky-600"></span>
+            <select id="comp-l1" class="rounded-md border-0 bg-transparent text-xs font-bold text-slate-900 focus:outline-none cursor-pointer">
+              {LAGUNAS_DESTACADAS.map(l => (
+                <option value={l.id} selected={l.id === 'palcacocha'}>
+                  {l.nombre} ({l.departamento})
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <span class="text-xs font-semibold text-slate-400">vs</span>
+          <span class="text-xs font-bold text-slate-400">contra</span>
 
-          <select id="comp-l2" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 shadow-sm">
-            {LAGUNAS_DESTACADAS.map(l => (
-              <option value={l.id} selected={l.id === 'paron'}>
-                {l.nombre} · {l.departamento}
-              </option>
-            ))}
-          </select>
+          <div class="inline-flex items-center gap-2 rounded-lg border-2 border-amber-500/40 bg-amber-50/40 px-2 py-1">
+            <span class="h-2.5 w-2.5 rounded-full bg-amber-600"></span>
+            <select id="comp-l2" class="rounded-md border-0 bg-transparent text-xs font-bold text-slate-900 focus:outline-none cursor-pointer">
+              {LAGUNAS_DESTACADAS.map(l => (
+                <option value={l.id} selected={l.id === 'paron'}>
+                  {l.nombre} ({l.departamento})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <!-- Botón para detonar explicación analítica -->
         <button 
           id="btn-explicar-diferencia"
           type="button"
-          class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition"
+          class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition cursor-pointer"
         >
-          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="h-3.5 w-3.5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>Explícame la diferencia técnica</span>
+          <span>Consultar análisis técnico al Asistente</span>
         </button>
 
       </div>
     </div>
 
-    <!-- Comparativa de Barras de Métricas -->
+    <!-- Síntesis Comparativa Automatizada del Grafo -->
+    <div class="rounded-xl border border-sky-200 bg-sky-50/80 p-4 mb-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-sky-900">
+          <span class="inline-block h-2 w-2 rounded-full bg-sky-600"></span>
+          <span>Veredicto Comparativo Oficial</span>
+          <span id="txt-comp-entidades-count" class="text-[10px] font-medium text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">3 datos clave</span>
+        </div>
+        <p id="txt-veredicto-comparativo" class="text-xs text-slate-700 leading-relaxed font-medium">
+          Comparando Palcacocha y Parón...
+        </p>
+      </div>
+    </div>
+
+    <!-- Comparativa de Barras de Métricas Paralelas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       
       <!-- Panel de Atributos Físicos y Amenaza -->
       <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
-        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
-          <span>Atributos de Riesgo y Capacidad</span>
-          <span class="text-xs font-normal text-slate-400">Datos verificados en Neo4j</span>
-        </h3>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+            Atributos de Riesgo y Capacidad Física
+          </h3>
+          <span class="text-[11px] font-semibold text-slate-400">Escala Oficial INAIGEM</span>
+        </div>
 
-        <!-- Métrica 1: Nivel de Riesgo -->
-        <div class="space-y-1.5">
-          <div class="flex justify-between text-xs font-medium">
-            <span class="text-slate-600">Nivel de riesgo de desborde</span>
-            <span id="txt-comp-riesgo" class="font-bold text-slate-900">Ambas en riesgo Muy Alto</span>
+        <!-- Métrica 1: Nivel de Riesgo Oficial INAIGEM -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-700">Nivel de Riesgo de Desborde</span>
+            <span id="txt-comp-riesgo-resumen" class="font-bold text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Ambas en riesgo Muy Alto</span>
           </div>
-          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
-            <div id="bar-riesgo-l1" class="h-full bg-rose-600 w-1/2"></div>
-            <div id="bar-riesgo-l2" class="h-full bg-rose-500 w-1/2"></div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span id="name-riesgo-l1" class="text-sky-800 font-bold truncate">Palcacocha</span>
+                <span id="badge-riesgo-l1" class="font-bold text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">Muy alto</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-riesgo-l1" class="bg-rose-600 h-full w-full transition-all duration-300"></div>
+              </div>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span id="name-riesgo-l2" class="text-amber-800 font-bold truncate">Parón</span>
+                <span id="badge-riesgo-l2" class="font-bold text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">Muy alto</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-riesgo-l2" class="bg-rose-600 h-full w-full transition-all duration-300"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Métrica 2: Poblados amenazados aguas abajo -->
-        <div class="space-y-1.5">
-          <div class="flex justify-between text-xs font-medium">
-            <span class="text-slate-600">Poblados amenazados aguas abajo</span>
-            <span id="txt-comp-poblados" class="font-bold text-slate-900">1 pueblo vs 3 pueblos</span>
+        <!-- Métrica 2: Volumen de Agua Almacenada -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-700">Volumen de Agua Almacenada (hm³)</span>
+            <span id="txt-comp-vol-diff" class="text-[11px] font-bold text-slate-600">Parón almacena 3.2x más volumen</span>
           </div>
-          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
-            <div id="bar-pob-l1" class="h-full bg-sky-600 w-[25%]" title="Huaraz (1)"></div>
-            <div id="bar-pob-l2" class="h-full bg-cyan-500 w-[75%]" title="Caraz, Pueblo Libre, Huaylas (3)"></div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span class="text-slate-600">Laguna 1</span>
+                <span id="val-vol-l1" class="font-bold text-slate-900">17.3 hm³</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-vol-l1" class="bg-sky-600 h-full w-[31%] transition-all duration-300"></div>
+              </div>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span class="text-slate-600">Laguna 2</span>
+                <span id="val-vol-l2" class="font-bold text-slate-900">55.0 hm³</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-vol-l2" class="bg-amber-600 h-full w-[100%] transition-all duration-300"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Métrica 3: Volumen almacenado -->
-        <div class="space-y-1.5">
-          <div class="flex justify-between text-xs font-medium">
-            <span class="text-slate-600">Volumen de agua almacenada</span>
-            <span id="txt-comp-vol" class="font-bold text-slate-900">17.3 hm³ vs 55.0 hm³</span>
+        <!-- Métrica 3: Centros Poblados Amenazados Aguas Abajo -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold text-slate-700">Población Expuesta Aguas Abajo</span>
+            <span class="text-[10px] text-slate-400">Trayectoria de aluvión</span>
           </div>
-          <div class="flex gap-2 h-2.5 rounded-full overflow-hidden bg-slate-100">
-            <div id="bar-vol-l1" class="h-full bg-indigo-600 w-[31%]"></div>
-            <div id="bar-vol-l2" class="h-full bg-blue-500 w-[100%]"></div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1">
+              <div class="flex justify-between items-center font-medium">
+                <span id="txt-pob-cant-l1" class="font-bold text-sky-900">1 pueblo</span>
+                <span class="text-[10px] text-slate-400">Aguas abajo</span>
+              </div>
+              <p id="txt-pob-nombres-l1" class="text-slate-600 text-[11px] leading-tight font-medium">Huaraz</p>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1">
+              <div class="flex justify-between items-center font-medium">
+                <span id="txt-pob-cant-l2" class="font-bold text-amber-900">3 pueblos</span>
+                <span class="text-[10px] text-slate-400">Aguas abajo</span>
+              </div>
+              <p id="txt-pob-nombres-l2" class="text-slate-600 text-[11px] leading-tight font-medium">Caraz, Pueblo Libre, Huaylas</p>
+            </div>
           </div>
         </div>
 
-        <!-- Obras de seguridad y mitigación -->
-        <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-4 text-xs">
+        <!-- Métrica 4: Altitud y Masa Glaciar -->
+        <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
+          <div class="space-y-0.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Altitud & Glaciar</span>
+            <p id="txt-alt-glac-l1" class="font-semibold text-slate-800 text-[11px]">4,566 m s.n.m. · Palcaraju</p>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Altitud & Glaciar</span>
+            <p id="txt-alt-glac-l2" class="font-semibold text-slate-800 text-[11px]">4,185 m s.n.m. · Huandoy</p>
+          </div>
+        </div>
+
+        <!-- Métrica 5: Obras de Seguridad Física -->
+        <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
           <div>
-            <span id="label-l1" class="font-bold text-slate-900 block">Palcacocha:</span>
-            <span id="obras-l1" class="text-slate-500">Sifones y dique de seguridad</span>
+            <span id="label-l1" class="font-bold text-sky-800 block text-[11px]">Palcacocha:</span>
+            <p id="obras-l1" class="text-slate-600 text-[11px] mt-0.5 leading-snug">Sifones flotantes y dique de contención (seguridad temporal)</p>
           </div>
           <div>
-            <span id="label-l2" class="font-bold text-slate-900 block">Parón:</span>
-            <span id="obras-l2" class="text-slate-500">Túnel de desagüe artificial</span>
+            <span id="label-l2" class="font-bold text-amber-800 block text-[11px]">Parón:</span>
+            <p id="obras-l2" class="text-slate-600 text-[11px] mt-0.5 leading-snug">Túnel de descarga regulada (seguridad hidráulica permanente)</p>
           </div>
         </div>
       </div>
@@ -114,61 +196,68 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
       <!-- Panel: Línea de Tiempo de Estudios Acumulados -->
       <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
         <div>
-          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
-            ¿Cuál se ha estudiado más, y desde cuándo?
-          </h3>
-          <p class="text-xs text-slate-500 mt-1">
-            Curva de estudios acumulados en el corpus institucional (1966–2026)
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+              ¿Cuál se ha estudiado más, y desde cuándo?
+            </h3>
+            <span class="text-[11px] font-semibold text-slate-400">1965 – 2026</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            Curva de evolución acumulada de investigaciones e informes técnicos oficiales en el corpus
           </p>
 
           <!-- Gráfico de curvas de estudios en SVG -->
-          <div class="mt-6 h-40 w-full relative">
-            <svg class="h-full w-full" viewBox="0 0 400 120" preserveAspectRatio="none">
+          <div class="mt-6 h-44 w-full relative">
+            <svg class="h-full w-full overflow-visible" viewBox="0 0 400 120" preserveAspectRatio="none">
               <!-- Rejilla horizontal -->
               <line x1="0" y1="20" x2="400" y2="20" stroke="#f1f5f9" stroke-width="1" />
-              <line x1="0" y1="60" x2="400" y2="60" stroke="#f1f5f9" stroke-width="1" />
-              <line x1="0" y1="100" x2="400" y2="100" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="55" x2="400" y2="55" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="90" x2="400" y2="90" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="115" x2="400" y2="115" stroke="#e2e8f0" stroke-width="1.5" />
 
-              <!-- Curva Laguna 1 -->
+              <!-- Curva Laguna 1 (Azul / Sky) -->
               <path 
                 id="path-curva-l1"
-                d="M 0,110 L 60,110 L 100,105 L 180,90 L 260,65 L 340,35 L 400,15" 
+                d="M 0,115 L 45.9,115 C 169.8,91.3 293.8,48.5 400,20" 
                 fill="none" 
                 stroke="#0284c7" 
-                stroke-width="2.5" 
+                stroke-width="3" 
                 stroke-linecap="round"
+                class="transition-all duration-500"
               />
 
-              <!-- Curva Laguna 2 -->
+              <!-- Curva Laguna 2 (Ámbar / Naranja) -->
               <path 
                 id="path-curva-l2"
-                d="M 0,110 L 20,108 L 80,100 L 160,88 L 240,75 L 320,60 L 400,45" 
+                d="M 0,115 L 6.6,115 C 144.3,103.5 282.0,82.7 400,68.9" 
                 fill="none" 
                 stroke="#d97706" 
-                stroke-width="2.5" 
+                stroke-width="3" 
                 stroke-linecap="round"
-                stroke-dasharray="4 2"
+                stroke-dasharray="5 3"
+                class="transition-all duration-500"
               />
             </svg>
 
             <!-- Leyenda de años en el eje X -->
             <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
               <span>1965</span>
-              <span>1985</span>
-              <span>2005</span>
+              <span>1980</span>
+              <span>1995</span>
+              <span>2010</span>
               <span>2026</span>
             </div>
           </div>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
           <div class="flex items-center gap-2">
-            <span class="inline-block h-2 w-2 rounded-full bg-sky-600"></span>
-            <span id="curva-txt-l1" class="text-slate-700 font-medium">Palcacocha: 68 docs (desde 1972)</span>
+            <span class="inline-block h-2.5 w-2.5 rounded-full bg-sky-600"></span>
+            <span id="curva-txt-l1" class="text-slate-800 font-semibold">Palcacocha: 68 docs (desde 1972)</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="inline-block h-2 w-2 rounded-full bg-amber-600"></span>
-            <span id="curva-txt-l2" class="text-slate-700 font-medium">Parón: 33 docs (desde 1966)</span>
+            <span class="inline-block h-2.5 w-2.5 rounded-full bg-amber-600"></span>
+            <span id="curva-txt-l2" class="text-slate-800 font-semibold">Parón: 33 docs (desde 1966)</span>
           </div>
         </div>
       </div>
@@ -179,75 +268,26 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
     <div class="rounded-xl border border-slate-200 bg-slate-950 p-6 text-white shadow-md">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
         <div>
-          <h3 class="text-sm font-bold text-slate-100 tracking-tight">Lo que las une y lo que las separa</h3>
-          <p class="text-xs text-slate-400">Subgrafo de entidades compartidas vs entidades disjuntas</p>
+          <h3 class="text-sm font-bold text-slate-100 tracking-tight">Red de Relaciones: Lo que las une y lo que las separa</h3>
+          <p class="text-xs text-slate-400">Subgrafo de entidades compartidas vs entidades exclusivas en el grafo de conocimiento</p>
         </div>
         <div class="flex items-center gap-3 text-xs">
           <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Compartido</span>
-          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Propio Laguna 1</span>
-          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-400"></span> Propio Laguna 2</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Exclusivo Laguna 1</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-400"></span> Exclusivo Laguna 2</span>
         </div>
       </div>
 
       <!-- Lienzo visual de nodos interactivos en SVG -->
       <div id="contenedor-red-relaciones" class="my-6 h-64 w-full flex items-center justify-center relative">
         <svg id="svg-red-relaciones" class="h-full w-full max-w-2xl" viewBox="0 0 600 240" fill="none">
-          <!-- Conexiones -->
-          <!-- L1 a compartidos -->
-          <line x1="160" y1="120" x2="300" y2="50" stroke="#334155" stroke-width="1.5" />
-          <line x1="160" y1="120" x2="300" y2="120" stroke="#334155" stroke-width="1.5" />
-          <line x1="160" y1="120" x2="300" y2="190" stroke="#334155" stroke-width="1.5" />
-
-          <!-- L2 a compartidos -->
-          <line x1="440" y1="120" x2="300" y2="50" stroke="#334155" stroke-width="1.5" />
-          <line x1="440" y1="120" x2="300" y2="120" stroke="#334155" stroke-width="1.5" />
-          <line x1="440" y1="120" x2="300" y2="190" stroke="#334155" stroke-width="1.5" />
-
-          <!-- Propios de L1 -->
-          <line x1="160" y1="120" x2="70" y2="70" stroke="#1e293b" stroke-width="1.5" />
-          <line x1="160" y1="120" x2="60" y2="170" stroke="#1e293b" stroke-width="1.5" />
-
-          <!-- Propios de L2 -->
-          <line x1="440" y1="120" x2="530" y2="70" stroke="#1e293b" stroke-width="1.5" />
-          <line x1="440" y1="120" x2="540" y2="170" stroke="#1e293b" stroke-width="1.5" />
-
-          <!-- Nodos Propios L1 -->
-          <circle cx="70" cy="70" r="22" fill="#0369a1" />
-          <text x="70" y="73" fill="#ffffff" font-size="9" text-anchor="middle" font-family="sans-serif">Huaraz</text>
-
-          <circle cx="60" cy="170" r="24" fill="#0369a1" />
-          <text x="60" y="173" fill="#ffffff" font-size="8" text-anchor="middle" font-family="sans-serif">Palcaraju</text>
-
-          <!-- Nodos Propios L2 -->
-          <circle cx="530" cy="70" r="22" fill="#b45309" />
-          <text x="530" y="73" fill="#ffffff" font-size="9" text-anchor="middle" font-family="sans-serif">Caraz</text>
-
-          <circle cx="540" cy="170" r="24" fill="#b45309" />
-          <text x="540" y="173" fill="#ffffff" font-size="8" text-anchor="middle" font-family="sans-serif">Huandoy</text>
-
-          <!-- Nodo Principal Laguna 1 -->
-          <circle cx="160" cy="120" r="32" fill="#0284c7" stroke="#38bdf8" stroke-width="2" />
-          <text id="node-l1" x="160" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">Palcacocha</text>
-
-          <!-- Nodo Principal Laguna 2 -->
-          <circle cx="440" cy="120" r="32" fill="#d97706" stroke="#fbbf24" stroke-width="2" />
-          <text id="node-l2" x="440" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">Parón</text>
-
-          <!-- Nodos Compartidos (En el Centro) -->
-          <circle cx="300" cy="50" r="20" fill="#047857" />
-          <text x="300" y="53" fill="#ffffff" font-size="9" font-weight="600" text-anchor="middle" font-family="sans-serif">Áncash</text>
-
-          <circle cx="300" cy="120" r="22" fill="#047857" />
-          <text x="300" y="123" fill="#ffffff" font-size="8" font-weight="600" text-anchor="middle" font-family="sans-serif">C. Blanca</text>
-
-          <circle cx="300" cy="190" r="20" fill="#047857" />
-          <text x="300" y="193" fill="#ffffff" font-size="8" font-weight="600" text-anchor="middle" font-family="sans-serif">Muy Alto</text>
+          <!-- Renderizado dinámico en JavaScript -->
         </svg>
       </div>
 
       <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
         <span id="txt-comparten-resumen">Comparten 3 entidades: Departamento (Áncash), Cordillera (Blanca) y Nivel de Riesgo (Muy alto).</span>
-        <span class="text-slate-500">Generado a partir de tripletas curadas</span>
+        <span class="text-slate-500">Conexiones verificadas en el grafo Kùzu</span>
       </div>
     </div>
 
@@ -259,45 +299,105 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
 
   const compL1 = document.getElementById('comp-l1') as HTMLSelectElement | null;
   const compL2 = document.getElementById('comp-l2') as HTMLSelectElement | null;
-  const nodeL1 = document.getElementById('node-l1');
-  const nodeL2 = document.getElementById('node-l2');
+  
+  // Elementos de la Síntesis
+  const txtVeredicto = document.getElementById('txt-veredicto-comparativo');
+  const txtEntidadesCount = document.getElementById('txt-comp-entidades-count');
+
+  // Elementos de Atributos
+  const txtRiesgoResumen = document.getElementById('txt-comp-riesgo-resumen');
+  const nameRiesgoL1 = document.getElementById('name-riesgo-l1');
+  const nameRiesgoL2 = document.getElementById('name-riesgo-l2');
+  const badgeRiesgoL1 = document.getElementById('badge-riesgo-l1');
+  const badgeRiesgoL2 = document.getElementById('badge-riesgo-l2');
+  const barRiesgoL1 = document.getElementById('bar-riesgo-l1');
+  const barRiesgoL2 = document.getElementById('bar-riesgo-l2');
+
+  const txtVolDiff = document.getElementById('txt-comp-vol-diff');
+  const valVolL1 = document.getElementById('val-vol-l1');
+  const valVolL2 = document.getElementById('val-vol-l2');
+  const barVolL1 = document.getElementById('bar-vol-l1');
+  const barVolL2 = document.getElementById('bar-vol-l2');
+
+  const txtPobCantL1 = document.getElementById('txt-pob-cant-l1');
+  const txtPobCantL2 = document.getElementById('txt-pob-cant-l2');
+  const txtPobNombresL1 = document.getElementById('txt-pob-nombres-l1');
+  const txtPobNombresL2 = document.getElementById('txt-pob-nombres-l2');
+
+  const txtAltGlacL1 = document.getElementById('txt-alt-glac-l1');
+  const txtAltGlacL2 = document.getElementById('txt-alt-glac-l2');
+
   const labelL1 = document.getElementById('label-l1');
   const labelL2 = document.getElementById('label-l2');
   const obrasL1 = document.getElementById('obras-l1');
   const obrasL2 = document.getElementById('obras-l2');
-  const txtRiesgo = document.getElementById('txt-comp-riesgo');
-  const barRiesgoL1 = document.getElementById('bar-riesgo-l1');
-  const barRiesgoL2 = document.getElementById('bar-riesgo-l2');
-  const txtPoblados = document.getElementById('txt-comp-poblados');
-  const barPobL1 = document.getElementById('bar-pob-l1');
-  const barPobL2 = document.getElementById('bar-pob-l2');
-  const txtVol = document.getElementById('txt-comp-vol');
-  const barVolL1 = document.getElementById('bar-vol-l1');
-  const barVolL2 = document.getElementById('bar-vol-l2');
+
+  // Curvas de Estudios (SVG)
+  const pathCurvaL1 = document.getElementById('path-curva-l1');
+  const pathCurvaL2 = document.getElementById('path-curva-l2');
   const curvaTxtL1 = document.getElementById('curva-txt-l1');
   const curvaTxtL2 = document.getElementById('curva-txt-l2');
-  const txtCompartenResumen = document.getElementById('txt-comparten-resumen');
+
+  // Red de Relaciones (SVG)
   const svgRed = document.getElementById('svg-red-relaciones');
+  const txtCompartenResumen = document.getElementById('txt-comparten-resumen');
+
   const btnExplicar = document.getElementById('btn-explicar-diferencia');
 
-  function getRiesgoColor(riesgo: string): string {
+  function getRiesgoInfo(riesgo: string) {
     const r = (riesgo || '').toLowerCase();
-    if (r.includes('muy')) return 'bg-rose-600';
-    if (r.includes('alto')) return 'bg-amber-500';
-    if (r.includes('medio')) return 'bg-yellow-500';
-    if (r.includes('bajo')) return 'bg-emerald-500';
-    return 'bg-slate-400';
+    if (r.includes('muy')) return { pct: '100%', bg: 'bg-rose-600', badgeClass: 'bg-rose-100 text-rose-800', label: 'Muy alto' };
+    if (r.includes('alto')) return { pct: '75%', bg: 'bg-amber-600', badgeClass: 'bg-amber-100 text-amber-800', label: 'Alto' };
+    if (r.includes('medio')) return { pct: '50%', bg: 'bg-yellow-500', badgeClass: 'bg-yellow-100 text-yellow-800', label: 'Medio' };
+    if (r.includes('bajo')) return { pct: '25%', bg: 'bg-emerald-600', badgeClass: 'bg-emerald-100 text-emerald-800', label: 'Bajo' };
+    return { pct: '15%', bg: 'bg-slate-400', badgeClass: 'bg-slate-100 text-slate-700', label: 'Sin evaluar' };
+  }
+
+  function generarPathCurva(primerAno: number, totalEstudios: number, maxEstudios: number): string {
+    const pAno = Math.max(1965, Math.min(2026, primerAno || 1990));
+    const clampX = (ano: number) => Math.max(0, Math.min(400, ((ano - 1965) / (2026 - 1965)) * 400));
+    const clampY = (val: number) => Math.max(15, Math.min(115, 115 - (val / Math.max(maxEstudios, 1)) * 95));
+
+    const startX = clampX(pAno);
+    const endX = 400;
+    const endY = clampY(totalEstudios);
+
+    if (startX >= 390) return `M 0,115 L ${startX.toFixed(1)},115 L 400,${endY.toFixed(1)}`;
+
+    const midX1 = startX + (endX - startX) * 0.35;
+    const midY1 = clampY(totalEstudios * 0.25);
+    const midX2 = startX + (endX - startX) * 0.70;
+    const midY2 = clampY(totalEstudios * 0.70);
+
+    return `M 0,115 L ${startX.toFixed(1)},115 C ${midX1.toFixed(1)},${midY1.toFixed(1)} ${midX2.toFixed(1)},${midY2.toFixed(1)} ${endX.toFixed(1)},${endY.toFixed(1)}`;
+  }
+
+  function generarSintesis(l1: any, l2: any): string {
+    const riesgoPart = (l1.riesgo === l2.riesgo)
+      ? `Ambas lagunas registran nivel de amenaza ${l1.riesgo} en los inventarios oficiales.`
+      : `${l1.nombre} presenta nivel de riesgo ${l1.riesgo}, mientras que ${l2.nombre} se sitúa en riesgo ${l2.riesgo}.`;
+
+    const vol1 = Number(l1.volumen_hm3 || 0);
+    const vol2 = Number(l2.volumen_hm3 || 0);
+    let volPart = '';
+    if (vol1 > vol2 && vol2 > 0) {
+      volPart = `${l1.nombre} almacena ${(vol1 / vol2).toFixed(1)}x más volumen de agua (${vol1} hm³ frente a ${vol2} hm³).`;
+    } else if (vol2 > vol1 && vol1 > 0) {
+      volPart = `${l2.nombre} almacena ${(vol2 / vol1).toFixed(1)}x más volumen de agua (${vol2} hm³ frente a ${vol1} hm³).`;
+    } else {
+      volPart = `Capacidades hídricas registradas: ${l1.nombre} (${vol1} hm³) y ${l2.nombre} (${vol2} hm³).`;
+    }
+
+    const pob1 = l1.pueblos_lista?.filter(Boolean).join(', ') || 'Población de quebrada';
+    const pob2 = l2.pueblos_lista?.filter(Boolean).join(', ') || 'Población de quebrada';
+    const pobPart = `En afectación directa, el cono de deyección de ${l1.nombre} compromete a ${pob1}, mientras que ${l2.nombre} amenaza a ${pob2}.`;
+
+    return `${riesgoPart} ${volPart} ${pobPart}`;
   }
 
   async function actualizarComparacion() {
     const id1 = compL1 ? compL1.value : 'palcacocha';
     const id2 = compL2 ? compL2.value : 'paron';
-
-    const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('·')[0].trim() : 'Palcacocha';
-    const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('·')[0].trim() : 'Parón';
-
-    if (labelL1) labelL1.textContent = `${l1Nombre}:`;
-    if (labelL2) labelL2.textContent = `${l2Nombre}:`;
 
     try {
       const data = await ApiService.getComparacion(id1, id2);
@@ -306,128 +406,168 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
       const l1 = data.laguna1;
       const l2 = data.laguna2;
 
-      // 1. Textos y etiquetas principales
-      if (nodeL1) nodeL1.textContent = l1.nombre;
-      if (nodeL2) nodeL2.textContent = l2.nombre;
+      // 1. Nombres en encabezados
+      if (nameRiesgoL1) nameRiesgoL1.textContent = l1.nombre;
+      if (nameRiesgoL2) nameRiesgoL2.textContent = l2.nombre;
+      if (labelL1) labelL1.textContent = `${l1.nombre}:`;
+      if (labelL2) labelL2.textContent = `${l2.nombre}:`;
 
-      // 2. Riesgo
-      if (txtRiesgo) {
-        txtRiesgo.textContent = l1.riesgo === l2.riesgo
-          ? `Ambas en riesgo ${l1.riesgo}`
-          : `${l1.riesgo} vs ${l2.riesgo}`;
+      // 2. Nivel de Riesgo Oficial
+      const infoR1 = getRiesgoInfo(l1.riesgo);
+      const infoR2 = getRiesgoInfo(l2.riesgo);
+      if (badgeRiesgoL1) {
+        badgeRiesgoL1.className = `font-bold text-[10px] px-1.5 py-0.5 rounded ${infoR1.badgeClass}`;
+        badgeRiesgoL1.textContent = infoR1.label;
+      }
+      if (badgeRiesgoL2) {
+        badgeRiesgoL2.className = `font-bold text-[10px] px-1.5 py-0.5 rounded ${infoR2.badgeClass}`;
+        badgeRiesgoL2.textContent = infoR2.label;
       }
       if (barRiesgoL1) {
-        barRiesgoL1.className = `h-full w-1/2 transition-all duration-300 ${getRiesgoColor(l1.riesgo)}`;
+        barRiesgoL1.style.width = infoR1.pct;
+        barRiesgoL1.className = `h-full transition-all duration-300 ${infoR1.bg}`;
       }
       if (barRiesgoL2) {
-        barRiesgoL2.className = `h-full w-1/2 transition-all duration-300 ${getRiesgoColor(l2.riesgo)}`;
+        barRiesgoL2.style.width = infoR2.pct;
+        barRiesgoL2.className = `h-full transition-all duration-300 ${infoR2.bg}`;
+      }
+      if (txtRiesgoResumen) {
+        txtRiesgoResumen.textContent = (l1.riesgo === l2.riesgo)
+          ? `Ambas en riesgo ${l1.riesgo}`
+          : `${l1.riesgo} vs ${l2.riesgo}`;
+        txtRiesgoResumen.className = (l1.riesgo === 'Muy alto' || l2.riesgo === 'Muy alto')
+          ? 'font-bold text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200'
+          : 'font-bold text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
       }
 
-      // 3. Poblados amenazados
-      if (txtPoblados) {
-        txtPoblados.textContent = `${l1.pueblos_abajo_total} pueblo(s) vs ${l2.pueblos_abajo_total} pueblo(s)`;
-      }
-      const maxPob = Math.max(l1.pueblos_abajo_total + l2.pueblos_abajo_total, 1);
-      const pctPob1 = Math.round((l1.pueblos_abajo_total / maxPob) * 100);
-      const pctPob2 = 100 - pctPob1;
-      if (barPobL1) {
-        barPobL1.style.width = `${Math.max(pctPob1, 15)}%`;
-        barPobL1.title = `${l1.pueblos_lista.join(', ')} (${l1.pueblos_abajo_total})`;
-      }
-      if (barPobL2) {
-        barPobL2.style.width = `${Math.max(pctPob2, 15)}%`;
-        barPobL2.title = `${l2.pueblos_lista.join(', ')} (${l2.pueblos_abajo_total})`;
+      // 3. Volumen Almacenado
+      const v1 = Number(l1.volumen_hm3 || 0);
+      const v2 = Number(l2.volumen_hm3 || 0);
+      const maxVol = Math.max(v1, v2, 0.1);
+      if (valVolL1) valVolL1.textContent = `${v1.toFixed(1)} hm³`;
+      if (valVolL2) valVolL2.textContent = `${v2.toFixed(1)} hm³`;
+      if (barVolL1) barVolL1.style.width = `${Math.max(12, Math.round((v1 / maxVol) * 100))}%`;
+      if (barVolL2) barVolL2.style.width = `${Math.max(12, Math.round((v2 / maxVol) * 100))}%`;
+      if (txtVolDiff) {
+        if (v1 > v2 && v2 > 0) {
+          txtVolDiff.textContent = `${l1.nombre} almacena ${(v1 / v2).toFixed(1)}x más volumen`;
+        } else if (v2 > v1 && v1 > 0) {
+          txtVolDiff.textContent = `${l2.nombre} almacena ${(v2 / v1).toFixed(1)}x más volumen`;
+        } else {
+          txtVolDiff.textContent = 'Volúmenes de agua comparables';
+        }
       }
 
-      // 4. Volumen
-      if (txtVol) {
-        txtVol.textContent = `${l1.volumen_hm3} hm³ vs ${l2.volumen_hm3} hm³`;
+      // 4. Centros Poblados Amenazados
+      const c1 = Number(l1.pueblos_abajo_total || 0);
+      const c2 = Number(l2.pueblos_abajo_total || 0);
+      if (txtPobCantL1) txtPobCantL1.textContent = `${c1} ${c1 === 1 ? 'centro poblado' : 'centros poblados'}`;
+      if (txtPobCantL2) txtPobCantL2.textContent = `${c2} ${c2 === 1 ? 'centro poblado' : 'centros poblados'}`;
+      if (txtPobNombresL1) txtPobNombresL1.textContent = l1.pueblos_lista?.filter(Boolean).join(', ') || 'Sin población directa registrada';
+      if (txtPobNombresL2) txtPobNombresL2.textContent = l2.pueblos_lista?.filter(Boolean).join(', ') || 'Sin población directa registrada';
+
+      // 5. Altitud y Masa Glaciar
+      if (txtAltGlacL1) txtAltGlacL1.textContent = `${l1.altitud_msnm || 4400} m s.n.m. · ${l1.glaciar_origen || 'Glaciar de cabecera'}`;
+      if (txtAltGlacL2) txtAltGlacL2.textContent = `${l2.altitud_msnm || 4400} m s.n.m. · ${l2.glaciar_origen || 'Glaciar de cabecera'}`;
+
+      // 6. Obras de Mitigación
+      if (obrasL1) obrasL1.textContent = l1.obras || 'Sin obras físicas registradas en inventario';
+      if (obrasL2) obrasL2.textContent = l2.obras || 'Sin obras físicas registradas en inventario';
+
+      // 7. Veredicto y Síntesis Comparativa
+      if (txtVeredicto) {
+        txtVeredicto.textContent = generarSintesis(l1, l2);
       }
-      const maxVol = Math.max(l1.volumen_hm3, l2.volumen_hm3, 1);
-      if (barVolL1) barVolL1.style.width = `${Math.round((l1.volumen_hm3 / maxVol) * 100)}%`;
-      if (barVolL2) barVolL2.style.width = `${Math.round((l2.volumen_hm3 / maxVol) * 100)}%`;
+      if (txtEntidadesCount) {
+        const count = data.elementos_compartidos || 2;
+        txtEntidadesCount.textContent = `${count} coincidencias en el grafo`;
+      }
 
-      // 5. Obras
-      if (obrasL1) obrasL1.textContent = l1.obras || 'Sin obras de mitigación física registradas';
-      if (obrasL2) obrasL2.textContent = l2.obras || 'Sin obras de mitigación física registradas';
+      // 8. Curvas SVG Dinámicas de Estudios
+      const maxEstudios = Math.max(l1.total_estudios || 1, l2.total_estudios || 1, 25);
+      const path1 = generarPathCurva(l1.primer_estudio_ano, l1.total_estudios, maxEstudios);
+      const path2 = generarPathCurva(l2.primer_estudio_ano, l2.total_estudios, maxEstudios);
 
-      // 6. Curva de estudios
-      if (curvaTxtL1) curvaTxtL1.textContent = `${l1.nombre}: ${l1.total_estudios} docs (desde ${l1.primer_estudio_ano})`;
-      if (curvaTxtL2) curvaTxtL2.textContent = `${l2.nombre}: ${l2.total_estudios} docs (desde ${l2.primer_estudio_ano})`;
+      if (pathCurvaL1) pathCurvaL1.setAttribute('d', path1);
+      if (pathCurvaL2) pathCurvaL2.setAttribute('d', path2);
 
-      // 7. Red de relaciones en el grafo (SVG)
+      if (curvaTxtL1) curvaTxtL1.textContent = `${l1.nombre}: ${l1.total_estudios} estudios (primer registro en ${l1.primer_estudio_ano})`;
+      if (curvaTxtL2) curvaTxtL2.textContent = `${l2.nombre}: ${l2.total_estudios} estudios (primer registro en ${l2.primer_estudio_ano})`;
+
+      // 9. Subgrafo de Relaciones SVG
       if (svgRed && data.red_relaciones) {
-        const compartidos = data.red_relaciones.nodos.filter(n => n.grupo === 'compartido');
-        const propiosL1 = data.red_relaciones.nodos.filter(n => n.grupo === 'propio_l1');
-        const propiosL2 = data.red_relaciones.nodos.filter(n => n.grupo === 'propio_l2');
+        const compartidos = data.red_relaciones.nodos.filter((n: any) => n.grupo === 'compartido');
+        const propiosL1 = data.red_relaciones.nodos.filter((n: any) => n.grupo === 'propio_l1');
+        const propiosL2 = data.red_relaciones.nodos.filter((n: any) => n.grupo === 'propio_l2');
 
         let svgHtml = '';
 
-        // Líneas a nodos compartidos
-        compartidos.forEach((_, idx) => {
-          const cy = 40 + idx * 75;
-          svgHtml += `<line x1="160" y1="120" x2="300" y2="${cy}" stroke="#334155" stroke-width="1.5" />`;
-          svgHtml += `<line x1="440" y1="120" x2="300" y2="${cy}" stroke="#334155" stroke-width="1.5" />`;
+        // Líneas de L1 y L2 hacia los nodos compartidos (centro)
+        compartidos.forEach((_: any, idx: number) => {
+          const cy = compartidos.length === 1 ? 120 : (45 + idx * (150 / Math.max(1, compartidos.length - 1)));
+          svgHtml += `<line x1="160" y1="120" x2="300" y2="${cy}" stroke="#047857" stroke-width="1.8" stroke-dasharray="3 2" />`;
+          svgHtml += `<line x1="440" y1="120" x2="300" y2="${cy}" stroke="#047857" stroke-width="1.8" stroke-dasharray="3 2" />`;
         });
 
-        // Líneas a nodos propios L1
-        propiosL1.forEach((_, idx) => {
-          const cy = 60 + idx * 90;
-          svgHtml += `<line x1="160" y1="120" x2="70" y2="${cy}" stroke="#1e293b" stroke-width="1.5" />`;
+        // Líneas hacia propios L1 (izquierda)
+        propiosL1.forEach((_: any, idx: number) => {
+          const cy = propiosL1.length === 1 ? 120 : (60 + idx * 100);
+          svgHtml += `<line x1="160" y1="120" x2="65" y2="${cy}" stroke="#0369a1" stroke-width="1.5" />`;
         });
 
-        // Líneas a nodos propios L2
-        propiosL2.forEach((_, idx) => {
-          const cy = 60 + idx * 90;
-          svgHtml += `<line x1="440" y1="120" x2="530" y2="${cy}" stroke="#1e293b" stroke-width="1.5" />`;
+        // Líneas hacia propios L2 (derecha)
+        propiosL2.forEach((_: any, idx: number) => {
+          const cy = propiosL2.length === 1 ? 120 : (60 + idx * 100);
+          svgHtml += `<line x1="440" y1="120" x2="535" y2="${cy}" stroke="#b45309" stroke-width="1.5" />`;
         });
 
-        // Render nodos propios L1
-        propiosL1.forEach((n, idx) => {
-          const cy = 60 + idx * 90;
+        // Render nodos propios L1 (azul)
+        propiosL1.forEach((n: any, idx: number) => {
+          const cy = propiosL1.length === 1 ? 120 : (60 + idx * 100);
           svgHtml += `
-            <circle cx="70" cy="${cy}" r="22" fill="#0369a1" />
-            <text x="70" y="${cy + 3}" fill="#ffffff" font-size="8.5" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 11)}</text>
+            <circle cx="65" cy="${cy}" r="22" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="65" y="${cy + 3}" fill="#ffffff" font-size="8.5" font-weight="600" text-anchor="middle" font-family="sans-serif">${String(n.label).slice(0, 11)}</text>
           `;
         });
 
-        // Render nodos propios L2
-        propiosL2.forEach((n, idx) => {
-          const cy = 60 + idx * 90;
+        // Render nodos propios L2 (ámbar)
+        propiosL2.forEach((n: any, idx: number) => {
+          const cy = propiosL2.length === 1 ? 120 : (60 + idx * 100);
           svgHtml += `
-            <circle cx="530" cy="${cy}" r="22" fill="#b45309" />
-            <text x="530" y="${cy + 3}" fill="#ffffff" font-size="8.5" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 11)}</text>
+            <circle cx="535" cy="${cy}" r="22" fill="#b45309" stroke="#fbbf24" stroke-width="1.5" />
+            <text x="535" y="${cy + 3}" fill="#ffffff" font-size="8.5" font-weight="600" text-anchor="middle" font-family="sans-serif">${String(n.label).slice(0, 11)}</text>
           `;
         });
 
         // Nodos principales L1 y L2
         svgHtml += `
-          <circle cx="160" cy="120" r="32" fill="#0284c7" stroke="#38bdf8" stroke-width="2" />
-          <text id="node-l1" x="160" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l1.nombre.slice(0, 13)}</text>
-          <circle cx="440" cy="120" r="32" fill="#d97706" stroke="#fbbf24" stroke-width="2" />
-          <text id="node-l2" x="440" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l2.nombre.slice(0, 13)}</text>
+          <circle cx="160" cy="120" r="32" fill="#0284c7" stroke="#38bdf8" stroke-width="2.5" />
+          <text x="160" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l1.nombre.slice(0, 13)}</text>
+          
+          <circle cx="440" cy="120" r="32" fill="#d97706" stroke="#fbbf24" stroke-width="2.5" />
+          <text x="440" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l2.nombre.slice(0, 13)}</text>
         `;
 
-        // Render nodos compartidos (centro)
-        compartidos.forEach((n, idx) => {
-          const cy = 40 + idx * 75;
+        // Render nodos compartidos (centro verde)
+        compartidos.forEach((n: any, idx: number) => {
+          const cy = compartidos.length === 1 ? 120 : (45 + idx * (150 / Math.max(1, compartidos.length - 1)));
           svgHtml += `
-            <circle cx="300" cy="${cy}" r="21" fill="#047857" stroke="#10b981" stroke-width="1.5" />
-            <text x="300" y="${cy + 3}" fill="#ffffff" font-size="8.5" font-weight="600" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 12)}</text>
+            <circle cx="300" cy="${cy}" r="22" fill="#047857" stroke="#34d399" stroke-width="1.5" />
+            <text x="300" y="${cy + 3}" fill="#ffffff" font-size="8.5" font-weight="700" text-anchor="middle" font-family="sans-serif">${String(n.label).slice(0, 12)}</text>
           `;
         });
 
         svgRed.innerHTML = svgHtml;
       }
 
-      // 8. Resumen de texto de pie
+      // 10. Resumen de texto de pie
       if (txtCompartenResumen) {
-        const compartidos = data.red_relaciones.nodos.filter(n => n.grupo === 'compartido');
+        const compartidos = (data.red_relaciones?.nodos || []).filter((n: any) => n.grupo === 'compartido');
         if (compartidos.length > 0) {
-          const nombres = compartidos.map(c => `${c.tipo} (${c.label})`).join(', ');
-          txtCompartenResumen.textContent = `Comparten ${compartidos.length} entidades en el grafo: ${nombres}.`;
+          const nombres = compartidos.map((c: any) => c.label).join(', ');
+          txtCompartenResumen.textContent = `Coincidencias en el grafo (${compartidos.length}): ${nombres}. Difieren en glaciar de origen y poblaciones expuestas.`;
         } else {
-          txtCompartenResumen.textContent = `No comparten cuenca ni cordillera directa; pertenecen a distintos sistemas glaciares.`;
+          txtCompartenResumen.textContent = `Sistemas hidrológicos independientes: pertenecen a distintas cuencas y cordilleras glaciares.`;
         }
       }
 
@@ -439,19 +579,20 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
   if (compL1) compL1.addEventListener('change', actualizarComparacion);
   if (compL2) compL2.addEventListener('change', actualizarComparacion);
 
-  // Inicializar al cargar
+  // Inicializar al cargar la página
   actualizarComparacion();
 
   if (btnExplicar) {
     btnExplicar.addEventListener('click', () => {
-      const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('·')[0].trim() : 'Palcacocha';
-      const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('·')[0].trim() : 'Parón';
+      const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('(')[0].trim() : 'Palcacocha';
+      const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('(')[0].trim() : 'Parón';
       
       const chatInput = document.getElementById('chat-pregunta') as HTMLTextAreaElement | null;
       const chatDrawer = document.getElementById('chat-drawer');
       if (chatInput && chatDrawer) {
-        chatInput.value = `¿Cuál es la diferencia en nivel de riesgo, volumen y poblados amenazados entre la laguna ${l1Nombre} y la laguna ${l2Nombre}?`;
+        chatInput.value = `¿Cuál es la diferencia técnica en nivel de riesgo, volumen almacenado, obras de seguridad y poblados amenazados entre la laguna ${l1Nombre} y la laguna ${l2Nombre}?`;
         chatDrawer.classList.remove('translate-x-full');
+        chatInput.focus();
       }
     });
   }

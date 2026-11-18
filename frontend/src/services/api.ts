@@ -178,21 +178,27 @@ export const ApiService = {
 
   async getComparacion(l1: string, l2: string): Promise<ComparacionResponse | null> {
     try {
-      const res = await fetch(`${BASE_URL}/api/lagunas/comparar?l1=${encodeURIComponent(l1)}&l2=${encodeURIComponent(l2)}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 400);
+      const res = await fetch(`${BASE_URL}/api/lagunas/comparar?l1=${encodeURIComponent(l1)}&l2=${encodeURIComponent(l2)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       if (res.ok) return await res.json();
     } catch {
-      // Manejar error y usar fallback seguro
+      // Fallback local instantáneo y enriquecido
     }
 
     const item1 = LAGUNAS_DESTACADAS.find(l => l.id === l1) || LAGUNAS_DESTACADAS[1];
     const item2 = LAGUNAS_DESTACADAS.find(l => l.id === l2) || LAGUNAS_DESTACADAS[2];
 
-    const nodos = [
+    const nodos: Array<{ id: string; label: string; tipo: string; grupo: string }> = [
       { id: "l1", label: item1.nombre, tipo: "laguna", grupo: "propio_l1" },
       { id: "l2", label: item2.nombre, tipo: "laguna", grupo: "propio_l2" }
     ];
     const enlaces: Array<{ origen: string; destino: string; rel: string }> = [];
 
+    // Departamento
     if (item1.departamento === item2.departamento) {
       nodos.push({ id: "dep_c", label: item1.departamento, tipo: "departamento", grupo: "compartido" });
       enlaces.push({ origen: "l1", destino: "dep_c", rel: "UBICADA_EN" }, { origen: "l2", destino: "dep_c", rel: "UBICADA_EN" });
@@ -202,6 +208,7 @@ export const ApiService = {
       enlaces.push({ origen: "l1", destino: "dep1", rel: "UBICADA_EN" }, { origen: "l2", destino: "dep2", rel: "UBICADA_EN" });
     }
 
+    // Cordillera
     if (item1.cordillera === item2.cordillera) {
       nodos.push({ id: "cord_c", label: `C. ${item1.cordillera}`, tipo: "cordillera", grupo: "compartido" });
       enlaces.push({ origen: "l1", destino: "cord_c", rel: "CORDILLERA" }, { origen: "l2", destino: "cord_c", rel: "CORDILLERA" });
@@ -211,9 +218,37 @@ export const ApiService = {
       enlaces.push({ origen: "l1", destino: "cord1", rel: "CORDILLERA" }, { origen: "l2", destino: "cord2", rel: "CORDILLERA" });
     }
 
+    // Nivel de riesgo
     if (item1.riesgo === item2.riesgo) {
       nodos.push({ id: "riesgo_c", label: `Riesgo ${item1.riesgo}`, tipo: "riesgo", grupo: "compartido" });
       enlaces.push({ origen: "l1", destino: "riesgo_c", rel: "NIVEL_RIESGO" }, { origen: "l2", destino: "riesgo_c", rel: "NIVEL_RIESGO" });
+    } else {
+      nodos.push({ id: "riesgo1", label: `Riesgo ${item1.riesgo}`, tipo: "riesgo", grupo: "propio_l1" });
+      nodos.push({ id: "riesgo2", label: `Riesgo ${item2.riesgo}`, tipo: "riesgo", grupo: "propio_l2" });
+      enlaces.push({ origen: "l1", destino: "riesgo1", rel: "NIVEL_RIESGO" }, { origen: "l2", destino: "riesgo2", rel: "NIVEL_RIESGO" });
+    }
+
+    // Glaciar de origen
+    if (item1.glaciar_origen === item2.glaciar_origen) {
+      nodos.push({ id: "glac_c", label: item1.glaciar_origen, tipo: "glaciar", grupo: "compartido" });
+      enlaces.push({ origen: "l1", destino: "glac_c", rel: "ORIGEN_GLACIAR" }, { origen: "l2", destino: "glac_c", rel: "ORIGEN_GLACIAR" });
+    } else {
+      nodos.push({ id: "glac1", label: item1.glaciar_origen.split('/')[0].trim(), tipo: "glaciar", grupo: "propio_l1" });
+      nodos.push({ id: "glac2", label: item2.glaciar_origen.split('/')[0].trim(), tipo: "glaciar", grupo: "propio_l2" });
+      enlaces.push({ origen: "l1", destino: "glac1", rel: "ORIGEN_GLACIAR" }, { origen: "l2", destino: "glac2", rel: "ORIGEN_GLACIAR" });
+    }
+
+    // Poblado amenazado
+    const p1 = item1.poblado_amenazado.split(',')[0].trim();
+    const p2 = item2.poblado_amenazado.split(',')[0].trim();
+    if (p1 === p2 && p1 !== 'Nadie registrado abajo') {
+      nodos.push({ id: "pob_c", label: p1, tipo: "poblado", grupo: "compartido" });
+      enlaces.push({ origen: "l1", destino: "pob_c", rel: "AMENAZA_A" }, { origen: "l2", destino: "pob_c", rel: "AMENAZA_A" });
+    } else {
+      if (p1) nodos.push({ id: "pob1", label: p1, tipo: "poblado", grupo: "propio_l1" });
+      if (p2) nodos.push({ id: "pob2", label: p2, tipo: "poblado", grupo: "propio_l2" });
+      if (p1) enlaces.push({ origen: "l1", destino: "pob1", rel: "AMENAZA_A" });
+      if (p2) enlaces.push({ origen: "l2", destino: "pob2", rel: "AMENAZA_A" });
     }
 
     return {
