@@ -34,6 +34,23 @@ export interface DepartamentoRiesgo {
   alto: number;
 }
 
+export interface CordilleraGlaciar {
+  nombre: string;
+  departamento: string;
+  superficie_1962_km2: number;
+  superficie_actual_km2: number;
+  perdida_pct: number;
+  lagunas_total: number;
+  lagunas_peligrosas: number;
+}
+
+export interface SaludResponse {
+  estado: string;
+  agente: string;
+  grafo_listo: boolean;
+  documentos_rag: number;
+}
+
 export interface LagunaItem {
   id: string;
   nombre: string;

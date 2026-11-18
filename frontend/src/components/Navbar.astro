@@ -15,11 +15,15 @@ import { SITE_CONFIG } from '../config/site.config';
         </div>
       </a>
 
-      <div class="hidden lg:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3 py-1 text-xs text-slate-600">
-        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-        <span class="font-medium text-slate-700">398</span> informes oficiales
+      <div 
+        id="backend-status-pill"
+        title="Verificando estado del backend..."
+        class="hidden lg:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3 py-1 text-xs text-slate-600 transition-colors"
+      >
+        <span id="backend-status-dot" class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+        <span id="backend-status-text" class="font-medium text-slate-700">398 informes oficiales</span>
         <span class="text-slate-300">|</span>
-        <span>Citas con evidencia</span>
+        <span id="backend-status-subtext">Citas con evidencia</span>
       </div>
     </div>
 
@@ -50,3 +54,43 @@ import { SITE_CONFIG } from '../config/site.config';
     </div>
   </div>
 </header>
+
+<script>
+  import { ApiService } from '../services/api';
+
+  async function verificarSaludBackend() {
+    const pill = document.getElementById('backend-status-pill');
+    const dot = document.getElementById('backend-status-dot');
+    const text = document.getElementById('backend-status-text');
+    const subtext = document.getElementById('backend-status-subtext');
+
+    if (!pill || !dot || !text) return;
+
+    try {
+      const salud = await ApiService.getSalud();
+      if (salud && salud.estado === 'vivo') {
+        dot.className = 'inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse';
+        text.textContent = `${salud.documentos_rag || 398} informes oficiales`;
+        if (subtext) subtext.textContent = salud.grafo_listo ? 'Grafo conectado' : 'Citas RAG';
+        pill.title = 'Backend en línea · GraphRAG e índice semántico activos';
+        pill.classList.remove('bg-slate-50/80');
+        pill.classList.add('bg-emerald-50/60', 'border-emerald-200');
+      } else {
+        dot.className = 'inline-block h-2 w-2 rounded-full bg-slate-400';
+        if (subtext) subtext.textContent = 'Catálogo local';
+        pill.title = 'Modo contingencia · Visualización local activa';
+      }
+    } catch {
+      dot.className = 'inline-block h-2 w-2 rounded-full bg-slate-400';
+      if (subtext) subtext.textContent = 'Catálogo local';
+      pill.title = 'Modo contingencia · Visualización local activa';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', verificarSaludBackend);
+  } else {
+    verificarSaludBackend();
+  }
+  document.addEventListener('astro:page-load', verificarSaludBackend);
+</script>

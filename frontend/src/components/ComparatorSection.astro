@@ -129,8 +129,9 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
               <line x1="0" y1="60" x2="400" y2="60" stroke="#f1f5f9" stroke-width="1" />
               <line x1="0" y1="100" x2="400" y2="100" stroke="#f1f5f9" stroke-width="1" />
 
-              <!-- Curva Laguna 1 (Palcacocha: 68 docs desde 1972) -->
+              <!-- Curva Laguna 1 -->
               <path 
+                id="path-curva-l1"
                 d="M 0,110 L 60,110 L 100,105 L 180,90 L 260,65 L 340,35 L 400,15" 
                 fill="none" 
                 stroke="#0284c7" 
@@ -138,8 +139,9 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
                 stroke-linecap="round"
               />
 
-              <!-- Curva Laguna 2 (Parón: 33 docs desde 1966) -->
+              <!-- Curva Laguna 2 -->
               <path 
+                id="path-curva-l2"
                 d="M 0,110 L 20,108 L 80,100 L 160,88 L 240,75 L 320,60 L 400,45" 
                 fill="none" 
                 stroke="#d97706" 
@@ -188,8 +190,8 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
       </div>
 
       <!-- Lienzo visual de nodos interactivos en SVG -->
-      <div class="my-6 h-64 w-full flex items-center justify-center relative">
-        <svg class="h-full w-full max-w-2xl" viewBox="0 0 600 240" fill="none">
+      <div id="contenedor-red-relaciones" class="my-6 h-64 w-full flex items-center justify-center relative">
+        <svg id="svg-red-relaciones" class="h-full w-full max-w-2xl" viewBox="0 0 600 240" fill="none">
           <!-- Conexiones -->
           <!-- L1 a compartidos -->
           <line x1="160" y1="120" x2="300" y2="50" stroke="#334155" stroke-width="1.5" />
@@ -244,7 +246,7 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
       </div>
 
       <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
-        <span>Comparten 3 entidades: Departamento (Áncash), Cordillera (Blanca) y Nivel de Riesgo (Muy alto).</span>
+        <span id="txt-comparten-resumen">Comparten 3 entidades: Departamento (Áncash), Cordillera (Blanca) y Nivel de Riesgo (Muy alto).</span>
         <span class="text-slate-500">Generado a partir de tripletas curadas</span>
       </div>
     </div>
@@ -253,26 +255,192 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
 </section>
 
 <script>
+  import { ApiService } from '../services/api';
+
   const compL1 = document.getElementById('comp-l1') as HTMLSelectElement | null;
   const compL2 = document.getElementById('comp-l2') as HTMLSelectElement | null;
   const nodeL1 = document.getElementById('node-l1');
   const nodeL2 = document.getElementById('node-l2');
   const labelL1 = document.getElementById('label-l1');
   const labelL2 = document.getElementById('label-l2');
+  const obrasL1 = document.getElementById('obras-l1');
+  const obrasL2 = document.getElementById('obras-l2');
+  const txtRiesgo = document.getElementById('txt-comp-riesgo');
+  const barRiesgoL1 = document.getElementById('bar-riesgo-l1');
+  const barRiesgoL2 = document.getElementById('bar-riesgo-l2');
+  const txtPoblados = document.getElementById('txt-comp-poblados');
+  const barPobL1 = document.getElementById('bar-pob-l1');
+  const barPobL2 = document.getElementById('bar-pob-l2');
+  const txtVol = document.getElementById('txt-comp-vol');
+  const barVolL1 = document.getElementById('bar-vol-l1');
+  const barVolL2 = document.getElementById('bar-vol-l2');
+  const curvaTxtL1 = document.getElementById('curva-txt-l1');
+  const curvaTxtL2 = document.getElementById('curva-txt-l2');
+  const txtCompartenResumen = document.getElementById('txt-comparten-resumen');
+  const svgRed = document.getElementById('svg-red-relaciones');
   const btnExplicar = document.getElementById('btn-explicar-diferencia');
 
-  function actualizarComparacion() {
+  function getRiesgoColor(riesgo: string): string {
+    const r = (riesgo || '').toLowerCase();
+    if (r.includes('muy')) return 'bg-rose-600';
+    if (r.includes('alto')) return 'bg-amber-500';
+    if (r.includes('medio')) return 'bg-yellow-500';
+    if (r.includes('bajo')) return 'bg-emerald-500';
+    return 'bg-slate-400';
+  }
+
+  async function actualizarComparacion() {
+    const id1 = compL1 ? compL1.value : 'palcacocha';
+    const id2 = compL2 ? compL2.value : 'paron';
+
     const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('·')[0].trim() : 'Palcacocha';
     const l2Nombre = compL2 ? compL2.options[compL2.selectedIndex].text.split('·')[0].trim() : 'Parón';
 
-    if (nodeL1) nodeL1.textContent = l1Nombre;
-    if (nodeL2) nodeL2.textContent = l2Nombre;
     if (labelL1) labelL1.textContent = `${l1Nombre}:`;
     if (labelL2) labelL2.textContent = `${l2Nombre}:`;
+
+    try {
+      const data = await ApiService.getComparacion(id1, id2);
+      if (!data) return;
+
+      const l1 = data.laguna1;
+      const l2 = data.laguna2;
+
+      // 1. Textos y etiquetas principales
+      if (nodeL1) nodeL1.textContent = l1.nombre;
+      if (nodeL2) nodeL2.textContent = l2.nombre;
+
+      // 2. Riesgo
+      if (txtRiesgo) {
+        txtRiesgo.textContent = l1.riesgo === l2.riesgo
+          ? `Ambas en riesgo ${l1.riesgo}`
+          : `${l1.riesgo} vs ${l2.riesgo}`;
+      }
+      if (barRiesgoL1) {
+        barRiesgoL1.className = `h-full w-1/2 transition-all duration-300 ${getRiesgoColor(l1.riesgo)}`;
+      }
+      if (barRiesgoL2) {
+        barRiesgoL2.className = `h-full w-1/2 transition-all duration-300 ${getRiesgoColor(l2.riesgo)}`;
+      }
+
+      // 3. Poblados amenazados
+      if (txtPoblados) {
+        txtPoblados.textContent = `${l1.pueblos_abajo_total} pueblo(s) vs ${l2.pueblos_abajo_total} pueblo(s)`;
+      }
+      const maxPob = Math.max(l1.pueblos_abajo_total + l2.pueblos_abajo_total, 1);
+      const pctPob1 = Math.round((l1.pueblos_abajo_total / maxPob) * 100);
+      const pctPob2 = 100 - pctPob1;
+      if (barPobL1) {
+        barPobL1.style.width = `${Math.max(pctPob1, 15)}%`;
+        barPobL1.title = `${l1.pueblos_lista.join(', ')} (${l1.pueblos_abajo_total})`;
+      }
+      if (barPobL2) {
+        barPobL2.style.width = `${Math.max(pctPob2, 15)}%`;
+        barPobL2.title = `${l2.pueblos_lista.join(', ')} (${l2.pueblos_abajo_total})`;
+      }
+
+      // 4. Volumen
+      if (txtVol) {
+        txtVol.textContent = `${l1.volumen_hm3} hm³ vs ${l2.volumen_hm3} hm³`;
+      }
+      const maxVol = Math.max(l1.volumen_hm3, l2.volumen_hm3, 1);
+      if (barVolL1) barVolL1.style.width = `${Math.round((l1.volumen_hm3 / maxVol) * 100)}%`;
+      if (barVolL2) barVolL2.style.width = `${Math.round((l2.volumen_hm3 / maxVol) * 100)}%`;
+
+      // 5. Obras
+      if (obrasL1) obrasL1.textContent = l1.obras || 'Sin obras de mitigación física registradas';
+      if (obrasL2) obrasL2.textContent = l2.obras || 'Sin obras de mitigación física registradas';
+
+      // 6. Curva de estudios
+      if (curvaTxtL1) curvaTxtL1.textContent = `${l1.nombre}: ${l1.total_estudios} docs (desde ${l1.primer_estudio_ano})`;
+      if (curvaTxtL2) curvaTxtL2.textContent = `${l2.nombre}: ${l2.total_estudios} docs (desde ${l2.primer_estudio_ano})`;
+
+      // 7. Red de relaciones en el grafo (SVG)
+      if (svgRed && data.red_relaciones) {
+        const compartidos = data.red_relaciones.nodos.filter(n => n.grupo === 'compartido');
+        const propiosL1 = data.red_relaciones.nodos.filter(n => n.grupo === 'propio_l1');
+        const propiosL2 = data.red_relaciones.nodos.filter(n => n.grupo === 'propio_l2');
+
+        let svgHtml = '';
+
+        // Líneas a nodos compartidos
+        compartidos.forEach((_, idx) => {
+          const cy = 40 + idx * 75;
+          svgHtml += `<line x1="160" y1="120" x2="300" y2="${cy}" stroke="#334155" stroke-width="1.5" />`;
+          svgHtml += `<line x1="440" y1="120" x2="300" y2="${cy}" stroke="#334155" stroke-width="1.5" />`;
+        });
+
+        // Líneas a nodos propios L1
+        propiosL1.forEach((_, idx) => {
+          const cy = 60 + idx * 90;
+          svgHtml += `<line x1="160" y1="120" x2="70" y2="${cy}" stroke="#1e293b" stroke-width="1.5" />`;
+        });
+
+        // Líneas a nodos propios L2
+        propiosL2.forEach((_, idx) => {
+          const cy = 60 + idx * 90;
+          svgHtml += `<line x1="440" y1="120" x2="530" y2="${cy}" stroke="#1e293b" stroke-width="1.5" />`;
+        });
+
+        // Render nodos propios L1
+        propiosL1.forEach((n, idx) => {
+          const cy = 60 + idx * 90;
+          svgHtml += `
+            <circle cx="70" cy="${cy}" r="22" fill="#0369a1" />
+            <text x="70" y="${cy + 3}" fill="#ffffff" font-size="8.5" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 11)}</text>
+          `;
+        });
+
+        // Render nodos propios L2
+        propiosL2.forEach((n, idx) => {
+          const cy = 60 + idx * 90;
+          svgHtml += `
+            <circle cx="530" cy="${cy}" r="22" fill="#b45309" />
+            <text x="530" y="${cy + 3}" fill="#ffffff" font-size="8.5" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 11)}</text>
+          `;
+        });
+
+        // Nodos principales L1 y L2
+        svgHtml += `
+          <circle cx="160" cy="120" r="32" fill="#0284c7" stroke="#38bdf8" stroke-width="2" />
+          <text id="node-l1" x="160" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l1.nombre.slice(0, 13)}</text>
+          <circle cx="440" cy="120" r="32" fill="#d97706" stroke="#fbbf24" stroke-width="2" />
+          <text id="node-l2" x="440" y="124" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${l2.nombre.slice(0, 13)}</text>
+        `;
+
+        // Render nodos compartidos (centro)
+        compartidos.forEach((n, idx) => {
+          const cy = 40 + idx * 75;
+          svgHtml += `
+            <circle cx="300" cy="${cy}" r="21" fill="#047857" stroke="#10b981" stroke-width="1.5" />
+            <text x="300" y="${cy + 3}" fill="#ffffff" font-size="8.5" font-weight="600" text-anchor="middle" font-family="sans-serif">${n.label.slice(0, 12)}</text>
+          `;
+        });
+
+        svgRed.innerHTML = svgHtml;
+      }
+
+      // 8. Resumen de texto de pie
+      if (txtCompartenResumen) {
+        const compartidos = data.red_relaciones.nodos.filter(n => n.grupo === 'compartido');
+        if (compartidos.length > 0) {
+          const nombres = compartidos.map(c => `${c.tipo} (${c.label})`).join(', ');
+          txtCompartenResumen.textContent = `Comparten ${compartidos.length} entidades en el grafo: ${nombres}.`;
+        } else {
+          txtCompartenResumen.textContent = `No comparten cuenca ni cordillera directa; pertenecen a distintos sistemas glaciares.`;
+        }
+      }
+
+    } catch (err) {
+      console.warn('Error al actualizar comparador:', err);
+    }
   }
 
   if (compL1) compL1.addEventListener('change', actualizarComparacion);
   if (compL2) compL2.addEventListener('change', actualizarComparacion);
+
+  // Inicializar al cargar
+  actualizarComparacion();
 
   if (btnExplicar) {
     btnExplicar.addEventListener('click', () => {

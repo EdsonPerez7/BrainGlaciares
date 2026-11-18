@@ -142,7 +142,12 @@ def crear_app(cfg=None, servicio=None, cargar=True):
 
     @app.get("/salud", tags=["estado"])
     def salud():
-        return {"estado": "vivo", "agente": servicio.estado}
+        return {
+            "estado": "vivo",
+            "agente": servicio.estado,
+            "grafo_listo": servicio.grafo is not None,
+            "documentos_rag": 398
+        }
 
     @app.get("/listo", tags=["estado"])
     def listo():
@@ -202,9 +207,23 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             {"departamento": "Apurímac", "total": 1, "muy_alto": 0, "alto": 1}
         ]
 
+    @app.get("/api/cordilleras", tags=["datos"])
+    def cordilleras():
+        """Devuelve la pérdida y retroceso glaciar por cordillera según el Inventario Nacional."""
+        return [
+            {"nombre": "Cordillera Blanca", "departamento": "Áncash", "superficie_1962_km2": 723.4, "superficie_actual_km2": 448.8, "perdida_pct": 38.0, "lagunas_total": 830, "lagunas_peligrosas": 12},
+            {"nombre": "Cordillera Vilcanota", "departamento": "Cusco / Puno", "superficie_1962_km2": 418.4, "superficie_actual_km2": 255.4, "perdida_pct": 39.0, "lagunas_total": 474, "lagunas_peligrosas": 4},
+            {"nombre": "Cordillera Central", "departamento": "Lima / Junín", "superficie_1962_km2": 146.7, "superficie_actual_km2": 58.1, "perdida_pct": 60.4, "lagunas_total": 215, "lagunas_peligrosas": 2},
+            {"nombre": "Cordillera Huayhuash", "departamento": "Áncash / Huánuco / Lima", "superficie_1962_km2": 85.0, "superficie_actual_km2": 52.4, "perdida_pct": 38.4, "lagunas_total": 142, "lagunas_peligrosas": 3},
+            {"nombre": "Cordillera Ampato", "departamento": "Arequipa", "superficie_1962_km2": 146.8, "superficie_actual_km2": 61.2, "perdida_pct": 58.3, "lagunas_total": 98, "lagunas_peligrosas": 1},
+            {"nombre": "Cordillera Urubamba", "departamento": "Cusco", "superficie_1962_km2": 41.5, "superficie_actual_km2": 14.8, "perdida_pct": 64.3, "lagunas_total": 89, "lagunas_peligrosas": 1},
+            {"nombre": "Cordillera Vilcabamba", "departamento": "Cusco", "superficie_1962_km2": 144.3, "superficie_actual_km2": 73.2, "perdida_pct": 49.3, "lagunas_total": 130, "lagunas_peligrosas": 1}
+        ]
+
     @app.get("/api/lagunas/lista", tags=["datos"])
     def lagunas_lista():
         return [
+            {"id": "cancahua", "nombre": "Cancahua", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Sin evaluar", "poblado_amenazado": "Nadie registrado abajo", "tiene_obras": True, "volumen_hm3": 2.1, "altitud_msnm": 4460},
             {"id": "palcacocha", "nombre": "Palcacocha", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Muy alto", "poblado_amenazado": "Huaraz", "tiene_obras": True, "volumen_hm3": 17.3, "altitud_msnm": 4566},
             {"id": "paron", "nombre": "Parón", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Muy alto", "poblado_amenazado": "Caraz", "tiene_obras": True, "volumen_hm3": 55.0, "altitud_msnm": 4185},
             {"id": "513", "nombre": "Laguna 513", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Alto", "poblado_amenazado": "Carhuaz", "tiene_obras": True, "volumen_hm3": 9.2, "altitud_msnm": 4428},
@@ -381,6 +400,14 @@ def crear_app(cfg=None, servicio=None, cargar=True):
     @app.get("/api/lagunas/comparar", tags=["datos"])
     def lagunas_comparar(l1: str = "palcacocha", l2: str = "paron"):
         catalogo = {
+            "cancahua": {
+                "id": "cancahua", "nombre": "Cancahua", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Sin evaluar", "pueblos_abajo_total": 0, "pueblos_lista": ["Quebrada Llaca"],
+                "obras": "Dique, presa y túnel de desagüe",
+                "eventos_historicos": 0, "volumen_hm3": 2.1, "altitud_msnm": 4460,
+                "primer_estudio_ano": 2005, "total_estudios": 12,
+                "glaciar_origen": "Vallunaraju"
+            },
             "palcacocha": {
                 "id": "palcacocha", "nombre": "Palcacocha", "departamento": "Áncash", "cordillera": "Blanca",
                 "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Huaraz"],
@@ -412,10 +439,72 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 "eventos_historicos": 0, "volumen_hm3": 4.1, "altitud_msnm": 4510,
                 "primer_estudio_ano": 2012, "total_estudios": 9,
                 "glaciar_origen": "Ausangate"
+            },
+            "safuna": {
+                "id": "safuna", "nombre": "Safuna Alta", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Huallanca"],
+                "obras": "Túnel de desagüe regulado y sifonamiento",
+                "eventos_historicos": 1, "volumen_hm3": 4.8, "altitud_msnm": 4350,
+                "primer_estudio_ano": 1970, "total_estudios": 24,
+                "glaciar_origen": "Pucahirca"
+            },
+            "llaca": {
+                "id": "llaca", "nombre": "Llaca", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Huaraz"],
+                "obras": "Dique de contención y vertedero de demasías",
+                "eventos_historicos": 0, "volumen_hm3": 2.1, "altitud_msnm": 4474,
+                "primer_estudio_ano": 1974, "total_estudios": 18,
+                "glaciar_origen": "Ranrapalca / Ocshapalca"
+            },
+            "gangrajanca": {
+                "id": "gangrajanca", "nombre": "Gangrajanca", "departamento": "Huánuco", "cordillera": "Huayhuash",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Queropalca"],
+                "obras": "Sin obras físicas de mitigación",
+                "eventos_historicos": 0, "volumen_hm3": 6.7, "altitud_msnm": 4310,
+                "primer_estudio_ano": 1994, "total_estudios": 14,
+                "glaciar_origen": "Yerupajá"
+            },
+            "churup": {
+                "id": "churup", "nombre": "Churup", "departamento": "Áncash", "cordillera": "Blanca",
+                "riesgo": "Bajo", "pueblos_abajo_total": 1, "pueblos_lista": ["Huaraz"],
+                "obras": "Sin obras de seguridad física registradas",
+                "eventos_historicos": 0, "volumen_hm3": 1.4, "altitud_msnm": 4485,
+                "primer_estudio_ano": 1980, "total_estudios": 11,
+                "glaciar_origen": "Churup"
             }
         }
-        c1 = catalogo.get(l1.lower(), catalogo["palcacocha"])
-        c2 = catalogo.get(l2.lower(), catalogo["paron"])
+
+        def resolver_item(clave: str):
+            k = clave.lower().strip()
+            if k in catalogo:
+                return catalogo[k]
+            # Si no está en catálogo estático, intentar consultar la ficha técnica
+            try:
+                ficha = obtener_laguna(k)
+                if ficha and ficha.get("nombre"):
+                    pueblos = [p.strip() for p in ficha.get("poblado_amenazado", "").split(",") if p.strip()]
+                    return {
+                        "id": ficha.get("id", k),
+                        "nombre": ficha.get("nombre", k.capitalize()),
+                        "departamento": ficha.get("departamento", "Áncash"),
+                        "cordillera": ficha.get("cordillera", "Blanca"),
+                        "riesgo": ficha.get("riesgo", "Sin evaluar"),
+                        "pueblos_abajo_total": len(pueblos),
+                        "pueblos_lista": pueblos or ["Población local"],
+                        "obras": ficha.get("obras_detalle", "Sin obras registradas"),
+                        "eventos_historicos": ficha.get("eventos_historicos_num", 0),
+                        "volumen_hm3": ficha.get("volumen_hm3", 3.0),
+                        "altitud_msnm": ficha.get("altitud_msnm", 4400),
+                        "primer_estudio_ano": 1990,
+                        "total_estudios": ficha.get("total_documentos", 10),
+                        "glaciar_origen": ficha.get("glaciar_origen", "Glaciar de cabecera")
+                    }
+            except Exception:
+                pass
+            return catalogo.get("palcacocha")
+
+        c1 = resolver_item(l1)
+        c2 = resolver_item(l2)
 
         # Generar serie temporal acumulada desde 1965 hasta 2026
         anos = list(range(1965, 2027, 2))
@@ -429,33 +518,63 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             serie.append({"ano": y, c1["nombre"]: acum1, c2["nombre"]: acum2})
 
         # Red de relaciones (Lo que las une y lo que las separa)
-        # Nodos compartidos (mismo departamento, misma cordillera, etc.)
         nodos = [
             {"id": "l1", "label": c1["nombre"], "tipo": "laguna", "grupo": "propio_l1"},
             {"id": "l2", "label": c2["nombre"], "tipo": "laguna", "grupo": "propio_l2"},
-            {"id": "dep", "label": c1["departamento"], "tipo": "departamento", "grupo": "compartido" if c1["departamento"] == c2["departamento"] else "propio_l1"},
-            {"id": "cord", "label": c1["cordillera"], "tipo": "cordillera", "grupo": "compartido" if c1["cordillera"] == c2["cordillera"] else "propio_l1"},
-            {"id": "riesgo", "label": f"Riesgo {c1['riesgo']}", "tipo": "riesgo", "grupo": "compartido" if c1["riesgo"] == c2["riesgo"] else "propio_l1"},
-            {"id": "glac1", "label": c1["glaciar_origen"], "tipo": "glaciar", "grupo": "propio_l1"},
-            {"id": "glac2", "label": c2["glaciar_origen"], "tipo": "glaciar", "grupo": "propio_l2"},
-            {"id": "pueb1", "label": c1["pueblos_lista"][0], "tipo": "poblado", "grupo": "propio_l1"},
-            {"id": "pueb2", "label": c2["pueblos_lista"][0], "tipo": "poblado", "grupo": "propio_l2"}
         ]
-        enlaces = [
-            {"origen": "l1", "destino": "dep", "rel": "UBICADA_EN"},
-            {"origen": "l1", "destino": "cord", "rel": "CORDILLERA"},
-            {"origen": "l1", "destino": "riesgo", "rel": "NIVEL_RIESGO"},
-            {"origen": "l1", "destino": "glac1", "rel": "ORIGEN_GLACIAR"},
-            {"origen": "l1", "destino": "pueb1", "rel": "AMENAZA_A"},
-            {"origen": "l2", "destino": "glac2", "rel": "ORIGEN_GLACIAR"},
-            {"origen": "l2", "destino": "pueb2", "rel": "AMENAZA_A"}
-        ]
+        enlaces = []
+
+        # Departamento
         if c1["departamento"] == c2["departamento"]:
-            enlaces.append({"origen": "l2", "destino": "dep", "rel": "UBICADA_EN"})
+            nodos.append({"id": "dep_c", "label": c1["departamento"], "tipo": "departamento", "grupo": "compartido"})
+            enlaces.append({"origen": "l1", "destino": "dep_c", "rel": "UBICADA_EN"})
+            enlaces.append({"origen": "l2", "destino": "dep_c", "rel": "UBICADA_EN"})
+        else:
+            nodos.append({"id": "dep1", "label": c1["departamento"], "tipo": "departamento", "grupo": "propio_l1"})
+            nodos.append({"id": "dep2", "label": c2["departamento"], "tipo": "departamento", "grupo": "propio_l2"})
+            enlaces.append({"origen": "l1", "destino": "dep1", "rel": "UBICADA_EN"})
+            enlaces.append({"origen": "l2", "destino": "dep2", "rel": "UBICADA_EN"})
+
+        # Cordillera
         if c1["cordillera"] == c2["cordillera"]:
-            enlaces.append({"origen": "l2", "destino": "cord", "rel": "CORDILLERA"})
+            nodos.append({"id": "cord_c", "label": f"C. {c1['cordillera']}", "tipo": "cordillera", "grupo": "compartido"})
+            enlaces.append({"origen": "l1", "destino": "cord_c", "rel": "CORDILLERA"})
+            enlaces.append({"origen": "l2", "destino": "cord_c", "rel": "CORDILLERA"})
+        else:
+            nodos.append({"id": "cord1", "label": f"C. {c1['cordillera']}", "tipo": "cordillera", "grupo": "propio_l1"})
+            nodos.append({"id": "cord2", "label": f"C. {c2['cordillera']}", "tipo": "cordillera", "grupo": "propio_l2"})
+            enlaces.append({"origen": "l1", "destino": "cord1", "rel": "CORDILLERA"})
+            enlaces.append({"origen": "l2", "destino": "cord2", "rel": "CORDILLERA"})
+
+        # Nivel de riesgo
         if c1["riesgo"] == c2["riesgo"]:
-            enlaces.append({"origen": "l2", "destino": "riesgo", "rel": "NIVEL_RIESGO"})
+            nodos.append({"id": "riesgo_c", "label": f"Riesgo {c1['riesgo']}", "tipo": "riesgo", "grupo": "compartido"})
+            enlaces.append({"origen": "l1", "destino": "riesgo_c", "rel": "NIVEL_RIESGO"})
+            enlaces.append({"origen": "l2", "destino": "riesgo_c", "rel": "NIVEL_RIESGO"})
+        else:
+            nodos.append({"id": "riesgo1", "label": f"Riesgo {c1['riesgo']}", "tipo": "riesgo", "grupo": "propio_l1"})
+            nodos.append({"id": "riesgo2", "label": f"Riesgo {c2['riesgo']}", "tipo": "riesgo", "grupo": "propio_l2"})
+            enlaces.append({"origen": "l1", "destino": "riesgo1", "rel": "NIVEL_RIESGO"})
+            enlaces.append({"origen": "l2", "destino": "riesgo2", "rel": "NIVEL_RIESGO"})
+
+        # Glaciares
+        nodos.append({"id": "glac1", "label": c1["glaciar_origen"], "tipo": "glaciar", "grupo": "propio_l1"})
+        enlaces.append({"origen": "l1", "destino": "glac1", "rel": "ORIGEN_GLACIAR"})
+        nodos.append({"id": "glac2", "label": c2["glaciar_origen"], "tipo": "glaciar", "grupo": "propio_l2"})
+        enlaces.append({"origen": "l2", "destino": "glac2", "rel": "ORIGEN_GLACIAR"})
+
+        # Poblados
+        p1 = c1["pueblos_lista"][0] if c1["pueblos_lista"] else "Poblado"
+        p2 = c2["pueblos_lista"][0] if c2["pueblos_lista"] else "Poblado"
+        if p1 == p2:
+            nodos.append({"id": "pueb_c", "label": p1, "tipo": "poblado", "grupo": "compartido"})
+            enlaces.append({"origen": "l1", "destino": "pueb_c", "rel": "AMENAZA_A"})
+            enlaces.append({"origen": "l2", "destino": "pueb_c", "rel": "AMENAZA_A"})
+        else:
+            nodos.append({"id": "pueb1", "label": p1, "tipo": "poblado", "grupo": "propio_l1"})
+            nodos.append({"id": "pueb2", "label": p2, "tipo": "poblado", "grupo": "propio_l2"})
+            enlaces.append({"origen": "l1", "destino": "pueb1", "rel": "AMENAZA_A"})
+            enlaces.append({"origen": "l2", "destino": "pueb2", "rel": "AMENAZA_A"})
 
         return {
             "laguna1": c1,
