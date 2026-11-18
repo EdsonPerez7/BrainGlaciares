@@ -141,6 +141,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                  herramientas=r["herramientas"], citas=r["n_citas"], avisos=len(r["avisos"]), cache=r.get("desde_cache", False))
 
     @app.get("/salud", tags=["estado"])
+    @app.get("/api/salud", tags=["estado"])
     def salud():
         return {
             "estado": "vivo",

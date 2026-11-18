@@ -42,6 +42,22 @@ const {
 
   const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
+  const DEPT_CENTROIDS: Record<string, L.LatLngTuple> = {
+    'ancash': [-9.52, -77.52],
+    'cusco': [-13.53, -71.96],
+    'junin': [-11.50, -75.50],
+    'puno': [-15.84, -70.02],
+    'apurimac': [-14.05, -73.08],
+    'huanuco': [-9.93, -76.24],
+    'lima': [-11.80, -76.50],
+    'arequipa': [-16.40, -71.50],
+    'pasco': [-10.68, -76.25],
+    'ayacucho': [-13.16, -74.22],
+    'huancavelica': [-12.78, -74.97],
+    'moquegua': [-17.19, -70.93],
+    'tacna': [-18.01, -70.25]
+  };
+
   function getRiskColor(riesgo: string): string {
     const r = (riesgo || '').toLowerCase();
     if (r.includes('muy')) return '#e11d48';
@@ -67,7 +83,7 @@ const {
         center: [-9.8, -76.5],
         zoom: 6,
         zoomControl: true,
-        scrollWheelZoom: false
+        scrollWheelZoom: true
       });
 
       const capaTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -93,14 +109,26 @@ const {
       }, undefined, { position: 'topright' }).addTo(map);
 
       const markersLayer = L.layerGroup().addTo(map);
+      const markersMap = new Map<string, { marker: L.CircleMarker; laguna: any }>();
+      let activeMarker: L.CircleMarker | null = null;
+      let currentDept = 'todos';
 
-      function renderMarkers(deptFilter: string) {
+      function renderMarkers(deptFilter: string, targetId?: string) {
         markersLayer.clearLayers();
-        const fNorm = norm(deptFilter);
+        markersMap.clear();
+        activeMarker = null;
+        currentDept = deptFilter || 'todos';
 
+        const fNorm = norm(deptFilter);
         const filtered = !fNorm || fNorm === 'todos'
           ? LAGUNAS_DESTACADAS
           : LAGUNAS_DESTACADAS.filter((l) => norm(l.departamento) === fNorm);
+
+        // Si el filtro por departamento no contiene la laguna objetivo pero se pidió una laguna específica, incluirla
+        if (targetId && !filtered.some(l => l.id.toLowerCase() === targetId.toLowerCase())) {
+          const extra = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === targetId.toLowerCase());
+          if (extra) filtered.push(extra);
+        }
 
         const coords: L.LatLngTuple[] = [];
 
@@ -123,18 +151,25 @@ const {
           popupEl.style.fontSize = '12px';
           popupEl.style.lineHeight = '1.45';
           popupEl.innerHTML = `
-            <strong style="font-size: 13px; color: #0f172a;">Laguna ${laguna.nombre}</strong><br/>
-            <span style="color: #475569;">${laguna.departamento} · Cordillera ${laguna.cordillera}</span><br/>
-            <span style="display: inline-block; margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; background: ${color}20; color: ${color};">
-              Riesgo ${laguna.riesgo}
-            </span>
+            <div style="font-weight: 800; font-size: 13px; color: #0f172a; margin-bottom: 2px;">Laguna ${laguna.nombre}</div>
+            <div style="color: #475569; font-size: 11px;">${laguna.departamento} · Cordillera ${laguna.cordillera}</div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
+              <span style="display: inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 10px; background: ${color}20; color: ${color}; border: 1px solid ${color}40;">
+                Riesgo ${laguna.riesgo}
+              </span>
+              <span style="font-size: 10px; color: #64748b;">${laguna.altitud_msnm} msnm</span>
+            </div>
           `;
 
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.textContent = 'Ver ficha técnica →';
-          btn.style.cssText = 'display:block; margin-top:8px; background:#0f172a; color:#fff; border:none; border-radius:6px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:600;';
-          btn.addEventListener('click', () => {
+          btn.textContent = 'Ver ficha técnica detallada →';
+          btn.style.cssText = 'display:block; width:100%; text-align:center; margin-top:8px; background:#0f172a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; font-weight:700; transition:background 0.2s;';
+          btn.onmouseover = () => { btn.style.background = '#0284c7'; };
+          btn.onmouseout = () => { btn.style.background = '#0f172a'; };
+
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (mode === 'event') {
               wrapper.dispatchEvent(new CustomEvent('bg:map-select', {
                 detail: { id: laguna.id, laguna },
@@ -147,23 +182,93 @@ const {
 
           popupEl.appendChild(btn);
           marker.bindPopup(popupEl);
+
+          marker.on('click', () => {
+            highlightMarker(marker);
+            wrapper.dispatchEvent(new CustomEvent('bg:map-active-laguna', {
+              detail: { id: laguna.id, laguna },
+              bubbles: true
+            }));
+          });
+
           markersLayer.addLayer(marker);
+          markersMap.set(laguna.id.toLowerCase(), { marker, laguna });
         });
 
-        if (coords.length > 0) {
-          const bounds = L.latLngBounds(coords);
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
-        } else {
-          map.setView([-9.8, -76.5], 6);
-        }
+        return coords;
       }
 
+      function highlightMarker(marker: L.CircleMarker) {
+        if (activeMarker && activeMarker !== marker) {
+          activeMarker.setStyle({ radius: 8, weight: 2, color: '#ffffff' });
+        }
+        marker.setStyle({ radius: 12, weight: 3.5, color: '#0284c7' });
+        activeMarker = marker;
+      }
+
+      function focusOn(options: { id?: string; dept?: string; lat?: number; lng?: number; zoom?: number }) {
+        map.invalidateSize();
+        const targetDept = options.dept ? norm(options.dept) : '';
+        const targetId = options.id ? options.id.toLowerCase().replace(/^laguna:/i, '').trim() : '';
+
+        // Si cambió el departamento o no hay marcadores cargados
+        const needsReload = targetDept && targetDept !== norm(currentDept);
+        if (needsReload || markersMap.size === 0) {
+          renderMarkers(options.dept || 'todos', targetId);
+        }
+
+        // 1. Si hay una laguna específica objetivo
+        if (targetId && markersMap.has(targetId)) {
+          const item = markersMap.get(targetId)!;
+          highlightMarker(item.marker);
+          map.setView([item.laguna.lat, item.laguna.lng], options.zoom || 13, { animate: true });
+          setTimeout(() => {
+            item.marker.openPopup();
+          }, 200);
+          return;
+        }
+
+        // Si se pasaron coordenadas explícitas de laguna
+        if (options.lat && options.lng) {
+          map.setView([options.lat, options.lng], options.zoom || 13, { animate: true });
+          return;
+        }
+
+        // 2. Si es filtro departamental
+        if (targetDept && targetDept !== 'todos') {
+          const matchingCoords: L.LatLngTuple[] = [];
+          markersMap.forEach(({ laguna }) => {
+            if (norm(laguna.departamento) === targetDept) {
+              matchingCoords.push([laguna.lat, laguna.lng]);
+            }
+          });
+
+          if (matchingCoords.length > 0) {
+            const bounds = L.latLngBounds(matchingCoords);
+            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 11 });
+          } else if (DEPT_CENTROIDS[targetDept]) {
+            map.setView(DEPT_CENTROIDS[targetDept], 8, { animate: true });
+          }
+          return;
+        }
+
+        // 3. Todo el Perú por defecto
+        map.setView([-9.8, -76.5], 6, { animate: true });
+      }
+
+      // Inicializar con todos los marcadores
       renderMarkers('todos');
+
+      // Escuchar evento de enfoque completo (laguna y/o departamento)
+      document.addEventListener('bg:map-focus', ((e: CustomEvent) => {
+        const detail = e.detail || {};
+        setTimeout(() => focusOn(detail), 40);
+      }) as EventListener);
 
       // Escuchar filtros externos por departamento
       document.addEventListener('bg:map-filter', ((e: CustomEvent<{ dept: string }>) => {
         const dept = e.detail?.dept || 'todos';
-        renderMarkers(dept);
+        setTimeout(() => focusOn({ dept }), 40);
       }) as EventListener);
 
       // Reajustar tiles automáticamente cuando el contenedor pase de hidden a visible

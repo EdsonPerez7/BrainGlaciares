@@ -2,9 +2,12 @@ import { SITE_CONFIG } from '../config/site.config';
 import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
 import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse, CatalogoResponse } from '../models/types';
 
-const BASE_URL = SITE_CONFIG.apiBaseUrl;
+let BASE_URL = SITE_CONFIG.apiBaseUrl;
 
 export const ApiService = {
+  getBaseUrl(): string {
+    return BASE_URL;
+  },
   async getCatalogo(limite: number = 50, q: string = ''): Promise<CatalogoResponse> {
     try {
       const url = `${BASE_URL}/api/catalogo?limite=${limite}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
@@ -81,11 +84,28 @@ export const ApiService = {
   },
 
   async getSalud(): Promise<SaludResponse | null> {
-    try {
-      const res = await fetch(`${BASE_URL}/salud`);
-      if (res.ok) return await res.json();
-    } catch {
-      // Backend offline o inalcanzable
+    const candidatos: string[] = [BASE_URL];
+    if (typeof window !== 'undefined') {
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') {
+        if (!candidatos.includes('http://127.0.0.1:8080')) candidatos.unshift('http://127.0.0.1:8080');
+        if (!candidatos.includes('http://localhost:8080')) candidatos.unshift('http://localhost:8080');
+      }
+    }
+
+    for (const host of candidatos) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch(`${host}/salud`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          BASE_URL = host;
+          return await res.json();
+        }
+      } catch {
+        // Probar siguiente host
+      }
     }
     return null;
   },

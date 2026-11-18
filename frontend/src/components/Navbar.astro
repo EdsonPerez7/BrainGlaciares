@@ -75,8 +75,7 @@ import { SITE_CONFIG } from '../config/site.config';
       const salud = await ApiService.getSalud();
       if (salud && salud.estado === 'vivo') {
         dot.className = 'inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse';
-        text.textContent = `${salud.documentos_rag || 398} informes oficiales`;
-        if (subtext) subtext.textContent = salud.grafo_listo ? 'Grafo conectado' : 'Citas RAG';
+        if (subtext) subtext.textContent = salud.grafo_listo ? 'Grafo conectado' : (salud.agente === 'listo' ? 'Servidor activo' : 'Citas RAG');
         pill.title = 'Backend en línea · GraphRAG e índice semántico activos';
         pill.classList.remove('bg-slate-50/80');
         pill.classList.add('bg-emerald-50/60', 'border-emerald-200');

@@ -562,34 +562,98 @@ import { SITE_CONFIG } from '../config/site.config';
     const listEl = document.getElementById('lista-lagunas-dept');
     if (!listEl) return;
 
-    const filtered = deptFilter === 'todos'
+    const fNorm = norm(deptFilter);
+    const filtered = !fNorm || fNorm === 'todos'
       ? LAGUNAS_DESTACADAS
-      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === norm(deptFilter));
+      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === fNorm);
 
-    listEl.innerHTML = filtered.map(l => `
-      <div 
-        class="p-2.5 rounded-xl border border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition cursor-pointer flex items-center justify-between"
-        onclick="window.selectLagunaById('${l.id}')"
-      >
-        <div>
-          <div class="text-xs font-bold text-slate-900">Laguna ${l.nombre}</div>
-          <div class="text-[11px] text-slate-500">${l.departamento} · Cordillera ${l.cordillera}</div>
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div class="p-3 text-center text-xs text-slate-400 bg-slate-50 rounded-xl border border-slate-200/60">
+          No hay lagunas críticas registradas en este catálogo para esta zona.
         </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
-          l.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800' :
-          l.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800' :
-          l.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800' :
-          'bg-slate-100 text-slate-700'
-        }">
-          ${l.riesgo}
-        </span>
-      </div>
-    `).join('');
+      `;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(l => {
+      const esActiva = currentLaguna && currentLaguna.id.toLowerCase() === l.id.toLowerCase();
+      return `
+        <div 
+          id="item-laguna-${l.id}"
+          class="p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2 ${
+            esActiva 
+              ? 'border-cyan-500 bg-cyan-50/70 shadow-xs ring-1 ring-cyan-400' 
+              : 'border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+          }"
+          onclick="window.enfocarLagunaEnMapa('${l.id}')"
+          title="Clic para enfocar en el mapa"
+        >
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
+              <span>Laguna ${l.nombre}</span>
+              ${esActiva ? '<span class="inline-block h-1.5 w-1.5 rounded-full bg-cyan-600"></span>' : ''}
+            </div>
+            <div class="text-[11px] text-slate-500 truncate">${l.departamento} · C. ${l.cordillera}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+              l.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800' :
+              l.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800' :
+              l.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800' :
+              'bg-slate-100 text-slate-700'
+            }">
+              ${l.riesgo}
+            </span>
+            <button 
+              type="button"
+              onclick="event.stopPropagation(); window.selectLagunaById('${l.id}')"
+              class="rounded-lg p-1 text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 transition"
+              title="Abrir ficha técnica detallada"
+            >
+              📋
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function resaltarLagunaEnLista(id) {
+    if (!id) return;
+    document.querySelectorAll('#lista-lagunas-dept > div').forEach(el => {
+      el.classList.remove('border-cyan-500', 'bg-cyan-50/70', 'shadow-xs', 'ring-1', 'ring-cyan-400');
+      el.classList.add('border-slate-200');
+    });
+    const target = document.getElementById(`item-laguna-${id}`);
+    if (target) {
+      target.classList.remove('border-slate-200');
+      target.classList.add('border-cyan-500', 'bg-cyan-50/70', 'shadow-xs', 'ring-1', 'ring-cyan-400');
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   // ========================================================
   // CONTROLADOR GLOBAL DE SELECCIÓN Y VISTAS
   // ========================================================
+  window.enfocarLagunaEnMapa = function(id) {
+    const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
+    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
+    if (match) {
+      currentLaguna = match;
+      renderFicha(match);
+      resaltarLagunaEnLista(match.id);
+      
+      mostrarMapa({
+        id: match.id,
+        dept: match.departamento.toLowerCase(),
+        lat: match.lat,
+        lng: match.lng,
+        zoom: 13
+      });
+    }
+  };
+
   window.selectLagunaById = async function(id) {
     const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
     const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
@@ -598,6 +662,7 @@ import { SITE_CONFIG } from '../config/site.config';
       mostrarFicha();
       const selectDept = document.getElementById('filtro-departamento');
       if (selectDept) selectDept.value = match.departamento.toLowerCase();
+      resaltarLagunaEnLista(match.id);
       return;
     }
 
@@ -626,7 +691,9 @@ import { SITE_CONFIG } from '../config/site.config';
         datos_conectados: data.datos_conectados || 12,
         confianza: data.confianza || 0.75,
         fecha_actualizacion: data.fecha_actualizacion || "2026",
-        alerta_especifica: data.alerta_especifica
+        alerta_especifica: data.alerta_especifica,
+        lat: data.lat || -9.42,
+        lng: data.lng || -77.50
       });
       mostrarFicha();
     } catch (err) {
@@ -645,7 +712,7 @@ import { SITE_CONFIG } from '../config/site.config';
     if (toggle) toggle.checked = false;
   }
 
-  function mostrarMapa() {
+  function mostrarMapa(options = {}) {
     document.getElementById('seccion-ficha')?.classList.add('hidden');
     document.getElementById('seccion-mapa')?.classList.remove('hidden');
     document.getElementById('tab-mapa')?.classList.replace('bg-slate-100', 'bg-slate-900');
@@ -654,6 +721,23 @@ import { SITE_CONFIG } from '../config/site.config';
     document.getElementById('tab-ficha')?.classList.replace('text-white', 'text-slate-700');
     const toggle = document.getElementById('toggle-ver-mapa');
     if (toggle) toggle.checked = true;
+
+    const selectDept = document.getElementById('filtro-departamento');
+    const targetDept = options.dept || (selectDept?.value !== 'todos' ? selectDept?.value : (currentLaguna ? currentLaguna.departamento.toLowerCase() : 'todos'));
+    const targetId = options.id || currentLaguna?.id;
+
+    const payload = {
+      id: targetId,
+      dept: targetDept,
+      lat: options.lat || currentLaguna?.lat,
+      lng: options.lng || currentLaguna?.lng,
+      zoom: options.zoom || (targetId ? 13 : 8)
+    };
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('bg:map-focus', { detail: payload }));
+      if (targetId) resaltarLagunaEnLista(targetId);
+    }, 60);
   }
 
   // ========================================================
@@ -687,24 +771,62 @@ import { SITE_CONFIG } from '../config/site.config';
       const { id } = e.detail || {};
       if (id) window.selectLagunaById(id);
     });
+
+    document.addEventListener('bg:map-active-laguna', (e) => {
+      const { laguna } = e.detail || {};
+      if (laguna) {
+        currentLaguna = laguna;
+        renderFicha(laguna);
+        resaltarLagunaEnLista(laguna.id);
+      }
+    });
   }
 
   function filtrarPorDepartamento(dept) {
     const select = document.getElementById('filtro-departamento');
     if (select) select.value = dept;
 
-    const deptObj = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento) === norm(dept));
+    const fNorm = norm(dept);
+    const deptObj = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento) === fNorm);
     if (deptObj) {
       document.getElementById('mapa-dept-nombre').textContent = deptObj.departamento;
       document.getElementById('mapa-dept-num').textContent = deptObj.total;
+      document.getElementById('mapa-dept-sub').textContent = `Departamento prioritario · ${deptObj.muy_alto} en riesgo muy alto`;
     } else {
       document.getElementById('mapa-dept-nombre').textContent = "Todo el Perú";
       document.getElementById('mapa-dept-num').textContent = "18";
+      document.getElementById('mapa-dept-sub').textContent = "13 departamentos con glaciares registrados";
     }
 
     renderListaDepartamental(dept);
-    document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
-    mostrarMapa();
+
+    // Buscar si hay lagunas en este departamento
+    const lagunasEnDept = fNorm === 'todos'
+      ? LAGUNAS_DESTACADAS
+      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === fNorm);
+
+    if (lagunasEnDept.length > 0) {
+      if (!currentLaguna || norm(currentLaguna.departamento) !== fNorm) {
+        currentLaguna = lagunasEnDept[0];
+        renderFicha(currentLaguna);
+      }
+    }
+
+    // Verificar si el mapa está actualmente visible
+    const mapaVisible = !document.getElementById('seccion-mapa')?.classList.contains('hidden');
+    if (mapaVisible) {
+      document.dispatchEvent(new CustomEvent('bg:map-focus', {
+        detail: {
+          dept: dept,
+          id: currentLaguna?.id,
+          lat: currentLaguna?.lat,
+          lng: currentLaguna?.lng
+        }
+      }));
+      if (currentLaguna) resaltarLagunaEnLista(currentLaguna.id);
+    } else {
+      document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
+    }
   }
 
   // ========================================================
