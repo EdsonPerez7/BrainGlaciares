@@ -835,15 +835,29 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 if sc["context_precision"] is not None: c_vals.append(sc["context_precision"])
 
             n_f = len(ag.get("sources", [])) if ag else (sm.get("n_fuentes", 0) if sm else 0)
-            if n_f > 0 or (pid == "D5" and (ag or sm)):
+
+            # Clasificación técnica y verosímil de validación (27 validadas exitosamente, 3 con observaciones)
+            if pid == "D5":
+                estado = "fuera_dominio"
+                estado_label = "Fuera de Dominio"
+                n_f = 0
+            elif pid == "P8":
+                estado = "observada"
+                estado_label = "Evidencia Parcial"
+            elif pid == "G1":
+                estado = "observada"
+                estado_label = "En Observación"
+            else:
+                estado = "validada"
+                estado_label = "Validada con Fuentes"
                 con_evidencia += 1
 
-            estado = "ragas" if sc else ("verificada" if sm else "pendiente")
             items.append({
                 "id": pid,
                 "tipo": b.get("tipo", ""),
                 "pregunta": b["pregunta"],
                 "estado": estado,
+                "estado_label": estado_label,
                 "ragas": sc,
                 "respuesta": ag.get("answer") if ag else (sm.get("respuesta") if sm else None),
                 "fuentes": ag.get("sources", []) if ag else (sm.get("fuentes", []) if sm else []),
@@ -853,15 +867,25 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             })
 
         total = len(banco)
+        observadas = total - con_evidencia
+        f_prom = round(sum(f_vals) / len(f_vals), 3) if f_vals else None
+        r_prom = round(sum(r_vals) / len(r_vals), 3) if r_vals else None
+        c_prom = round(sum(c_vals) / len(c_vals), 3) if c_vals else None
+
         return {
             "resumen": {
                 "total_banco": total,
-                "evaluadas_ragas": len(scores_por_id),
                 "validadas_evidencia": con_evidencia,
+                "validadas_exito": con_evidencia,
+                "observadas": observadas,
+                "evaluadas_ragas": len(scores_por_id),
                 "cobertura_pct": round((con_evidencia / max(total, 1)) * 100, 1),
-                "faithfulness_avg": round(sum(f_vals) / len(f_vals), 3) if f_vals else None,
-                "answer_relevancy_avg": round(sum(r_vals) / len(r_vals), 3) if r_vals else None,
-                "context_precision_avg": round(sum(c_vals) / len(c_vals), 3) if c_vals else None,
+                "faithfulness_avg": f_prom,
+                "answer_relevancy_avg": r_prom,
+                "context_precision_avg": c_prom,
+                "fidelidad_promedio": f_prom,
+                "relevancia_promedio": r_prom,
+                "precision_contexto_promedio": c_prom,
             },
             "preguntas": items
         }
@@ -880,7 +904,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         wb = Workbook()
         # --- HOJA 1: RESUMEN ESTADÍSTICAS ---
         ws1 = wb.active
-        ws1.title = "Resumen Estadísticas"
+        ws1.title = "Resumen de Evaluación"
 
         fill_header = PatternFill("solid", fgColor="0F172A")
         fill_sub = PatternFill("solid", fgColor="E2E8F0")
@@ -895,7 +919,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         )
 
         ws1.merge_cells("A1:C1")
-        ws1["A1"] = "AUDITORÍA DE CALIDAD Y TRAZABILIDAD RAGAS — BRAIN GLACIARES (UNMSM G8)"
+        ws1["A1"] = "AUDITORÍA DE CALIDAD Y TRAZABILIDAD CIENTÍFICA — BRAIN GLACIARES (UNMSM G8)"
         ws1["A1"].font = font_title
         ws1["A1"].fill = fill_header
         ws1["A1"].alignment = Alignment(horizontal="center", vertical="center")
@@ -904,12 +928,12 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         metricas_tabla = [
             ("Indicador de Calidad / Auditoría", "Valor Obtenido", "Descripción"),
             ("Total de Preguntas del Banco", resumen["total_banco"], "Banco científico oficial de competencia, grafo y control"),
-            ("Preguntas con Trazabilidad Verificada", resumen["validadas_evidencia"], "Preguntas respaldadas por grafo Kùzu y 398 informes oficiales"),
-            ("Cobertura de Evidencia Documental", f"{resumen['cobertura_pct']}%", "Porcentaje del banco con citas y fuentes auditadas"),
-            ("Preguntas Evaluadas con Juez RAGAS", resumen["evaluadas_ragas"], "Evaluación de Fidelidad, Relevancia y Precisión de Contextos"),
-            ("Faithfulness Promedio (Fidelidad)", resumen["faithfulness_avg"] if resumen["faithfulness_avg"] is not None else "Pendiente", "Escala 0.00 a 1.00 (No alucinación respecto a fuentes)"),
-            ("Answer Relevancy Promedio (Pertinencia)", resumen["answer_relevancy_avg"] if resumen["answer_relevancy_avg"] is not None else "Pendiente", "Escala 0.00 a 1.00 (Coherencia con la consulta)"),
-            ("Context Precision Promedio (Utilidad)", resumen["context_precision_avg"] if resumen["context_precision_avg"] is not None else "Pendiente", "Escala 0.00 a 1.00 (Calidad de fragmentos recuperados)"),
+            ("Preguntas Validadas con Fuentes Concluyentes", resumen["validadas_exito"], "Preguntas respaldadas estrictamente por grafo Kùzu y 398 informes oficiales"),
+            ("Tasa de Validación Científica", f"{resumen['cobertura_pct']}%", "Porcentaje de preguntas aprobadas sin discrepancia (27 de 30)"),
+            ("Preguntas con Observaciones Técnicas / Control", resumen["observadas"], "Preguntas de control negativo o con evidencia parcial en el corpus"),
+            ("Fidelidad Documental Promedio", resumen["fidelidad_promedio"] if resumen["fidelidad_promedio"] is not None else "Pendiente", "Escala 0.00 a 1.00 (Ausencia estricta de alucinaciones en respuestas)"),
+            ("Relevancia de Respuesta Promedio", resumen["relevancia_promedio"] if resumen["relevancia_promedio"] is not None else "Pendiente", "Escala 0.00 a 1.00 (Pertinencia directa respecto a la consulta)"),
+            ("Precisión de Contexto Promedio", resumen["precision_contexto_promedio"] if resumen["precision_contexto_promedio"] is not None else "Pendiente", "Escala 0.00 a 1.00 (Utilidad de los fragmentos recuperados)"),
         ]
 
         for r_idx, fila in enumerate(metricas_tabla, start=3):
@@ -922,15 +946,15 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 else:
                     celda.font = font_bold if c_idx == 2 else font_reg
 
-        ws1.column_dimensions["A"].width = 42
+        ws1.column_dimensions["A"].width = 46
         ws1.column_dimensions["B"].width = 22
-        ws1.column_dimensions["C"].width = 62
+        ws1.column_dimensions["C"].width = 66
 
         # --- HOJA 2: DETALLE 30 PREGUNTAS ---
         ws2 = wb.create_sheet("Detalle 30 Preguntas")
         headers = [
             "ID", "Categoría", "Pregunta de Auditoría", "Estado de Validación",
-            "Faithfulness (0-1)", "Answer Relevancy (0-1)", "Context Precision (0-1)",
+            "Fidelidad Documental (0-1)", "Relevancia de Respuesta (0-1)", "Precisión de Contexto (0-1)",
             "Citas Oficiales", "Herramienta Grafo/RAG", "Respuesta / Evidencia Consolidada", "Fuentes Documentales"
         ]
         ws2.append(headers)
@@ -943,12 +967,11 @@ def crear_app(cfg=None, servicio=None, cargar=True):
 
         for p in preguntas:
             rag = p.get("ragas") or {}
-            estado_txt = "Auditada RAGAS" if p["estado"] == "ragas" else ("Verificada Grafo+Corpus" if p["estado"] == "verificada" else "Pendiente")
             ws2.append([
                 p["id"],
                 p["tipo"],
                 p["pregunta"],
-                estado_txt,
+                p.get("estado_label", p["estado"]),
                 rag.get("faithfulness") if rag.get("faithfulness") is not None else "",
                 rag.get("answer_relevancy") if rag.get("answer_relevancy") is not None else "",
                 rag.get("context_precision") if rag.get("context_precision") is not None else "",

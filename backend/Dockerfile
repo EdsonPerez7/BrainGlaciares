@@ -35,6 +35,8 @@ FROM base AS produccion
 COPY *.py ./
 COPY static ./static
 COPY datos ./datos
+COPY banco_preguntas.json ./
+COPY resultados ./resultados
 # La copia del grafo queda lista: si Neo4j está en pausa al despertar, el servicio no pierde 2 minutos construyéndola
 RUN python -c "from grafo_resiliente import construir_base_previa as c; c('datos')"
 RUN useradd --uid 1000 --create-home agente && chown -R agente /app

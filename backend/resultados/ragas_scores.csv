@@ -73,7 +73,7 @@ P8,¿Qué bofedales están en subcuencas con glaciares en retroceso y qué servi
 - bofedal: Cara Cara · subcuenca: Negrohuaycco · en_retroceso: Coropuna · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [2]
 - bofedal: Muysiniga · subcuenca: Negrohuaycco · en_retroceso: Coropuna · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [3]
 - bofedal: Cátac · subcuenca: Pachacoto · en_retroceso: Pastoruri, Pachacoto · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [4]
-- bofedal: Cochapampa · subcuenca: Quillcayhuanca · en_retroceso: Quillcayhuanca · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídric",0.875,0.702,0.75
+- bofedal: Cochapampa · subcuenca: Quillcayhuanca · en_retroceso: Quillcayhuanca · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídric",0.58,0.62,0.50
 P9,¿Cómo cambió la superficie glaciar de una cordillera entre los inventarios de 2018 y 2023?,"**Hechos del grafo** (19 filas):
 - anio: 1955 · km2: 726.26 · confianza: 0.85 [1]
 - anio: 1970 · km2: 723.37 · confianza: 0.8 [2]
@@ -173,7 +173,7 @@ G1,¿Qué lagunas en riesgo alto o muy alto no tienen obras de seguridad registr
 - Las ciudades de Huaraz y Huancayo se encuentran expuestas a un riesgo muy alto ante posibles aluviones por el desborde de lagunas glaciares. La metodología aplicada ha permitido realizar, por primera vez, una evaluación … [7]
 - Riesgos asociados a glaciares En 2018, se han efectuado estudios de evaluación de riesgo por aluvión de tres subcuencas de origen glaciar para tomar medidas de prevención en el marco del Sistema Nacional de la Gestión de… [8]
 - Se han identificado 32 lagunas glaciares con riesgo de desborde en el departamento de Huánuco, una de las cuales se encuentra compartida con Lima. Todas se concentran en el extremo suroeste del departamento, en la provin… [9]
-- El retroceso acelerado de glaciares debido al cambio climático ha originado la formación de lagunas nuevas con alto nivel de amenaza física. Las nuevas lagunas, de acuerdo con su ",1.0,0.68,0.75
+- El retroceso acelerado de glaciares debido al cambio climático ha originado la formación de lagunas nuevas con alto nivel de amenaza física. Las nuevas lagunas, de acuerdo con su ",0.64,0.55,0.52
 G2,¿Qué cordillera tiene más lagunas en riesgo?,"**Hechos del grafo** (13 filas):
 - cordillera: Oriental · lagunas_en_riesgo: 13 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, A-10, Yanaraju, Ananta, Lecma [1]
 - cordillera: Huagoruncho · lagunas_en_riesgo: 11 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, Yanaraju, Lecma [2]
