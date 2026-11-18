@@ -918,6 +918,14 @@ def crear_app(cfg=None, servicio=None, cargar=True):
     @app.get("/api/evaluacion/excel", tags=["evaluacion"])
     def descargar_excel_evaluacion():
         """Genera y descarga el reporte oficial en Excel (.xlsx) con las 30 preguntas validadas y estadísticas RAGAS."""
+        ruta_excel_fisico = os.path.join(CARPETA_BASE, "resultados", "Validacion_RAGAS_30_Preguntas.xlsx")
+        if os.path.exists(ruta_excel_fisico):
+            return FileResponse(
+                path=ruta_excel_fisico,
+                filename="Validacion_RAGAS_30_Preguntas.xlsx",
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
         import io
         from openpyxl import Workbook
         from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
