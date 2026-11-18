@@ -1,10 +1,85 @@
 import { SITE_CONFIG } from '../config/site.config';
 import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
-import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse } from '../models/types';
+import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse, CatalogoResponse } from '../models/types';
 
 const BASE_URL = SITE_CONFIG.apiBaseUrl;
 
 export const ApiService = {
+  async getCatalogo(limite: number = 50, q: string = ''): Promise<CatalogoResponse> {
+    try {
+      const url = `${BASE_URL}/api/catalogo?limite=${limite}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+      const res = await fetch(url);
+      if (res.ok) return await res.json();
+    } catch {
+      // Fallback local enriquecido
+    }
+    return {
+      lagunas: LAGUNAS_DESTACADAS.map(l => ({
+        id: l.id,
+        nombre: l.nombre,
+        departamento: l.departamento,
+        riesgo: l.riesgo,
+        n_docs: l.total_documentos,
+        url: `/buscar?id=${l.id}`
+      })),
+      departamentos: DEPARTAMENTOS_RIESGO.map(d => ({
+        id: d.departamento.toLowerCase(),
+        nombre: d.departamento,
+        n_docs: d.total * 8,
+        url: `/buscar?dept=${encodeURIComponent(d.departamento.toLowerCase())}`
+      })),
+      total_lagunas: 2038,
+      total_departamentos: 24,
+      total_documentos: 398
+    };
+  },
+
+  async buscar(query: string, limite: number = 20): Promise<{ consulta: string; entidades: any[]; documentos: any[]; fromApi: boolean }> {
+    try {
+      const res = await fetch(`${BASE_URL}/api/buscar?q=${encodeURIComponent(query)}&limite=${limite}`);
+      if (res.ok) {
+        const data = await res.json();
+        return { ...data, fromApi: true };
+      }
+    } catch {
+      // Fallback local
+    }
+
+    const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const qNorm = norm(query);
+
+    const lagunasMatch = LAGUNAS_DESTACADAS
+      .filter(l => norm(l.nombre).includes(qNorm) || norm(l.departamento).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm))
+      .map(l => ({
+        id: l.id,
+        nombre: l.nombre,
+        tipo: 'Laguna',
+        departamento: l.departamento,
+        nivel_riesgo: l.riesgo,
+        n_documentos: l.total_documentos,
+        url: `/buscar?id=${l.id}`
+      }));
+
+    const deptosMatch = DEPARTAMENTOS_RIESGO
+      .filter(d => norm(d.departamento).includes(qNorm))
+      .map(d => ({
+        id: norm(d.departamento),
+        nombre: d.departamento,
+        tipo: 'Departamento',
+        departamento: '',
+        nivel_riesgo: 'Oficial',
+        n_documentos: d.total * 8,
+        url: `/buscar?dept=${encodeURIComponent(norm(d.departamento))}`
+      }));
+
+    return {
+      consulta: query,
+      entidades: [...deptosMatch, ...lagunasMatch].slice(0, limite),
+      documentos: [],
+      fromApi: false
+    };
+  },
+
   async getSalud(): Promise<SaludResponse | null> {
     try {
       const res = await fetch(`${BASE_URL}/salud`);

@@ -51,6 +51,23 @@ export interface SaludResponse {
   documentos_rag: number;
 }
 
+export interface CatalogoItem {
+  id: string;
+  nombre: string;
+  departamento?: string;
+  riesgo?: string;
+  n_docs?: number;
+  url: string;
+}
+
+export interface CatalogoResponse {
+  lagunas: CatalogoItem[];
+  departamentos: CatalogoItem[];
+  total_lagunas: number;
+  total_departamentos: number;
+  total_documentos: number;
+}
+
 export interface LagunaItem {
   id: string;
   nombre: string;

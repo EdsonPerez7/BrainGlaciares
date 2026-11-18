@@ -1,0 +1,186 @@
+---
+/**
+ * Componente Mapa Territorial Reutilizable (GlacierMap)
+ * Utiliza Leaflet 1.9.4 empaquetado localmente con Vite (sin depender de CDNs externos para el script).
+ * Soporta filtrado dinámico por departamento mediante el evento `bg:map-filter` y
+ * ajuste automático de tamaño con ResizeObserver cuando se muestra dentro de pestañas.
+ */
+interface Props {
+  mapId?: string;
+  heightClass?: string;
+  mode?: 'navigate' | 'event';
+}
+
+const {
+  mapId = 'glacier-map',
+  heightClass = 'h-[460px]',
+  mode = 'navigate',
+} = Astro.props;
+---
+
+<div
+  class="relative w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+  data-bg-map
+  data-map-id={mapId}
+  data-mode={mode}
+>
+  <div id={mapId} class={`w-full ${heightClass} z-0`}></div>
+
+  <!-- Leyenda flotante de niveles de riesgo -->
+  <div class="pointer-events-none absolute bottom-3 left-3 z-[400] flex flex-wrap items-center gap-3 rounded-lg border border-slate-200/90 bg-white/95 px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur-sm">
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Muy alto</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-orange-600"></span> Alto</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-600"></span> Bajo</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-500"></span> Sin evaluar</span>
+  </div>
+</div>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+  import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  function getRiskColor(riesgo: string): string {
+    const r = (riesgo || '').toLowerCase();
+    if (r.includes('muy')) return '#e11d48';
+    if (r.includes('alto')) return '#ea580c';
+    if (r.includes('medio')) return '#ca8a04';
+    if (r.includes('bajo')) return '#16a34a';
+    return '#64748b';
+  }
+
+  function initGlacierMaps() {
+    const containers = document.querySelectorAll<HTMLElement>('[data-bg-map]');
+
+    containers.forEach((wrapper) => {
+      if (wrapper.dataset.initialized === 'true') return;
+      wrapper.dataset.initialized = 'true';
+
+      const mapId = wrapper.dataset.mapId || 'glacier-map';
+      const mode = wrapper.dataset.mode || 'navigate';
+      const mapEl = document.getElementById(mapId);
+      if (!mapEl) return;
+
+      const map = L.map(mapId, {
+        center: [-9.8, -76.5],
+        zoom: 6,
+        zoomControl: true,
+        scrollWheelZoom: false
+      });
+
+      const capaTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; IGN, USGS, OpenStreetMap',
+        maxZoom: 18
+      });
+
+      const capaClara = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 16
+      });
+
+      const capaOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      });
+
+      capaTopo.addTo(map);
+      L.control.layers({
+        'Relieve Topográfico': capaTopo,
+        'Mapa Claro Minimalista': capaClara,
+        'OpenStreetMap': capaOSM
+      }, undefined, { position: 'topright' }).addTo(map);
+
+      const markersLayer = L.layerGroup().addTo(map);
+
+      function renderMarkers(deptFilter: string) {
+        markersLayer.clearLayers();
+        const fNorm = norm(deptFilter);
+
+        const filtered = !fNorm || fNorm === 'todos'
+          ? LAGUNAS_DESTACADAS
+          : LAGUNAS_DESTACADAS.filter((l) => norm(l.departamento) === fNorm);
+
+        const coords: L.LatLngTuple[] = [];
+
+        filtered.forEach((laguna) => {
+          const color = getRiskColor(laguna.riesgo);
+          const pos: L.LatLngTuple = [laguna.lat, laguna.lng];
+          coords.push(pos);
+
+          const marker = L.circleMarker(pos, {
+            radius: 8,
+            fillColor: color,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.92
+          });
+
+          const popupEl = document.createElement('div');
+          popupEl.style.fontFamily = 'inherit';
+          popupEl.style.fontSize = '12px';
+          popupEl.style.lineHeight = '1.45';
+          popupEl.innerHTML = `
+            <strong style="font-size: 13px; color: #0f172a;">Laguna ${laguna.nombre}</strong><br/>
+            <span style="color: #475569;">${laguna.departamento} · Cordillera ${laguna.cordillera}</span><br/>
+            <span style="display: inline-block; margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; background: ${color}20; color: ${color};">
+              Riesgo ${laguna.riesgo}
+            </span>
+          `;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = 'Ver ficha técnica →';
+          btn.style.cssText = 'display:block; margin-top:8px; background:#0f172a; color:#fff; border:none; border-radius:6px; padding:5px 10px; cursor:pointer; font-size:11px; font-weight:600;';
+          btn.addEventListener('click', () => {
+            if (mode === 'event') {
+              wrapper.dispatchEvent(new CustomEvent('bg:map-select', {
+                detail: { id: laguna.id, laguna },
+                bubbles: true
+              }));
+            } else {
+              window.location.href = `/buscar?id=${encodeURIComponent(laguna.id)}`;
+            }
+          });
+
+          popupEl.appendChild(btn);
+          marker.bindPopup(popupEl);
+          markersLayer.addLayer(marker);
+        });
+
+        if (coords.length > 0) {
+          const bounds = L.latLngBounds(coords);
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+        } else {
+          map.setView([-9.8, -76.5], 6);
+        }
+      }
+
+      renderMarkers('todos');
+
+      // Escuchar filtros externos por departamento
+      document.addEventListener('bg:map-filter', ((e: CustomEvent<{ dept: string }>) => {
+        const dept = e.detail?.dept || 'todos';
+        renderMarkers(dept);
+      }) as EventListener);
+
+      // Reajustar tiles automáticamente cuando el contenedor pase de hidden a visible
+      const ro = new ResizeObserver(() => {
+        if (mapEl.offsetParent !== null) {
+          map.invalidateSize();
+        }
+      });
+      ro.observe(mapEl);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGlacierMaps);
+  } else {
+    initGlacierMaps();
+  }
+  document.addEventListener('astro:page-load', initGlacierMaps);
+</script>
+

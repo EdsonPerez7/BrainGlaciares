@@ -1,8 +1,8 @@
 ---
-import { SITE_CONFIG } from '../config/site.config';
+import SearchBox from './SearchBox.astro';
 ---
 
-<section class="relative overflow-hidden bg-[#78b6eb] w-full min-h-[640px] lg:min-h-[720px] xl:min-h-[780px] flex items-center">
+<section class="relative overflow-x-clip bg-[#78b6eb] w-full min-h-[640px] lg:min-h-[720px] xl:min-h-[780px] flex items-center">
   
   <!-- ======================================================== -->
   <!-- LIENZO 3D WEBGL AL 100%: SOBREVUELO CONTINUO DE LOS ANDES -->
@@ -66,26 +66,7 @@ import { SITE_CONFIG } from '../config/site.config';
 
       <!-- Buscador Institucional Integrado en la Consola -->
       <div class="space-y-3">
-        <div class="relative max-w-lg">
-          <input 
-            id="hero-search-input"
-            type="text" 
-            autocomplete="off"
-            placeholder="Escribe tu pueblo, departamento o una laguna..." 
-            class="w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3.5 pl-11 text-sm text-white shadow-inner placeholder:text-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition backdrop-blur-md"
-          />
-          <svg class="absolute left-3.5 top-4 h-4 w-4 text-slate-300 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-
-          <!-- Menú desplegable flotante de autocompletado inteligente -->
-          <div 
-            id="hero-search-dropdown" 
-            class="hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-white/20 bg-slate-950/95 p-2 shadow-2xl backdrop-blur-xl max-h-80 overflow-y-auto space-y-1 text-left"
-          >
-            <!-- Contenido inyectado dinámicamente -->
-          </div>
-        </div>
+        <SearchBox inputId="hero-search-input" theme="dark" mode="navigate" maxWidthClass="max-w-lg" />
 
         <!-- Consultas rápidas recomendadas -->
         <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300">
@@ -686,169 +667,16 @@ import { SITE_CONFIG } from '../config/site.config';
       alert('Configuración de perspectiva y cordilleras copiada al portapapeles');
     });
   }
+</script>
 
-  // ========================================================
-  // BUSCADOR CON DESPLEGABLE EN VIVO Y NAVEGACIÓN A /BUSCAR
-  // ========================================================
-  const searchInput = document.getElementById('hero-search-input') as HTMLInputElement | null;
-  const searchDropdown = document.getElementById('hero-search-dropdown') as HTMLDivElement | null;
-  const sugerencias = document.querySelectorAll<HTMLButtonElement>('.btn-sugerencia');
-
-  // Redirección para botones de sugerencia
-  sugerencias.forEach(btn => {
+<!-- ======================================================== -->
+<!-- SUGERENCIAS RÁPIDAS DEL HERO                             -->
+<!-- ======================================================== -->
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.btn-sugerencia').forEach(btn => {
     btn.addEventListener('click', () => {
       const href = btn.dataset.href;
-      if (href) {
-        window.location.href = href;
-      }
+      if (href) window.location.href = href;
     });
   });
-
-  if (searchInput && searchDropdown) {
-    const SEARCH_ITEMS = [
-      { type: 'laguna', title: 'Laguna Cancahua', subtitle: 'Áncash · Cordillera Blanca', icon: '🏔️', url: '/buscar?id=cancahua', tags: 'cancahua ancash blanca vallunaraju sin evaluar' },
-      { type: 'laguna', title: 'Laguna Palcacocha', subtitle: 'Áncash · Cordillera Blanca (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=palcacocha', tags: 'palcacocha ancash blanca huaraz cojup muy alto' },
-      { type: 'laguna', title: 'Laguna Parón', subtitle: 'Áncash · Cordillera Blanca (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=paron', tags: 'paron ancash caraz huandoy muy alto' },
-      { type: 'laguna', title: 'Laguna 513', subtitle: 'Áncash · Cordillera Blanca (Riesgo alto)', icon: '🏔️', url: '/buscar?id=513', tags: '513 ancash carhuaz hualcan alto' },
-      { type: 'laguna', title: 'Laguna Upiscocha', subtitle: 'Cusco · Cordillera Vilcanota (Riesgo alto)', icon: '🏔️', url: '/buscar?id=upiscocha', tags: 'upiscocha cusco vilcanota ausangate ocongate' },
-      { type: 'laguna', title: 'Laguna Gangrajanca', subtitle: 'Huánuco · Cordillera Huayhuash (Riesgo muy alto)', icon: '🏔️', url: '/buscar?id=gangrajanca', tags: 'gangrajanca huanuco huayhuash yerupaja queropalca' },
-      { type: 'departamento', title: 'Áncash', subtitle: '9 lagunas en riesgo · Puesto 1 de 13 departamentos', icon: '🏛️', url: '/buscar?dept=áncash', tags: 'ancash cordillera blanca huayhuash' },
-      { type: 'departamento', title: 'Cusco', subtitle: '2 lagunas en riesgo · Vilcanota y Urubamba', icon: '🏛️', url: '/buscar?dept=cusco', tags: 'cusco vilcanota urubamba ausangate' },
-      { type: 'departamento', title: 'Huánuco', subtitle: '3 lagunas en riesgo · Huayhuash', icon: '🏛️', url: '/buscar?dept=huánuco', tags: 'huanuco queropalca yerupaja' },
-      { type: 'departamento', title: 'Puno', subtitle: '2 lagunas en riesgo · Carabaya y Apolobamba', icon: '🏛️', url: '/buscar?dept=puno', tags: 'puno carabaya apolobamba' },
-      { type: 'pueblo', title: 'Huaraz', subtitle: 'Áncash · Amenazada por Laguna Palcacocha', icon: '🏘️', url: '/buscar?q=Huaraz', tags: 'huaraz ancash cojup palcacocha aluvion' },
-      { type: 'pueblo', title: 'Caraz', subtitle: 'Áncash · Amenazada por Laguna Parón', icon: '🏘️', url: '/buscar?q=Caraz', tags: 'caraz ancash paron' },
-      { type: 'pueblo', title: 'Carhuaz', subtitle: 'Áncash · Amenazada por Laguna 513', icon: '🏘️', url: '/buscar?q=Carhuaz', tags: 'carhuaz ancash 513' },
-      { type: 'pueblo', title: 'Queropalca', subtitle: 'Huánuco · Cuenca Yerupajá', icon: '🏘️', url: '/buscar?q=Queropalca', tags: 'queropalca huanuco gangrajanca' }
-    ];
-
-    const API_BASE = "{SITE_CONFIG.apiBaseUrl}";
-    const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    let debounceTimer: any = null;
-
-    function renderDropdown(items: any[], docs: any[] = []) {
-      if (!searchDropdown) return;
-      if (items.length === 0 && docs.length === 0) {
-        searchDropdown.innerHTML = `
-          <div class="px-3.5 py-3 text-xs text-slate-400 text-center">
-            No se encontraron coincidencias directas.<br/>
-            <span class="text-sky-300 font-medium">Presiona Enter para buscar en todo el corpus</span>
-          </div>
-        `;
-        searchDropdown.classList.remove('hidden');
-        return;
-      }
-
-      let html = '';
-      if (items.length > 0) {
-        html += items.slice(0, 6).map(item => `
-          <a 
-            href="${item.url}" 
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 transition group text-left block"
-          >
-            <span class="text-base select-none">${item.icon || '📍'}</span>
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold text-white group-hover:text-sky-300 transition truncate">${item.title}</div>
-              <div class="text-[11px] text-slate-400 truncate">${item.subtitle}</div>
-            </div>
-            <span class="text-slate-500 group-hover:text-sky-300 text-xs">→</span>
-          </a>
-        `).join('');
-      }
-
-      // Si hay documentos recuperados del RAG (sin LLM)
-      if (docs.length > 0) {
-        html += `<div class="pt-2 pb-1 px-3 border-t border-white/10 text-[10px] uppercase font-bold tracking-wider text-sky-400 flex items-center justify-between">
-          <span>Evidencia RAG (398 Informes)</span>
-          <span class="text-[9px] text-slate-400 font-normal">Cero LLM</span>
-        </div>`;
-        html += docs.slice(0, 3).map(doc => `
-          <a 
-            href="/buscar?q=${encodeURIComponent(doc.titulo || searchInput.value)}" 
-            class="flex items-start gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 transition group text-left block"
-          >
-            <span class="text-sm select-none">📄</span>
-            <div class="flex-1 min-w-0">
-              <div class="text-[11px] font-semibold text-slate-200 group-hover:text-sky-300 truncate">${doc.titulo}</div>
-              <div class="text-[10px] text-slate-400 truncate">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
-              <p class="text-[10px] text-slate-400 italic line-clamp-1 mt-0.5">"${doc.extracto}"</p>
-            </div>
-          </a>
-        `).join('');
-      }
-
-      searchDropdown.innerHTML = html;
-      searchDropdown.classList.remove('hidden');
-    }
-
-    async function fetchRAG(query: string) {
-      try {
-        const res = await fetch(`${API_BASE}/api/buscar?q=${encodeURIComponent(query)}&limite=6`);
-        if (!res.ok) throw new Error('API error');
-        const data = await res.json();
-        
-        const entidadesMapeadas = (data.entidades || []).map((e: any) => ({
-          title: e.tipo === 'Laguna' ? `Laguna ${e.nombre}` : e.nombre,
-          subtitle: `${e.departamento || e.tipo} · ${e.nivel_riesgo !== 'Sin evaluar' ? `Riesgo ${e.nivel_riesgo}` : 'Oficial'}`,
-          icon: e.tipo === 'Laguna' ? '🏔️' : (e.tipo === 'Glaciar' ? '❄️' : (e.tipo === 'Poblado' ? '🏘️' : '🏛️')),
-          url: e.url
-        }));
-
-        if (entidadesMapeadas.length > 0 || (data.documentos && data.documentos.length > 0)) {
-          renderDropdown(entidadesMapeadas, data.documentos || []);
-          return;
-        }
-      } catch (err) {
-        // Fallback silencioso al catálogo local
-      }
-
-      // Fallback
-      const filtered = SEARCH_ITEMS.filter(it => norm(it.title).includes(norm(query)) || norm(it.tags).includes(norm(query)));
-      renderDropdown(filtered);
-    }
-
-    searchInput.addEventListener('focus', () => {
-      const q = searchInput.value.trim();
-      if (!q) {
-        renderDropdown(SEARCH_ITEMS.slice(0, 6));
-      } else {
-        fetchRAG(q);
-      }
-    });
-
-    searchInput.addEventListener('input', () => {
-      const q = searchInput.value.trim();
-      if (!q) {
-        renderDropdown(SEARCH_ITEMS.slice(0, 6));
-        return;
-      }
-      // Respuesta instantánea con catálogo local mientras llega la API RAG
-      const localMatches = SEARCH_ITEMS.filter(it => norm(it.title).includes(norm(q)) || norm(it.tags).includes(norm(q)));
-      renderDropdown(localMatches);
-
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        fetchRAG(q);
-      }, 200);
-    });
-
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const q = searchInput.value.trim();
-        if (q) {
-          window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
-        }
-      } else if (e.key === 'Escape') {
-        searchDropdown.classList.add('hidden');
-      }
-    });
-
-    // Cerrar al hacer clic afuera
-    document.addEventListener('click', (e) => {
-      if (!searchInput.contains(e.target as Node) && !searchDropdown.contains(e.target as Node)) {
-        searchDropdown.classList.add('hidden');
-      }
-    });
-  }
 </script>

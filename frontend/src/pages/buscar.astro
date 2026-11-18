@@ -1,14 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SearchBox from '../components/SearchBox.astro';
+import GlacierMap from '../components/GlacierMap.astro';
 import { LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
 import { SITE_CONFIG } from '../config/site.config';
 ---
 
 <Layout title="Buscar lagunas y zonas de riesgo · Brain Glaciares">
-  <!-- Estilos de Leaflet para el mapa territorial -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <main class="min-h-screen bg-slate-50/70 pb-20 pt-6">
     <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-6">
 
@@ -65,27 +63,15 @@ import { SITE_CONFIG } from '../config/site.config';
           </p>
         </div>
 
-        <!-- Buscador con desplegable integrado -->
-        <div class="relative w-full md:w-96">
-          <input 
-            id="buscar-input"
-            type="text"
-            autocomplete="off"
+        <!-- Buscador reutilizable conectado al backend -->
+        <div class="w-full md:w-96">
+          <SearchBox
+            inputId="buscar-input"
+            theme="light"
+            mode="event"
+            maxWidthClass="max-w-full"
             placeholder="Pueblo, departamento o laguna (con o sin tildes)..."
-            class="w-full rounded-xl border border-cyan-400/80 bg-white py-2 pl-9 pr-8 text-xs sm:text-sm text-slate-900 shadow-xs placeholder:text-slate-400 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
           />
-          <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <span class="pointer-events-none absolute right-3 top-2.5 text-[10px] text-slate-400">▼</span>
-
-          <!-- Desplegable en vivo -->
-          <div 
-            id="buscar-dropdown"
-            class="hidden absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-72 overflow-y-auto space-y-1 text-left"
-          >
-            <!-- Inyectado por JS -->
-          </div>
         </div>
       </div>
 
@@ -411,11 +397,11 @@ import { SITE_CONFIG } from '../config/site.config';
             <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs flex flex-col">
               <div class="p-3.5 border-b border-slate-200 flex items-center justify-between text-xs text-slate-700 bg-slate-50">
                 <span class="font-bold">Distribución geográfica de lagunas de alta montaña</span>
-                <span class="text-slate-400 text-[11px]">Cartografía oficial CARTO / OSM</span>
+                <span class="text-slate-400 text-[11px]">Cartografía Esri Topo / OSM</span>
               </div>
 
-              <!-- Contenedor del Mapa Leaflet -->
-              <div id="mapa-leaflet" class="w-full h-[520px] bg-slate-100 relative z-0"></div>
+              <!-- Contenedor del Mapa Leaflet (componente modular) -->
+              <GlacierMap mapId="mapa-leaflet" heightClass="h-[520px]" mode="event" />
 
               <!-- Leyenda inferior -->
               <div class="p-3 border-t border-slate-200 bg-white flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
@@ -570,81 +556,6 @@ import { SITE_CONFIG } from '../config/site.config';
   }
 
   // ========================================================
-  // MAPA INTERACTIVO LEAFLET
-  // ========================================================
-  function initMap() {
-    if (mapInstance) return;
-    const mapEl = document.getElementById('mapa-leaflet');
-    if (!mapEl || typeof L === 'undefined') return;
-
-    // Centro inicial en Perú (Áncash / Cordillera Blanca)
-    mapInstance = L.map('mapa-leaflet', {
-      center: [-9.4, -77.5],
-      zoom: 8,
-      zoomControl: true
-    });
-
-    // Capa base CARTO Positron (coincide exactamente con la imagen del usuario)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(mapInstance);
-
-    markersLayer = L.layerGroup().addTo(mapInstance);
-    updateMapMarkers('todos');
-  }
-
-  function updateMapMarkers(deptFilter) {
-    if (!markersLayer || !mapInstance) return;
-    markersLayer.clearLayers();
-
-    const filtered = deptFilter === 'todos' 
-      ? LAGUNAS_DESTACADAS 
-      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === norm(deptFilter));
-
-    filtered.forEach(laguna => {
-      const color = laguna.riesgo === 'Muy alto' ? '#e11d48' :
-                    laguna.riesgo === 'Alto' ? '#ea580c' :
-                    laguna.riesgo === 'Medio' ? '#ca8a04' :
-                    laguna.riesgo === 'Bajo' ? '#16a34a' : '#64748b';
-
-      const marker = L.circleMarker([laguna.lat, laguna.lng], {
-        radius: 8,
-        fillColor: color,
-        color: '#ffffff',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.9
-      });
-
-      marker.bindPopup(`
-        <div style="font-family: inherit; font-size: 12px; line-height: 1.4;">
-          <strong style="font-size: 13px;">Laguna ${laguna.nombre}</strong><br/>
-          <span>${laguna.departamento} · Cordillera ${laguna.cordillera}</span><br/>
-          <span style="display: inline-block; margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: ${color}20; color: ${color};">
-            Riesgo ${laguna.riesgo}
-          </span><br/>
-          <button onclick="window.selectLagunaById('${laguna.id}')" style="margin-top: 8px; background: #0f172a; color: #fff; border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 11px; font-weight: bold;">
-            Ver ficha técnica →
-          </button>
-        </div>
-      `);
-
-      markersLayer.addLayer(marker);
-    });
-
-    if (filtered.length > 0) {
-      if (deptFilter !== 'todos') {
-        const bounds = L.latLngBounds(filtered.map(l => [l.lat, l.lng]));
-        mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
-      } else {
-        mapInstance.setView([-9.4, -77.5], 7);
-      }
-    }
-  }
-
-  // ========================================================
   // LISTA LATERAL DE LAGUNAS EN EL MAPA
   // ========================================================
   function renderListaDepartamental(deptFilter) {
@@ -679,14 +590,47 @@ import { SITE_CONFIG } from '../config/site.config';
   // ========================================================
   // CONTROLADOR GLOBAL DE SELECCIÓN Y VISTAS
   // ========================================================
-  window.selectLagunaById = function(id) {
-    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === id.toLowerCase());
+  window.selectLagunaById = async function(id) {
+    const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
+    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
     if (match) {
       renderFicha(match);
       mostrarFicha();
-      // Actualizar select de departamento
       const selectDept = document.getElementById('filtro-departamento');
       if (selectDept) selectDept.value = match.departamento.toLowerCase();
+      return;
+    }
+
+    // Si no está en el catálogo local, consultar la ficha viva desde el backend (2,038 lagunas)
+    try {
+      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(cleanId)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      renderFicha({
+        id: data.id || cleanId,
+        nombre: data.nombre || cleanId,
+        departamento: data.departamento || "Áncash",
+        cordillera: data.cordillera || "Andina",
+        riesgo: data.riesgo || "Sin evaluar",
+        poblado_amenazado: data.poblado_amenazado || "Población local",
+        tiene_obras: Boolean(data.tiene_obras),
+        obras_detalle: data.obras_detalle || "Sin obras registradas",
+        volumen_hm3: data.volumen_hm3 || 0,
+        superficie_km2: data.superficie_km2 || 0,
+        documento_superficie: data.documento_superficie,
+        pueblos_aguas_abajo_num: data.pueblos_aguas_abajo_num || 0,
+        eventos_historicos_num: data.eventos_historicos_num || 0,
+        altitud_msnm: data.altitud_msnm || 4400,
+        glaciar_origen: data.glaciar_origen || "Glaciar de cabecera",
+        total_documentos: data.total_documentos || 0,
+        datos_conectados: data.datos_conectados || 12,
+        confianza: data.confianza || 0.75,
+        fecha_actualizacion: data.fecha_actualizacion || "2026",
+        alerta_especifica: data.alerta_especifica
+      });
+      mostrarFicha();
+    } catch (err) {
+      console.warn('No se pudo cargar la ficha dinámica:', err);
     }
   };
 
@@ -710,180 +654,38 @@ import { SITE_CONFIG } from '../config/site.config';
     document.getElementById('tab-ficha')?.classList.replace('text-white', 'text-slate-700');
     const toggle = document.getElementById('toggle-ver-mapa');
     if (toggle) toggle.checked = true;
-
-    initMap();
-    setTimeout(() => {
-      mapInstance?.invalidateSize();
-    }, 200);
   }
 
   // ========================================================
-  // AUTOCOMPLETADO EN EL BUSCADOR SUPERIOR CON API RAG VIVA
+  // CONEXIÓN CON COMPONENTES REUTILIZABLES SearchBox & GlacierMap
   // ========================================================
-  function initSearchInput() {
-    const input = document.getElementById('buscar-input');
-    const dropdown = document.getElementById('buscar-dropdown');
-    if (!input || !dropdown) return;
+  function initSearchListener() {
+    document.addEventListener('bg:search-select', (e) => {
+      const { item, docs } = e.detail || {};
+      if (!item) return;
 
-    function renderLocalMatches(q) {
-      const qNorm = norm(q);
-      const items = [];
-
-      LAGUNAS_DESTACADAS.forEach(l => {
-        if (!qNorm || norm(l.nombre).includes(qNorm) || norm(l.departamento).includes(qNorm) || norm(l.cordillera).includes(qNorm)) {
-          items.push({
-            title: `Laguna ${l.nombre}`,
-            subtitle: `${l.departamento} · Cordillera ${l.cordillera} (${l.riesgo})`,
-            icon: '🏔️',
-            action: () => {
-              window.selectLagunaById(l.id);
-              dropdown.classList.add('hidden');
-              input.value = `Laguna ${l.nombre}`;
-            }
-          });
-        }
-      });
-
-      DEPARTAMENTOS_RIESGO.forEach(d => {
-        if (!qNorm || norm(d.departamento).includes(qNorm)) {
-          items.push({
-            title: d.departamento,
-            subtitle: `${d.total} lagunas en riesgo · ${d.muy_alto} muy alto`,
-            icon: '🏛️',
-            action: () => {
-              filtrarPorDepartamento(d.departamento.toLowerCase());
-              dropdown.classList.add('hidden');
-              input.value = d.departamento;
-            }
-          });
-        }
-      });
-
-      renderDropdownHTML(items, []);
-    }
-
-    function renderDropdownHTML(items, docs) {
-      if (items.length === 0 && docs.length === 0) {
-        dropdown.innerHTML = `<div class="p-3 text-xs text-slate-500 text-center">No se encontraron coincidencias en el corpus de 398 documentos</div>`;
-        dropdown.classList.remove('hidden');
-        return;
-      }
-
-      let html = '';
-      if (items.length > 0) {
-        html += items.slice(0, 6).map((it, idx) => `
-          <div 
-            class="item-search-res flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-            data-index="${idx}"
-          >
-            <span class="text-base select-none">${it.icon || '📍'}</span>
-            <div class="flex-1 min-w-0">
-              <div class="text-xs font-bold text-slate-900 truncate">${it.title}</div>
-              <div class="text-[11px] text-slate-500 truncate">${it.subtitle}</div>
+      if (item.type === 'laguna') {
+        window.selectLagunaById(item.id);
+      } else if (item.type === 'departamento') {
+        filtrarPorDepartamento(norm(item.nombre));
+      } else if (docs && docs.length > 0) {
+        const contDocs = document.getElementById('lista-docs-rag');
+        if (contDocs) {
+          contDocs.innerHTML = docs.map(doc => `
+            <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
+              <div class="font-bold text-slate-900 text-xs">${doc.titulo}</div>
+              <div class="text-[10px] text-slate-500 font-semibold">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
+              <p class="text-[11px] text-slate-600 italic">"${doc.extracto}..."</p>
             </div>
-            <span class="text-xs text-slate-400">→</span>
-          </div>
-        `).join('');
-      }
-
-      if (docs.length > 0) {
-        html += `
-          <div class="pt-2 pb-1 px-3 border-t border-slate-100 text-[10px] uppercase font-bold tracking-wider text-cyan-800 flex items-center justify-between">
-            <span>Fragmentos de 398 Informes (RAG)</span>
-            <span class="text-[9px] text-slate-400 font-normal">Cero LLM</span>
-          </div>
-        `;
-        html += docs.slice(0, 3).map((d, dIdx) => `
-          <div 
-            class="item-doc-res p-2.5 rounded-lg hover:bg-cyan-50/60 transition cursor-pointer border border-transparent hover:border-cyan-200"
-            data-doc-index="${dIdx}"
-          >
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-900">
-              <span class="truncate pr-2">${d.titulo || 'Informe Oficial'}</span>
-              <span class="text-[9px] text-slate-500 shrink-0">${d.fuente} · ${d.anio} ${d.pagina ? `p. ${d.pagina}` : ''}</span>
-            </div>
-            <p class="text-[10px] text-slate-500 italic line-clamp-1 mt-0.5">"${d.extracto}"</p>
-          </div>
-        `).join('');
-      }
-
-      dropdown.innerHTML = html;
-
-      dropdown.querySelectorAll('.item-search-res').forEach(el => {
-        const idx = Number(el.getAttribute('data-index'));
-        if (items[idx]?.action) {
-          el.addEventListener('click', () => items[idx].action());
+          `).join('');
         }
-      });
-
-      dropdown.querySelectorAll('.item-doc-res').forEach(el => {
-        const dIdx = Number(el.getAttribute('data-doc-index'));
-        el.addEventListener('click', () => {
-          dropdown.classList.add('hidden');
-          const doc = docs[dIdx];
-          if (doc?.titulo) {
-            input.value = doc.titulo;
-          }
-        });
-      });
-
-      dropdown.classList.remove('hidden');
-    }
-
-    async function queryLiveAPI(query) {
-      try {
-        const res = await fetch(`${API_BASE}/api/buscar?q=${encodeURIComponent(query)}&limite=6`);
-        if (!res.ok) throw new Error("API offline");
-        const data = await res.json();
-
-        const entidades = (data.entidades || []).map(e => ({
-          title: e.tipo === 'Laguna' ? `Laguna ${e.nombre}` : e.nombre,
-          subtitle: `${e.departamento || e.tipo} · ${e.nivel_riesgo !== 'Sin evaluar' ? `Riesgo ${e.nivel_riesgo}` : 'Oficial'}`,
-          icon: e.tipo === 'Laguna' ? '🏔️' : (e.tipo === 'Glaciar' ? '❄️' : (e.tipo === 'Poblado' ? '🏘️' : '🏛️')),
-          action: () => {
-            if (e.tipo.toLowerCase() === 'laguna') {
-              window.selectLagunaById(e.id);
-            } else if (e.tipo.toLowerCase() === 'departamento') {
-              filtrarPorDepartamento(e.nombre.toLowerCase());
-            }
-            dropdown.classList.add('hidden');
-            input.value = e.nombre;
-          }
-        }));
-
-        if (entidades.length > 0 || (data.documentos && data.documentos.length > 0)) {
-          renderDropdownHTML(entidades, data.documentos || []);
-          return;
-        }
-      } catch (e) {
-        // Fallback
-      }
-
-      renderLocalMatches(query);
-    }
-
-    input.addEventListener('focus', () => {
-      const q = input.value.trim();
-      if (!q) renderLocalMatches('');
-      else queryLiveAPI(q);
-    });
-
-    input.addEventListener('input', () => {
-      const q = input.value.trim();
-      renderLocalMatches(q);
-
-      clearTimeout(searchDebounce);
-      if (q.length >= 2) {
-        searchDebounce = setTimeout(() => {
-          queryLiveAPI(q);
-        }, 220);
+        mostrarFicha();
       }
     });
 
-    document.addEventListener('click', (e) => {
-      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
+    document.addEventListener('bg:map-select', (e) => {
+      const { id } = e.detail || {};
+      if (id) window.selectLagunaById(id);
     });
   }
 
@@ -901,9 +703,7 @@ import { SITE_CONFIG } from '../config/site.config';
     }
 
     renderListaDepartamental(dept);
-    if (mapInstance) {
-      updateMapMarkers(dept);
-    }
+    document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
     mostrarMapa();
   }
 
@@ -914,7 +714,7 @@ import { SITE_CONFIG } from '../config/site.config';
     // Inicializar Ficha por defecto
     renderFicha(LAGUNAS_DESTACADAS[0]);
     renderListaDepartamental('todos');
-    initSearchInput();
+    initSearchListener();
 
     // Tabs
     document.getElementById('tab-ficha')?.addEventListener('click', mostrarFicha);
@@ -968,6 +768,9 @@ import { SITE_CONFIG } from '../config/site.config';
       filtrarPorDepartamento(deptParam);
     } else if (qParam) {
       const qNorm = norm(qParam);
+      const inputEl = document.getElementById('buscar-input');
+      if (inputEl) inputEl.value = qParam;
+
       const matchLaguna = LAGUNAS_DESTACADAS.find(l => norm(l.nombre).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm));
       if (matchLaguna) {
         window.selectLagunaById(matchLaguna.id);
@@ -975,6 +778,8 @@ import { SITE_CONFIG } from '../config/site.config';
         const matchDept = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento).includes(qNorm));
         if (matchDept) {
           filtrarPorDepartamento(matchDept.departamento.toLowerCase());
+        } else if (inputEl) {
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
         }
       }
     }

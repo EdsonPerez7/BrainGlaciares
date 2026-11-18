@@ -1,5 +1,6 @@
 ---
 import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
+import GlacierMap from './GlacierMap.astro';
 ---
 
 <section id="buscar" class="border-b border-slate-200 bg-white py-14 w-full">
@@ -73,75 +74,17 @@ import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data
 
       </div>
 
-      <!-- Lado Derecho: Mapa Vectorial Interactivo de Departamentos -->
+      <!-- Lado Derecho: Mapa Territorial Interactivo con Leaflet -->
       <div class="lg:col-span-7">
-        <div class="rounded-xl border border-slate-200 bg-slate-950 p-6 text-white shadow-md relative min-h-[460px] flex flex-col justify-between">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div class="flex items-center justify-between pb-2.5 px-1 text-xs">
             <div class="flex items-center gap-2">
               <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-              <span class="text-xs font-semibold text-slate-200">Mapa de Distribución de Riesgo Glaciar</span>
+              <span class="font-bold text-slate-800">Mapa Territorial de Lagunas en Riesgo</span>
             </div>
-            <span class="text-[11px] text-slate-400">Haz clic en cada departamento para filtrar</span>
+            <span class="text-[11px] text-slate-400">Haz clic en un punto para ver ficha técnica</span>
           </div>
-
-          <!-- Mapa esquemático del Perú simplificado en SVG limpio -->
-          <div class="flex-1 flex items-center justify-center py-4">
-            <svg class="h-80 w-auto" viewBox="0 0 320 420" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Trazo de Departamentos de Perú con estilo sobrio -->
-              <!-- Costa Norte / Tumbes / Piura -->
-              <path class="dep-svg cursor-pointer transition hover:opacity-80" data-name="piura" d="M 60,60 L 90,50 L 100,75 L 80,95 Z" fill="#334155" stroke="#0f172a" stroke-width="1.5" />
-              <!-- Cajamarca / Amazonas -->
-              <path class="dep-svg cursor-pointer transition hover:opacity-80" data-name="cajamarca" d="M 90,50 L 140,55 L 130,110 L 100,95 Z" fill="#334155" stroke="#0f172a" stroke-width="1.5" />
-              <!-- Loreto (Selva Norte) -->
-              <path class="dep-svg cursor-pointer transition hover:opacity-80" data-name="loreto" d="M 140,40 L 250,50 L 280,130 L 180,150 L 140,90 Z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" />
-              
-              <!-- Áncash (Epicentro de Glaciares: 8 lagunas en riesgo) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="áncash" d="M 80,140 L 125,130 L 135,175 L 90,185 Z" fill="#e11d48" stroke="#0f172a" stroke-width="1.5">
-                <title>Áncash: 8 lagunas en riesgo</title>
-              </path>
-
-              <!-- Huánuco (3 lagunas) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="huánuco" d="M 125,130 L 170,140 L 160,180 L 135,175 Z" fill="#f43f5e" stroke="#0f172a" stroke-width="1.5">
-                <title>Huánuco: 3 lagunas en riesgo</title>
-              </path>
-
-              <!-- Pasco (1 laguna) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="pasco" d="M 135,175 L 160,180 L 165,205 L 130,205 Z" fill="#fb7185" stroke="#0f172a" stroke-width="1.5" />
-
-              <!-- Junín (1 laguna) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="junín" d="M 130,205 L 165,205 L 180,240 L 140,245 Z" fill="#fb7185" stroke="#0f172a" stroke-width="1.5" />
-
-              <!-- Lima -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="lima" d="M 90,185 L 130,195 L 135,260 L 110,270 Z" fill="#f43f5e" stroke="#0f172a" stroke-width="1.5" />
-
-              <!-- Cusco (2 lagunas) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="cusco" d="M 180,240 L 245,245 L 235,305 L 185,290 Z" fill="#f43f5e" stroke="#0f172a" stroke-width="1.5">
-                <title>Cusco: 2 lagunas en riesgo</title>
-              </path>
-
-              <!-- Puno (2 lagunas) -->
-              <path class="dep-svg cursor-pointer transition hover:brightness-125" data-name="puno" d="M 235,305 L 285,310 L 275,370 L 225,355 Z" fill="#f43f5e" stroke="#0f172a" stroke-width="1.5">
-                <title>Puno: 2 lagunas en riesgo</title>
-              </path>
-
-              <!-- Arequipa / Sur -->
-              <path class="dep-svg cursor-pointer transition hover:opacity-80" data-name="arequipa" d="M 140,290 L 210,310 L 195,365 L 150,340 Z" fill="#334155" stroke="#0f172a" stroke-width="1.5" />
-            </svg>
-          </div>
-
-          <!-- Leyenda del Mapa -->
-          <div class="mt-2 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-              <span class="text-[11px]">Nivel de concentración:</span>
-              <span class="inline-block h-2 w-5 rounded bg-rose-600"></span>
-              <span class="text-[11px] text-slate-300">Muy alto (Áncash)</span>
-              <span class="inline-block h-2 w-5 rounded bg-rose-400"></span>
-              <span class="text-[11px] text-slate-300">Medio/Alto</span>
-              <span class="inline-block h-2 w-5 rounded bg-slate-700"></span>
-              <span class="text-[11px] text-slate-400">Sin glaciares</span>
-            </div>
-            <span class="text-[11px] text-slate-500">Coordenadas WGS84</span>
-          </div>
+          <GlacierMap mapId="home-glacier-map" heightClass="h-[440px]" mode="navigate" />
         </div>
       </div>
 
@@ -153,15 +96,16 @@ import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data
   const selectDept = document.getElementById('select-departamento') as HTMLSelectElement | null;
   const panelTitulo = document.getElementById('panel-titulo');
   const panelBadge = document.getElementById('panel-badge');
-  const panelDesc = document.getElementById('panel-descripcion');
   const itemsLaguna = document.querySelectorAll('.item-laguna');
-  const depSvgs = document.querySelectorAll('.dep-svg');
+
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   function filtrarPorDepartamento(dept: string) {
+    const deptNorm = norm(dept);
     itemsLaguna.forEach(item => {
       const el = item as HTMLElement;
-      const itemDept = el.getAttribute('data-dept') || '';
-      if (dept === 'todos' || itemDept.includes(dept)) {
+      const itemDept = norm(el.getAttribute('data-dept') || '');
+      if (deptNorm === 'todos' || itemDept.includes(deptNorm)) {
         el.style.display = 'block';
       } else {
         el.style.display = 'none';
@@ -170,11 +114,13 @@ import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data
 
     if (panelTitulo) panelTitulo.textContent = dept === 'todos' ? 'Todo el Perú' : dept.toUpperCase();
     if (panelBadge) {
-      if (dept === 'áncash') panelBadge.textContent = '8 lagunas críticas';
-      else if (dept === 'huánuco' || dept === 'cusco' || dept === 'puno') panelBadge.textContent = 'Lagunas identificadas';
-      else if (dept === 'todos') panelBadge.textContent = '18 lagunas críticas';
+      if (deptNorm === 'ancash') panelBadge.textContent = '8 lagunas críticas';
+      else if (deptNorm === 'huanuco' || deptNorm === 'cusco' || deptNorm === 'puno') panelBadge.textContent = 'Lagunas identificadas';
+      else if (deptNorm === 'todos') panelBadge.textContent = '18 lagunas críticas';
       else panelBadge.textContent = 'Zona monitoreada';
     }
+
+    document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
   }
 
   if (selectDept) {
@@ -183,14 +129,4 @@ import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data
       filtrarPorDepartamento(val);
     });
   }
-
-  depSvgs.forEach(svg => {
-    svg.addEventListener('click', () => {
-      const name = svg.getAttribute('data-name') || '';
-      if (selectDept) {
-        selectDept.value = name;
-        filtrarPorDepartamento(name);
-      }
-    });
-  });
 </script>

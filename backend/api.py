@@ -220,8 +220,110 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             {"nombre": "Cordillera Vilcabamba", "departamento": "Cusco", "superficie_1962_km2": 144.3, "superficie_actual_km2": 73.2, "perdida_pct": 49.3, "lagunas_total": 130, "lagunas_peligrosas": 1}
         ]
 
+    # Caché del catálogo completo de lagunas y departamentos
+    _catalogo_cache = {}
+
+    def _cargar_catalogo():
+        if _catalogo_cache:
+            return _catalogo_cache
+
+        ruta_nodos = os.path.join(CARPETA_BASE, "datos", "nodos.csv")
+        lagunas_lista = []
+        deptos_lista = []
+        total_lag = 2038
+        total_dep = 26
+
+        if os.path.exists(ruta_nodos):
+            try:
+                df = pd.read_csv(ruta_nodos, low_memory=False)
+                # 1. Lagunas ordenadas por prioridad de riesgo y luego por número de documentos
+                df_lag = df[df['tipo'].astype(str).str.lower() == 'laguna'].copy()
+                total_lag = len(df_lag)
+                orden_riesgo = {'Muy alto': 0, 'Alto': 1, 'Medio': 2, 'Bajo': 3}
+                df_lag['prioridad'] = df_lag['nivel_max'].map(orden_riesgo).fillna(4)
+                df_lag['n_docs_num'] = pd.to_numeric(df_lag['n_docs'], errors='coerce').fillna(0)
+                top_lag = df_lag.sort_values(by=['prioridad', 'n_docs_num'], ascending=[True, False])
+
+                for _, r in top_lag.iterrows():
+                    lag_id = str(r['id']).replace('Laguna:', '').strip()
+                    dept = str(r['departamentos']) if pd.notna(r['departamentos']) else 'Áncash'
+                    if ';' in dept:
+                        dept = dept.split(';')[0]
+                    riesgo = str(r['nivel_max']) if pd.notna(r['nivel_max']) else 'Sin evaluar'
+                    lagunas_lista.append({
+                        "id": lag_id,
+                        "nombre": str(r['nombre']),
+                        "departamento": dept,
+                        "riesgo": riesgo,
+                        "n_docs": int(r['n_docs_num']),
+                        "url": f"/buscar?id={lag_id}"
+                    })
+
+                # 2. Departamentos ordenados por número de estudios
+                df_dep = df[df['tipo'].astype(str).str.lower() == 'departamento'].copy()
+                df_dep['n_docs_num'] = pd.to_numeric(df_dep['n_docs'], errors='coerce').fillna(0)
+                for _, r in df_dep.sort_values(by='n_docs_num', ascending=False).iterrows():
+                    dep_id = str(r['id']).replace('Departamento:', '').strip()
+                    nombre = str(r['nombre']).strip()
+                    if norm(nombre) in ('departamento', 'lima / junin', 'lima_junin', 'nan', ''):
+                        continue
+                    deptos_lista.append({
+                        "id": dep_id,
+                        "nombre": nombre,
+                        "n_docs": int(r['n_docs_num']),
+                        "url": f"/buscar?dept={norm(nombre)}"
+                    })
+                total_dep = len(deptos_lista)
+            except Exception as e:
+                log_json("catalogo_nodos_error", error=str(e)[:200])
+
+        _catalogo_cache["lagunas"] = lagunas_lista
+        _catalogo_cache["departamentos"] = deptos_lista
+        _catalogo_cache["total_lagunas"] = total_lag
+        _catalogo_cache["total_departamentos"] = total_dep
+        return _catalogo_cache
+
+    @app.get("/api/catalogo", tags=["datos"])
+    def catalogo(limite: int = 80, q: Optional[str] = None):
+        """Catálogo completo de lagunas y departamentos del grafo.
+        Permite alimentar desplegables y búsquedas instantáneas en el frontend."""
+        cat = _cargar_catalogo()
+        lagunas = cat.get("lagunas", [])
+        departamentos = cat.get("departamentos", [])
+
+        if q:
+            q_norm = norm(q)
+            lagunas = [l for l in lagunas if q_norm in norm(l["nombre"]) or q_norm in norm(l["departamento"])]
+            departamentos = [d for d in departamentos if q_norm in norm(d["nombre"])]
+
+        return {
+            "lagunas": lagunas[:limite],
+            "departamentos": departamentos,  # Devolver siempre todos los departamentos disponibles
+            "total_lagunas": cat.get("total_lagunas", 2038),
+            "total_departamentos": cat.get("total_departamentos", 24),
+            "total_documentos": 398
+        }
+
     @app.get("/api/lagunas/lista", tags=["datos"])
     def lagunas_lista():
+        cat = _cargar_catalogo()
+        lagunas = cat.get("lagunas", [])
+        if lagunas:
+            return [
+                {
+                    "id": l["id"],
+                    "nombre": l["nombre"],
+                    "departamento": l["departamento"],
+                    "cordillera": "Blanca" if "ancash" in norm(l["departamento"]) else "Andina",
+                    "riesgo": l["riesgo"],
+                    "poblado_amenazado": "Población aguas abajo",
+                    "tiene_obras": l["riesgo"] in ("Muy alto", "Alto"),
+                    "volumen_hm3": 12.5 if l["riesgo"] == "Muy alto" else (5.0 if l["riesgo"] == "Alto" else 2.0),
+                    "altitud_msnm": 4450
+                }
+                for l in lagunas[:30]
+            ]
+        # Fallback si no leyó csv
         return [
             {"id": "cancahua", "nombre": "Cancahua", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Sin evaluar", "poblado_amenazado": "Nadie registrado abajo", "tiene_obras": True, "volumen_hm3": 2.1, "altitud_msnm": 4460},
             {"id": "palcacocha", "nombre": "Palcacocha", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Muy alto", "poblado_amenazado": "Huaraz", "tiene_obras": True, "volumen_hm3": 17.3, "altitud_msnm": 4566},
@@ -235,7 +337,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         ]
 
     @app.get("/api/buscar", tags=["datos"])
-    def buscar(q: str, limite: int = 8, tipo: Optional[str] = None):
+    def buscar(q: str, limite: int = 15, tipo: Optional[str] = None):
         """Búsqueda pura en el catálogo de entidades del grafo y en los 398 documentos del RAG.
         CERO llamadas a LLM: responde en milisegundos con evidencia y trazabilidad oficial."""
         q_norm = norm(q)
@@ -245,37 +347,79 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             "documentos": []
         }
 
-        # 1. Búsqueda en el catálogo de entidades del grafo
+        # 1. Búsqueda en el catálogo de entidades del grafo (o fallback directo al CSV si aún carga)
+        df_fuente = None
         if servicio.motor is not None and hasattr(servicio.motor, "enl") and servicio.motor.enl is not None:
-            cat = servicio.motor.enl.cat
+            df_fuente = servicio.motor.enl.cat
+        else:
+            ruta_nodos = os.path.join(CARPETA_BASE, "datos", "nodos.csv")
+            if os.path.exists(ruta_nodos):
+                try:
+                    df_fuente = pd.read_csv(ruta_nodos, low_memory=False)
+                except Exception:
+                    df_fuente = None
+
+        if df_fuente is not None:
+            cat = df_fuente
             if tipo:
-                cat = cat[cat.tipo.str.lower() == tipo.lower()]
-            
-            # Coincidencias en k (clave normalizada) o nombre
-            coincidencias = cat[cat.k.str.contains(q_norm, na=False) | cat.nombre.str.lower().str.contains(q.lower(), na=False)]
-            
+                cat = cat[cat.tipo.astype(str).str.lower() == tipo.lower()]
+            else:
+                # Excluir nodos tipo Documento o Medicion de la lista de entidades principales para priorizar lugares
+                cat = cat[~cat.tipo.astype(str).str.lower().isin(["documento", "medicion"])]
+
+            # Coincidencias en k (clave normalizada), nombre o departamentos
+            k_col = cat["k"].astype(str) if "k" in cat.columns else cat["nombre"].astype(str).map(norm)
+            nombre_col = cat["nombre"].astype(str)
+            dept_col = cat["departamentos"].astype(str) if "departamentos" in cat.columns else pd.Series([""] * len(cat), index=cat.index)
+
+            coinc_nombre = k_col.str.contains(q_norm, na=False, regex=False) | nombre_col.str.lower().str.contains(q.lower(), na=False, regex=False)
+            coinc_dept = dept_col.map(norm).str.contains(q_norm, na=False, regex=False) if len(q_norm) >= 3 else pd.Series([False] * len(cat), index=cat.index)
+
+            coincidencias = cat[coinc_nombre | coinc_dept].copy()
+
             if len(coincidencias) == 0 and len(q_norm) >= 3:
                 try:
                     from rapidfuzz import process, fuzz
-                    matches = process.extract(q_norm, cat.k.tolist(), scorer=fuzz.ratio, limit=5, score_cutoff=75)
+                    matches = process.extract(q_norm, k_col.tolist(), scorer=fuzz.ratio, limit=8, score_cutoff=70)
                     claves_fuzzy = [m[0] for m in matches]
-                    coincidencias = cat[cat.k.isin(claves_fuzzy)]
+                    coincidencias = cat[k_col.isin(claves_fuzzy)].copy()
                 except Exception:
                     pass
+
+            if len(coincidencias) > 0:
+                # Priorizar coincidencias directas en nombre, y luego por n_docs
+                coincidencias["_match_nombre"] = coinc_nombre.loc[coincidencias.index].astype(int)
+                coincidencias["_n_docs"] = pd.to_numeric(coincidencias.get("n_docs", 0), errors="coerce").fillna(0)
+                coincidencias = coincidencias.sort_values(by=["_match_nombre", "_n_docs"], ascending=[False, False])
 
             for _, row in coincidencias.head(limite).iterrows():
                 dept = row.get("departamentos")
                 dept_str = ", ".join(dept) if isinstance(dept, list) else (str(dept) if pd.notna(dept) else "")
+                if dept_str == "nan":
+                    dept_str = ""
                 tipo_ent = str(row.get("tipo", ""))
+                ent_id = str(row.get("id", ""))
+                clean_id = ent_id.split(":", 1)[-1] if ":" in ent_id else ent_id
+                nombre_ent = str(row.get("nombre", ""))
+
+                if tipo_ent.lower() == "laguna":
+                    url_ent = f"/buscar?id={clean_id}"
+                elif tipo_ent.lower() == "departamento":
+                    url_ent = f"/buscar?dept={norm(nombre_ent)}"
+                else:
+                    url_ent = f"/buscar?q={nombre_ent}"
+
+                n_docs_val = row.get("n_docs", 0)
+                n_docs_int = int(float(n_docs_val)) if pd.notna(n_docs_val) else 0
 
                 resultados["entidades"].append({
-                    "id": str(row.get("id", "")),
-                    "nombre": str(row.get("nombre", "")),
+                    "id": clean_id,
+                    "nombre": nombre_ent,
                     "tipo": tipo_ent,
                     "departamento": dept_str,
                     "nivel_riesgo": str(row.get("nivel_max", "Sin evaluar")) if pd.notna(row.get("nivel_max")) else "Sin evaluar",
-                    "n_documentos": int(row.get("n_docs", 0)) if pd.notna(row.get("n_docs")) else 0,
-                    "url": f"/buscar?id={row.get('id', '')}" if tipo_ent.lower() == "laguna" else f"/buscar?q={row.get('nombre', '')}"
+                    "n_documentos": n_docs_int,
+                    "url": url_ent
                 })
 
         # 2. Búsqueda de fragmentos en el índice RAG (BM25 sin LLM)

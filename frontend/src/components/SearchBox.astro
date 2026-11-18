@@ -1,0 +1,334 @@
+---
+/**
+ * Componente Buscador Reutilizable (SearchBox)
+ * Conectado en tiempo real al catálogo y motor de búsqueda del backend (/api/catalogo y /api/buscar).
+ * Soporta tema oscuro ('dark' para Hero) y claro ('light' para páginas internas),
+ * así como modo navegación ('navigate') o modo evento ('event') para vistas interactivas.
+ */
+interface Props {
+  inputId?: string;
+  placeholder?: string;
+  theme?: 'dark' | 'light';
+  mode?: 'navigate' | 'event';
+  maxWidthClass?: string;
+}
+
+const {
+  inputId = 'bg-search-input',
+  placeholder = 'Escribe tu pueblo, departamento o una laguna...',
+  theme = 'dark',
+  mode = 'navigate',
+  maxWidthClass = 'max-w-lg',
+} = Astro.props;
+
+const isDark = theme === 'dark';
+---
+
+<div
+  class={`relative w-full ${maxWidthClass}`}
+  data-bg-searchbox
+  data-theme={theme}
+  data-mode={mode}
+>
+  <input
+    id={inputId}
+    data-search-input
+    type="text"
+    autocomplete="off"
+    placeholder={placeholder}
+    class={isDark
+      ? 'w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3.5 pl-11 text-sm text-white shadow-inner placeholder:text-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition backdrop-blur-md'
+      : 'w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 pl-10 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition'
+    }
+  />
+  <svg
+    class={isDark
+      ? 'absolute left-3.5 top-4 h-4 w-4 text-slate-300 pointer-events-none'
+      : 'absolute left-3.5 top-3 h-4 w-4 text-slate-400 pointer-events-none'
+    }
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+
+  <!-- Menú desplegable flotante -->
+  <div
+    data-search-dropdown
+    class={isDark
+      ? 'hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-white/20 bg-slate-950/95 p-2.5 shadow-2xl backdrop-blur-xl max-h-96 overflow-y-auto space-y-1 text-left'
+      : 'hidden absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-slate-200 bg-white p-2 shadow-xl max-h-96 overflow-y-auto space-y-1 text-left'
+    }
+  >
+  </div>
+</div>
+
+<script>
+  import { ApiService } from '../services/api';
+  import type { CatalogoResponse } from '../models/types';
+
+  let catalogoCompartido: CatalogoResponse | null = null;
+
+  function getBadgeRiesgo(riesgo: string | undefined, isDark: boolean): string {
+    if (!riesgo || riesgo === 'Sin evaluar' || riesgo === 'Oficial') return '';
+    const r = riesgo.toLowerCase();
+    if (isDark) {
+      if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Muy alto</span>';
+      if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Alto</span>';
+      if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Medio</span>';
+      return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Bajo</span>';
+    }
+    if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800">Muy alto</span>';
+    if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">Alto</span>';
+    if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-100 text-yellow-800">Medio</span>';
+    return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Bajo</span>';
+  }
+
+  function getIconoTipo(tipo: string): string {
+    const t = (tipo || '').toLowerCase();
+    if (t === 'laguna') return '🏔️';
+    if (t === 'glaciar' || t === 'nevado') return '❄️';
+    if (t === 'centropoblado' || t === 'poblado' || t === 'provincia' || t === 'distrito') return '🏘️';
+    if (t === 'departamento') return '🏛️';
+    if (t === 'cuenca' || t === 'rio' || t === 'quebrada') return '💧';
+    return '📍';
+  }
+
+  function initSearchBoxes() {
+    const boxes = document.querySelectorAll<HTMLElement>('[data-bg-searchbox]');
+
+    boxes.forEach((box) => {
+      if (box.dataset.initialized === 'true') return;
+      box.dataset.initialized = 'true';
+
+      const input = box.querySelector<HTMLInputElement>('[data-search-input]');
+      const dropdown = box.querySelector<HTMLDivElement>('[data-search-dropdown]');
+      if (!input || !dropdown) return;
+
+      const isDark = box.dataset.theme !== 'light';
+      const mode = box.dataset.mode || 'navigate';
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+      let ultimoResultadoDocs: any[] = [];
+
+      function renderSecciones(
+        grupos: Array<{ titulo: string; badge?: string; items: any[] }>,
+        docs: any[] = []
+      ) {
+        if (!dropdown || !input) return;
+        ultimoResultadoDocs = docs;
+        const totalItems = grupos.reduce((acc, g) => acc + g.items.length, 0);
+
+        if (totalItems === 0 && docs.length === 0) {
+          dropdown.innerHTML = `
+            <div class="px-3.5 py-4 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'} text-center">
+              No se encontraron coincidencias directas.<br/>
+              <span class="${isDark ? 'text-sky-300' : 'text-slate-900'} font-medium">Presiona Enter para buscar en todo el corpus</span>
+            </div>
+          `;
+          dropdown.classList.remove('hidden');
+          return;
+        }
+
+        let html = '';
+
+        grupos.forEach((grupo) => {
+          if (grupo.items.length === 0) return;
+          html += `<div class="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-400 border-white/10' : 'text-slate-500 border-slate-100'} flex items-center justify-between border-b mt-1 first:mt-0 mb-1">
+            <span>${grupo.titulo}</span>
+            ${grupo.badge ? `<span class="text-[9px] ${isDark ? 'text-sky-400' : 'text-sky-700'} font-semibold">${grupo.badge}</span>` : ''}
+          </div>`;
+
+          html += grupo.items.map((item, idx) => {
+            const payload = encodeURIComponent(JSON.stringify(item));
+            return `
+              <a
+                href="${item.url}"
+                data-search-item="${payload}"
+                data-idx="${idx}"
+                class="flex items-center gap-3 px-3 py-2 rounded-xl ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'} transition group text-left block"
+              >
+                <span class="text-base select-none">${item.icon || '📍'}</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold ${isDark ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-700'} transition truncate">${item.title}</span>
+                    ${getBadgeRiesgo(item.riesgo, isDark)}
+                  </div>
+                  <div class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${item.subtitle}</div>
+                </div>
+                <span class="${isDark ? 'text-slate-500 group-hover:text-sky-300' : 'text-slate-400 group-hover:text-slate-900'} text-xs">→</span>
+              </a>
+            `;
+          }).join('');
+        });
+
+        if (docs.length > 0) {
+          html += `<div class="pt-2 pb-1 px-3 border-t ${isDark ? 'border-white/10 text-sky-400' : 'border-slate-100 text-sky-700'} text-[10px] uppercase font-bold tracking-wider flex items-center justify-between mt-1">
+            <span>Evidencia Documental RAG (398 Informes)</span>
+            <span class="text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'} font-normal">Cero LLM</span>
+          </div>`;
+
+          html += docs.slice(0, 5).map((doc) => {
+            const qUrl = `/buscar?q=${encodeURIComponent(input.value || doc.titulo || '')}`;
+            const docPayload = encodeURIComponent(JSON.stringify({ type: 'documento', title: doc.titulo, doc, url: qUrl }));
+            return `
+              <a
+                href="${qUrl}"
+                data-search-item="${docPayload}"
+                class="flex items-start gap-2.5 px-3 py-2 rounded-xl ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'} transition group text-left block"
+              >
+                <span class="text-sm select-none">📄</span>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[11px] font-semibold ${isDark ? 'text-slate-200 group-hover:text-sky-300' : 'text-slate-800 group-hover:text-sky-700'} truncate">${doc.titulo}</div>
+                  <div class="text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
+                  <p class="text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} italic line-clamp-1 mt-0.5">"${doc.extracto}"</p>
+                </div>
+              </a>
+            `;
+          }).join('');
+        }
+
+        dropdown.innerHTML = html;
+        dropdown.classList.remove('hidden');
+
+        // Interceptar clics si el modo es 'event'
+        if (mode === 'event') {
+          dropdown.querySelectorAll<HTMLAnchorElement>('[data-search-item]').forEach((el) => {
+            el.addEventListener('click', (e) => {
+              e.preventDefault();
+              try {
+                const item = JSON.parse(decodeURIComponent(el.dataset.searchItem || '{}'));
+                input.value = item.nombre || item.title || '';
+                dropdown.classList.add('hidden');
+                box.dispatchEvent(new CustomEvent('bg:search-select', {
+                  detail: { item, docs: ultimoResultadoDocs, query: input.value },
+                  bubbles: true
+                }));
+              } catch {
+                // Fallback a navegación normal si fallase el parseo
+                window.location.href = el.href;
+              }
+            });
+          });
+        }
+      }
+
+      async function cargarCatalogoInicial() {
+        if (!dropdown) return;
+        dropdown.innerHTML = `<div class="px-3.5 py-3 text-xs ${isDark ? 'text-sky-300' : 'text-slate-500'} text-center animate-pulse">Cargando catálogo oficial...</div>`;
+        dropdown.classList.remove('hidden');
+
+        if (!catalogoCompartido) {
+          catalogoCompartido = await ApiService.getCatalogo(60);
+        }
+
+        const deptos = (catalogoCompartido.departamentos || []).map((d) => ({
+          id: d.id,
+          nombre: d.nombre,
+          type: 'departamento',
+          title: d.nombre,
+          subtitle: `Departamento · ${d.n_docs} estudios oficiales`,
+          icon: '🏛️',
+          url: d.url
+        }));
+
+        const lagunas = (catalogoCompartido.lagunas || []).map((l) => ({
+          id: l.id,
+          nombre: l.nombre,
+          type: 'laguna',
+          title: `Laguna ${l.nombre}`,
+          subtitle: `${l.departamento} · ${l.n_docs} informes`,
+          riesgo: l.riesgo,
+          icon: '🏔️',
+          url: l.url
+        }));
+
+        renderSecciones([
+          { titulo: `🏛️ Departamentos del Perú (${deptos.length})`, badge: 'Ver lagunas', items: deptos },
+          { titulo: `🏔️ Lagunas Prioritarias (${lagunas.length} de ${catalogoCompartido.total_lagunas || 2038})`, badge: 'Riesgo y Estudios', items: lagunas }
+        ]);
+      }
+
+      async function ejecutarBusqueda(query: string) {
+        if (!dropdown) return;
+        const data = await ApiService.buscar(query, 20);
+
+        const entidadesMapeadas = (data.entidades || []).map((e) => ({
+          id: e.id,
+          nombre: e.nombre,
+          type: (e.tipo || '').toLowerCase(),
+          title: e.tipo === 'Laguna' ? `Laguna ${e.nombre}` : e.nombre,
+          subtitle: `${e.departamento ? `${e.departamento} · ` : ''}${e.tipo} · ${e.n_documentos ? `${e.n_documentos} docs` : 'Oficial'}`,
+          riesgo: e.nivel_riesgo,
+          icon: getIconoTipo(e.tipo),
+          url: e.url
+        }));
+
+        renderSecciones(
+          [{
+            titulo: `Coincidencias para "${query}"`,
+            badge: `${entidadesMapeadas.length} entidades`,
+            items: entidadesMapeadas
+          }],
+          data.documentos || []
+        );
+      }
+
+      input.addEventListener('focus', () => {
+        const q = input.value.trim();
+        if (!q) {
+          cargarCatalogoInicial();
+        } else {
+          ejecutarBusqueda(q);
+        }
+      });
+
+      input.addEventListener('input', () => {
+        const q = input.value.trim();
+        if (!q) {
+          cargarCatalogoInicial();
+          return;
+        }
+
+        if (dropdown) {
+          dropdown.innerHTML = `<div class="px-3.5 py-3 text-xs ${isDark ? 'text-sky-300' : 'text-slate-600'} text-center animate-pulse">Consultando 13,829 entidades y 398 informes para "${q}"...</div>`;
+          dropdown.classList.remove('hidden');
+        }
+
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          ejecutarBusqueda(q);
+        }, 160);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const q = input.value.trim();
+          if (!q) return;
+          if (mode === 'event') {
+            ejecutarBusqueda(q);
+          } else {
+            window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
+          }
+        } else if (e.key === 'Escape') {
+          dropdown.classList.add('hidden');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!box.contains(e.target as Node)) {
+          dropdown.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearchBoxes);
+  } else {
+    initSearchBoxes();
+  }
+  document.addEventListener('astro:page-load', initSearchBoxes);
+</script>
+
