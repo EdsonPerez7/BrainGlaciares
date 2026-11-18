@@ -4,15 +4,27 @@ import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionR
 
 let BASE_URL = SITE_CONFIG.apiBaseUrl;
 
+let _memoriaCatalogo: CatalogoResponse | null = null;
+let _memoriaDeptos: DepartamentoRiesgo[] | null = null;
+
 export const ApiService = {
   getBaseUrl(): string {
     return BASE_URL;
   },
-  async getCatalogo(limite: number = 50, q: string = ''): Promise<CatalogoResponse> {
+  async getCatalogo(limite: number = 80, q: string = '', forzarRecarga = false): Promise<CatalogoResponse> {
+    if (!q && !forzarRecarga && _memoriaCatalogo) {
+      return _memoriaCatalogo;
+    }
     try {
       const url = `${BASE_URL}/api/catalogo?limite=${limite}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
       const res = await fetch(url);
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (!q && data && data.lagunas && data.lagunas.length > 0) {
+          _memoriaCatalogo = data;
+        }
+        return data;
+      }
     } catch {
       // Fallback local enriquecido
     }
@@ -21,8 +33,19 @@ export const ApiService = {
         id: l.id,
         nombre: l.nombre,
         departamento: l.departamento,
+        cordillera: l.cordillera,
         riesgo: l.riesgo,
         n_docs: l.total_documentos,
+        lat: l.lat,
+        lng: l.lng,
+        volumen_hm3: l.volumen_hm3,
+        altitud_msnm: l.altitud_msnm,
+        poblado_amenazado: l.poblado_amenazado,
+        tiene_obras: l.tiene_obras,
+        obras_detalle: l.obras_detalle,
+        glaciar_origen: l.glaciar_origen,
+        confianza: l.confianza,
+        fecha_actualizacion: l.fecha_actualizacion,
         url: `/buscar?id=${l.id}`
       })),
       departamentos: DEPARTAMENTOS_RIESGO.map(d => ({
@@ -166,14 +189,34 @@ export const ApiService = {
     };
   },
 
-  async getDepartamentosRiesgo(): Promise<DepartamentoRiesgo[]> {
+  async getDepartamentosRiesgo(forzarRecarga = false): Promise<DepartamentoRiesgo[]> {
+    if (!forzarRecarga && _memoriaDeptos) {
+      return _memoriaDeptos;
+    }
     try {
       const res = await fetch(`${BASE_URL}/api/departamentos/riesgo`);
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          _memoriaDeptos = data;
+        }
+        return data;
+      }
     } catch {
       // Fallback local
     }
     return DEPARTAMENTOS_RIESGO;
+  },
+
+  async getLagunaFicha(id: string): Promise<any> {
+    const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
+    try {
+      const res = await fetch(`${BASE_URL}/api/lagunas/${encodeURIComponent(cleanId)}`);
+      if (res.ok) return await res.json();
+    } catch {
+      // Fallback
+    }
+    return null;
   },
 
   async getLagunasLista(): Promise<LagunaItem[]> {
@@ -199,7 +242,7 @@ export const ApiService = {
   async getComparacion(l1: string, l2: string): Promise<ComparacionResponse | null> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 400);
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
       const res = await fetch(`${BASE_URL}/api/lagunas/comparar?l1=${encodeURIComponent(l1)}&l2=${encodeURIComponent(l2)}`, {
         signal: controller.signal
       });

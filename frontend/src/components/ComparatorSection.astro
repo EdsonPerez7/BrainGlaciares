@@ -582,6 +582,36 @@ import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
   // Inicializar al cargar la página
   actualizarComparacion();
 
+  // Poblar selectores de forma dinámica desde el catálogo del backend
+  ApiService.getCatalogo(120).then((data) => {
+    const catalogo = data?.lagunas;
+    if (Array.isArray(catalogo) && catalogo.length > 0 && compL1 && compL2) {
+      const val1 = compL1.value;
+      const val2 = compL2.value;
+
+      const optsHtml = catalogo.map((l: any) =>
+        `<option value="${l.id}">${l.nombre} (${l.departamento})</option>`
+      ).join('');
+
+      compL1.innerHTML = optsHtml;
+      compL2.innerHTML = optsHtml;
+
+      if (catalogo.some((l: any) => l.id.toLowerCase() === val1.toLowerCase())) {
+        compL1.value = val1;
+      } else {
+        compL1.value = catalogo[0].id;
+      }
+
+      if (catalogo.some((l: any) => l.id.toLowerCase() === val2.toLowerCase())) {
+        compL2.value = val2;
+      } else {
+        compL2.value = catalogo[1]?.id || catalogo[0].id;
+      }
+
+      actualizarComparacion();
+    }
+  }).catch(() => {});
+
   if (btnExplicar) {
     btnExplicar.addEventListener('click', () => {
       const l1Nombre = compL1 ? compL1.options[compL1.selectedIndex].text.split('(')[0].trim() : 'Palcacocha';

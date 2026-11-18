@@ -39,6 +39,7 @@ const {
   import L from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { ApiService } from '../services/api';
 
   const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -112,6 +113,7 @@ const {
       const markersMap = new Map<string, { marker: L.CircleMarker; laguna: any }>();
       let activeMarker: L.CircleMarker | null = null;
       let currentDept = 'todos';
+      let lagunasCatalogo: any[] = [...LAGUNAS_DESTACADAS];
 
       function renderMarkers(deptFilter: string, targetId?: string) {
         markersLayer.clearLayers();
@@ -121,12 +123,12 @@ const {
 
         const fNorm = norm(deptFilter);
         const filtered = !fNorm || fNorm === 'todos'
-          ? LAGUNAS_DESTACADAS
-          : LAGUNAS_DESTACADAS.filter((l) => norm(l.departamento) === fNorm);
+          ? [...lagunasCatalogo]
+          : lagunasCatalogo.filter((l) => norm(l.departamento) === fNorm);
 
         // Si el filtro por departamento no contiene la laguna objetivo pero se pidió una laguna específica, incluirla
         if (targetId && !filtered.some(l => l.id.toLowerCase() === targetId.toLowerCase())) {
-          const extra = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === targetId.toLowerCase());
+          const extra = lagunasCatalogo.find(l => l.id.toLowerCase() === targetId.toLowerCase());
           if (extra) filtered.push(extra);
         }
 
@@ -258,6 +260,23 @@ const {
 
       // Inicializar con todos los marcadores
       renderMarkers('todos');
+
+      // Escuchar actualización dinámica del catálogo desde el backend
+      document.addEventListener('bg:map-update-catalog', ((e: CustomEvent<{ lagunas?: any[] }>) => {
+        if (e.detail?.lagunas && e.detail.lagunas.length > 0) {
+          lagunasCatalogo = e.detail.lagunas;
+          renderMarkers(currentDept);
+        }
+      }) as EventListener);
+
+      // Hidratación en segundo plano para catálogos dinámicos
+      ApiService.getCatalogo(150).then((data) => {
+        const lagunas = data?.lagunas;
+        if (Array.isArray(lagunas) && lagunas.length > 0) {
+          lagunasCatalogo = lagunas;
+          renderMarkers(currentDept);
+        }
+      }).catch(() => {});
 
       // Escuchar evento de enfoque completo (laguna y/o departamento)
       document.addEventListener('bg:map-focus', ((e: CustomEvent) => {

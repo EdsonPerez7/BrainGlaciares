@@ -433,6 +433,8 @@ import { SITE_CONFIG } from '../config/site.config';
   // Normalizador para búsqueda insensible a acentos
   const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+  let listaLagunas = [...LAGUNAS_DESTACADAS];
+  let listaDeptos = [...DEPARTAMENTOS_RIESGO];
   let currentLaguna = LAGUNAS_DESTACADAS[0]; // Por defecto Cancahua
   let mapInstance = null;
   let markersLayer = null;
@@ -564,8 +566,8 @@ import { SITE_CONFIG } from '../config/site.config';
 
     const fNorm = norm(deptFilter);
     const filtered = !fNorm || fNorm === 'todos'
-      ? LAGUNAS_DESTACADAS
-      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === fNorm);
+      ? listaLagunas
+      : listaLagunas.filter(l => norm(l.departamento) === fNorm);
 
     if (filtered.length === 0) {
       listEl.innerHTML = `
@@ -638,7 +640,7 @@ import { SITE_CONFIG } from '../config/site.config';
   // ========================================================
   window.enfocarLagunaEnMapa = function(id) {
     const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
-    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
+    const match = listaLagunas.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
     if (match) {
       currentLaguna = match;
       renderFicha(match);
@@ -656,48 +658,70 @@ import { SITE_CONFIG } from '../config/site.config';
 
   window.selectLagunaById = async function(id) {
     const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
-    const match = LAGUNAS_DESTACADAS.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
+
+    // 1. Siempre intentar consultar la ficha viva desde el backend (2,038 lagunas del grafo)
+    try {
+      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(cleanId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const fichaViva = {
+          id: data.id || cleanId,
+          nombre: data.nombre || cleanId,
+          departamento: data.departamento || "Áncash",
+          cordillera: data.cordillera || "Andina",
+          riesgo: data.riesgo || "Sin evaluar",
+          poblado_amenazado: data.poblado_amenazado || "Población local",
+          tiene_obras: Boolean(data.tiene_obras),
+          obras_detalle: data.obras_detalle || "Sin obras registradas",
+          volumen_hm3: data.volumen_hm3 || 0,
+          superficie_km2: data.superficie_km2 || 0,
+          documento_superficie: data.documento_superficie,
+          pueblos_aguas_abajo_num: data.pueblos_aguas_abajo_num || 0,
+          eventos_historicos_num: data.eventos_historicos_num || 0,
+          altitud_msnm: data.altitud_msnm || 4400,
+          glaciar_origen: data.glaciar_origen || "Glaciar de cabecera",
+          total_documentos: data.total_documentos || 0,
+          datos_conectados: data.datos_conectados || 12,
+          confianza: data.confianza || 0.75,
+          fecha_actualizacion: data.fecha_actualizacion || "2026",
+          alerta_especifica: data.alerta_especifica,
+          lat: data.lat || -9.42,
+          lng: data.lng || -77.50
+        };
+
+        // Renderizar fragmentos oficiales del RAG si vienen disponibles
+        if (data.fragmentos_rag && data.fragmentos_rag.length > 0) {
+          const contDocs = document.getElementById('lista-docs-rag');
+          if (contDocs) {
+            contDocs.innerHTML = data.fragmentos_rag.map(doc => `
+              <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
+                <div class="font-bold text-slate-900 text-xs">${doc.titulo}</div>
+                <div class="text-[10px] text-slate-500 font-semibold">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
+                <p class="text-[11px] text-slate-600 italic">"${doc.extracto}..."</p>
+              </div>
+            `).join('');
+          }
+        }
+
+        renderFicha(fichaViva);
+        mostrarFicha();
+        const selectDept = document.getElementById('filtro-departamento');
+        if (selectDept) selectDept.value = fichaViva.departamento.toLowerCase();
+        resaltarLagunaEnLista(fichaViva.id);
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend inaccesible para ficha en vivo, usando copia local:', err);
+    }
+
+    // 2. Respaldo local si la red falla
+    const match = listaLagunas.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
     if (match) {
       renderFicha(match);
       mostrarFicha();
       const selectDept = document.getElementById('filtro-departamento');
       if (selectDept) selectDept.value = match.departamento.toLowerCase();
       resaltarLagunaEnLista(match.id);
-      return;
-    }
-
-    // Si no está en el catálogo local, consultar la ficha viva desde el backend (2,038 lagunas)
-    try {
-      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(cleanId)}`);
-      if (!res.ok) return;
-      const data = await res.json();
-      renderFicha({
-        id: data.id || cleanId,
-        nombre: data.nombre || cleanId,
-        departamento: data.departamento || "Áncash",
-        cordillera: data.cordillera || "Andina",
-        riesgo: data.riesgo || "Sin evaluar",
-        poblado_amenazado: data.poblado_amenazado || "Población local",
-        tiene_obras: Boolean(data.tiene_obras),
-        obras_detalle: data.obras_detalle || "Sin obras registradas",
-        volumen_hm3: data.volumen_hm3 || 0,
-        superficie_km2: data.superficie_km2 || 0,
-        documento_superficie: data.documento_superficie,
-        pueblos_aguas_abajo_num: data.pueblos_aguas_abajo_num || 0,
-        eventos_historicos_num: data.eventos_historicos_num || 0,
-        altitud_msnm: data.altitud_msnm || 4400,
-        glaciar_origen: data.glaciar_origen || "Glaciar de cabecera",
-        total_documentos: data.total_documentos || 0,
-        datos_conectados: data.datos_conectados || 12,
-        confianza: data.confianza || 0.75,
-        fecha_actualizacion: data.fecha_actualizacion || "2026",
-        alerta_especifica: data.alerta_especifica,
-        lat: data.lat || -9.42,
-        lng: data.lng || -77.50
-      });
-      mostrarFicha();
-    } catch (err) {
-      console.warn('No se pudo cargar la ficha dinámica:', err);
     }
   };
 
@@ -787,23 +811,24 @@ import { SITE_CONFIG } from '../config/site.config';
     if (select) select.value = dept;
 
     const fNorm = norm(dept);
-    const deptObj = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento) === fNorm);
+    const deptObj = listaDeptos.find(d => norm(d.departamento) === fNorm);
     if (deptObj) {
       document.getElementById('mapa-dept-nombre').textContent = deptObj.departamento;
       document.getElementById('mapa-dept-num').textContent = deptObj.total;
       document.getElementById('mapa-dept-sub').textContent = `Departamento prioritario · ${deptObj.muy_alto} en riesgo muy alto`;
     } else {
+      const totalReg = listaDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
       document.getElementById('mapa-dept-nombre').textContent = "Todo el Perú";
-      document.getElementById('mapa-dept-num').textContent = "18";
-      document.getElementById('mapa-dept-sub').textContent = "13 departamentos con glaciares registrados";
+      document.getElementById('mapa-dept-num').textContent = String(totalReg || 18);
+      document.getElementById('mapa-dept-sub').textContent = `${listaDeptos.length} departamentos con glaciares registrados`;
     }
 
     renderListaDepartamental(dept);
 
     // Buscar si hay lagunas en este departamento
     const lagunasEnDept = fNorm === 'todos'
-      ? LAGUNAS_DESTACADAS
-      : LAGUNAS_DESTACADAS.filter(l => norm(l.departamento) === fNorm);
+      ? listaLagunas
+      : listaLagunas.filter(l => norm(l.departamento) === fNorm);
 
     if (lagunasEnDept.length > 0) {
       if (!currentLaguna || norm(currentLaguna.departamento) !== fNorm) {
@@ -830,13 +855,77 @@ import { SITE_CONFIG } from '../config/site.config';
   }
 
   // ========================================================
+  // SINCRONIZACIÓN CON BACKEND (Single Source of Truth)
+  // ========================================================
+  async function sincronizarBackend() {
+    try {
+      // 1. Departamentos y conteos calculados dinámicamente desde nodos.csv
+      const resDeptos = await fetch(`${API_BASE}/api/departamentos/riesgo`);
+      if (resDeptos.ok) {
+        const dataDeptos = await resDeptos.json();
+        if (Array.isArray(dataDeptos) && dataDeptos.length > 0) {
+          listaDeptos = dataDeptos;
+          const select = document.getElementById('filtro-departamento');
+          if (select) {
+            const currentVal = select.value || 'todos';
+            const totalLagunas = dataDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
+            select.innerHTML = `
+              <option value="todos">Todo el Perú (${totalLagunas} lagunas críticas)</option>
+              ${dataDeptos.map(d => `<option value="${d.departamento.toLowerCase()}">${d.departamento} (${d.total} lagunas · ${d.muy_alto} muy alto)</option>`).join('')}
+            `;
+            if (dataDeptos.some(d => d.departamento.toLowerCase() === currentVal)) {
+              select.value = currentVal;
+            } else {
+              select.value = 'todos';
+            }
+          }
+        }
+      }
+
+      // 2. Catálogo completo con georreferenciación y riesgo
+      const resCat = await fetch(`${API_BASE}/api/catalogo?limit=150`);
+      if (resCat.ok) {
+        const dataCat = await resCat.json();
+        const lagunasArr = Array.isArray(dataCat) ? dataCat : (dataCat.lagunas || []);
+        if (Array.isArray(lagunasArr) && lagunasArr.length > 0) {
+          listaLagunas = lagunasArr;
+
+          // Propagar al mapa Leaflet para redibujar marcadores
+          document.dispatchEvent(new CustomEvent('bg:map-update-catalog', {
+            detail: { lagunas: listaLagunas }
+          }));
+
+          // Refrescar lista lateral con el filtro actual
+          const select = document.getElementById('filtro-departamento');
+          const deptActivo = select ? select.value : 'todos';
+          renderListaDepartamental(deptActivo);
+
+          // Si la ficha activa está en el nuevo catálogo, enriquecerla
+          if (currentLaguna) {
+            const matchActual = listaLagunas.find(l => l.id.toLowerCase() === currentLaguna.id.toLowerCase());
+            if (matchActual) {
+              currentLaguna = { ...currentLaguna, ...matchActual };
+              renderFicha(currentLaguna);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Conexión con backend en segundo plano diferida, conservando catálogo base:', err);
+    }
+  }
+
+  // ========================================================
   // EVENT LISTENERS & INICIALIZACIÓN
   // ========================================================
-  document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar Ficha por defecto
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Inicializar Ficha por defecto con respaldo inmediato
     renderFicha(LAGUNAS_DESTACADAS[0]);
     renderListaDepartamental('todos');
     initSearchListener();
+
+    // Sincronizar de inmediato con el backend (Single Source of Truth)
+    await sincronizarBackend();
 
     // Tabs
     document.getElementById('tab-ficha')?.addEventListener('click', mostrarFicha);
@@ -893,11 +982,11 @@ import { SITE_CONFIG } from '../config/site.config';
       const inputEl = document.getElementById('buscar-input');
       if (inputEl) inputEl.value = qParam;
 
-      const matchLaguna = LAGUNAS_DESTACADAS.find(l => norm(l.nombre).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm));
+      const matchLaguna = listaLagunas.find(l => norm(l.nombre).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm));
       if (matchLaguna) {
         window.selectLagunaById(matchLaguna.id);
       } else {
-        const matchDept = DEPARTAMENTOS_RIESGO.find(d => norm(d.departamento).includes(qNorm));
+        const matchDept = listaDeptos.find(d => norm(d.departamento).includes(qNorm));
         if (matchDept) {
           filtrarPorDepartamento(matchDept.departamento.toLowerCase());
         } else if (inputEl) {

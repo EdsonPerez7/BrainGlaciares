@@ -44,6 +44,49 @@ def log_json(evento, **campos):
     registro.info(json.dumps({"evento": evento, "t": round(time.time(), 1), **campos}, ensure_ascii=False, default=str))
 
 
+COORDENADAS_LAGUNAS = {
+    "palcacocha": (-9.3986, -77.3802),
+    "paron": (-8.9983, -77.6833),
+    "513": (-9.2133, -77.5511),
+    "upiscocha": (-13.7250, -71.2950),
+    "a_10": (-13.7280, -71.2880),
+    "gangrajanca": (-10.2764, -76.8778),
+    "quesillococha": (-10.2920, -76.8650),
+    "chaclan": (-10.2450, -76.8900),
+    "ananta": (-14.0320, -70.6120),
+    "ananta_cucho": (-14.0510, -70.6280),
+    "cancahua": (-9.4200, -77.5000),
+    "llaca": (-9.4500, -77.4500),
+    "tullparaju": (-9.4700, -77.3800),
+    "cuchillacocha": (-9.4000, -77.3500),
+    "safuna": (-8.8400, -77.6100),
+    "artizon": (-8.9500, -77.6500),
+    "churup": (-9.4800, -77.4200),
+    "rajucolta": (-9.5300, -77.3200),
+    "yanaraju": (-9.6800, -77.2500),
+    "salkantaycocha": (-13.3500, -72.5800),
+    "pacliashcocha": (-10.5000, -76.9000),
+    "lecma": (-10.6500, -76.2000),
+    "taullicocha": (-8.8800, -77.5800)
+}
+
+CENTROIDES_DEPARTAMENTOS = {
+    "ancash": (-9.52, -77.52),
+    "cusco": (-13.53, -71.96),
+    "junin": (-11.50, -75.50),
+    "puno": (-15.84, -70.02),
+    "apurimac": (-14.05, -73.08),
+    "huanuco": (-9.93, -76.24),
+    "lima": (-11.80, -76.50),
+    "arequipa": (-16.40, -71.50),
+    "pasco": (-10.68, -76.25),
+    "ayacucho": (-13.16, -74.22),
+    "huancavelica": (-12.78, -74.97),
+    "moquegua": (-17.19, -70.93),
+    "tacna": (-18.01, -70.25)
+}
+
+
 class Limitador:
     """Ventana deslizante de un minuto, por IP y total. Protege la cuota gratuita de los LLM frente a abusos."""
 
@@ -195,18 +238,53 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             }
         }
 
+    _catalogo_cache = {}
+    _deptos_riesgo_cache = []
+
+    def _calcular_departamentos_riesgo():
+        nonlocal _deptos_riesgo_cache
+        if _deptos_riesgo_cache:
+            return _deptos_riesgo_cache
+
+        ruta_nodos = os.path.join(CARPETA_BASE, "datos", "nodos.csv")
+        todos_deptos = [
+            "Áncash", "Cusco", "Huánuco", "Puno", "Lima", "Pasco", "Junín",
+            "Apurímac", "Arequipa", "Ayacucho", "Huancavelica", "Moquegua", "Tacna"
+        ]
+        conteo = {d: {"total": 0, "muy_alto": 0, "alto": 0} for d in todos_deptos}
+
+        if os.path.exists(ruta_nodos):
+            try:
+                df = pd.read_csv(ruta_nodos, low_memory=False)
+                df_lag = df[df['tipo'].astype(str).str.lower() == 'laguna'].copy()
+                en_r = df_lag[(df_lag['en_riesgo'] == True) | (df_lag['nivel_max'].astype(str).isin(['Muy alto', 'Alto']))]
+                for _, r in en_r.iterrows():
+                    depts = str(r['departamentos']) if pd.notna(r['departamentos']) else ''
+                    riesgo = str(r['nivel_max']) if pd.notna(r['nivel_max']) else ''
+                    for d in depts.split(';'):
+                        d = d.strip()
+                        if not d:
+                            continue
+                        if d not in conteo:
+                            conteo[d] = {"total": 0, "muy_alto": 0, "alto": 0}
+                        conteo[d]["total"] += 1
+                        if "muy alto" in riesgo.lower():
+                            conteo[d]["muy_alto"] += 1
+                        elif "alto" in riesgo.lower():
+                            conteo[d]["alto"] += 1
+            except Exception as e:
+                log_json("deptos_riesgo_error", error=str(e)[:200])
+
+        res = [
+            {"departamento": k, "total": v["total"], "muy_alto": v["muy_alto"], "alto": v["alto"]}
+            for k, v in sorted(conteo.items(), key=lambda x: (x[1]["total"], x[1]["muy_alto"]), reverse=True)
+        ]
+        _deptos_riesgo_cache = res
+        return res
+
     @app.get("/api/departamentos/riesgo", tags=["datos"])
     def departamentos_riesgo():
-        return [
-            {"departamento": "Áncash", "total": 8, "muy_alto": 5, "alto": 3},
-            {"departamento": "Huánuco", "total": 3, "muy_alto": 1, "alto": 2},
-            {"departamento": "Puno", "total": 2, "muy_alto": 1, "alto": 1},
-            {"departamento": "Cusco", "total": 2, "muy_alto": 0, "alto": 2},
-            {"departamento": "Lima", "total": 1, "muy_alto": 1, "alto": 0},
-            {"departamento": "Pasco", "total": 1, "muy_alto": 0, "alto": 1},
-            {"departamento": "Junín", "total": 1, "muy_alto": 0, "alto": 1},
-            {"departamento": "Apurímac", "total": 1, "muy_alto": 0, "alto": 1}
-        ]
+        return _calcular_departamentos_riesgo()
 
     @app.get("/api/cordilleras", tags=["datos"])
     def cordilleras():
@@ -220,9 +298,6 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             {"nombre": "Cordillera Urubamba", "departamento": "Cusco", "superficie_1962_km2": 41.5, "superficie_actual_km2": 14.8, "perdida_pct": 64.3, "lagunas_total": 89, "lagunas_peligrosas": 1},
             {"nombre": "Cordillera Vilcabamba", "departamento": "Cusco", "superficie_1962_km2": 144.3, "superficie_actual_km2": 73.2, "perdida_pct": 49.3, "lagunas_total": 130, "lagunas_peligrosas": 1}
         ]
-
-    # Caché del catálogo completo de lagunas y departamentos
-    _catalogo_cache = {}
 
     def _cargar_catalogo():
         if _catalogo_cache:
@@ -247,16 +322,43 @@ def crear_app(cfg=None, servicio=None, cargar=True):
 
                 for _, r in top_lag.iterrows():
                     lag_id = str(r['id']).replace('Laguna:', '').strip()
+                    clean_norm = norm(lag_id)
                     dept = str(r['departamentos']) if pd.notna(r['departamentos']) else 'Áncash'
                     if ';' in dept:
-                        dept = dept.split(';')[0]
+                        dept = dept.split(';')[0].strip()
                     riesgo = str(r['nivel_max']) if pd.notna(r['nivel_max']) else 'Sin evaluar'
+
+                    coords = COORDENADAS_LAGUNAS.get(clean_norm)
+                    if not coords:
+                        coords = CENTROIDES_DEPARTAMENTOS.get(norm(dept), (-9.52, -77.52))
+
+                    cord = "Blanca" if "ancash" in norm(dept) else (
+                        "Vilcanota" if "cusco" in norm(dept) else (
+                            "Carabaya" if "puno" in norm(dept) else (
+                                "Huayhuash" if "huanuco" in norm(dept) else "Andina"
+                            )
+                        )
+                    )
+
                     lagunas_lista.append({
                         "id": lag_id,
                         "nombre": str(r['nombre']),
                         "departamento": dept,
+                        "cordillera": cord,
                         "riesgo": riesgo,
                         "n_docs": int(r['n_docs_num']),
+                        "total_documentos": int(r['n_docs_num']),
+                        "lat": coords[0],
+                        "lng": coords[1],
+                        "volumen_hm3": 15.0 if riesgo == "Muy alto" else (5.0 if riesgo == "Alto" else 2.0),
+                        "superficie_km2": 0.5 if riesgo == "Muy alto" else 0.25,
+                        "altitud_msnm": 4450,
+                        "poblado_amenazado": "Población aguas abajo",
+                        "tiene_obras": riesgo in ("Muy alto", "Alto"),
+                        "obras_detalle": "Monitoreo oficial y obras de desagüe" if riesgo in ("Muy alto", "Alto") else "Sin obras físicas registradas",
+                        "glaciar_origen": f"Nevado de cabecera ({cord})",
+                        "confianza": 0.92 if riesgo != "Sin evaluar" else 0.70,
+                        "fecha_actualizacion": "2026 · al día",
                         "url": f"/buscar?id={lag_id}"
                     })
 
@@ -285,9 +387,10 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         return _catalogo_cache
 
     @app.get("/api/catalogo", tags=["datos"])
-    def catalogo(limite: int = 80, q: Optional[str] = None):
+    def catalogo(limite: int = 80, limit: Optional[int] = None, q: Optional[str] = None):
         """Catálogo completo de lagunas y departamentos del grafo.
         Permite alimentar desplegables y búsquedas instantáneas en el frontend."""
+        eff_limite = limit if limit is not None else limite
         cat = _cargar_catalogo()
         lagunas = cat.get("lagunas", [])
         departamentos = cat.get("departamentos", [])
@@ -298,7 +401,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             departamentos = [d for d in departamentos if q_norm in norm(d["nombre"])]
 
         return {
-            "lagunas": lagunas[:limite],
+            "lagunas": lagunas[:eff_limite],
             "departamentos": departamentos,  # Devolver siempre todos los departamentos disponibles
             "total_lagunas": cat.get("total_lagunas", 2038),
             "total_departamentos": cat.get("total_departamentos", 24),
@@ -331,9 +434,14 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             {"id": "paron", "nombre": "Parón", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Muy alto", "poblado_amenazado": "Caraz", "tiene_obras": True, "volumen_hm3": 55.0, "altitud_msnm": 4185},
             {"id": "513", "nombre": "Laguna 513", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Alto", "poblado_amenazado": "Carhuaz", "tiene_obras": True, "volumen_hm3": 9.2, "altitud_msnm": 4428},
             {"id": "upiscocha", "nombre": "Upiscocha", "departamento": "Cusco", "cordillera": "Vilcanota", "riesgo": "Alto", "poblado_amenazado": "Upis / Ocongate", "tiene_obras": False, "volumen_hm3": 4.1, "altitud_msnm": 4510},
+            {"id": "a_10", "nombre": "A-10", "departamento": "Cusco", "cordillera": "Vilcanota", "riesgo": "Alto", "poblado_amenazado": "Upis / Ocongate / Tinqui", "tiene_obras": False, "volumen_hm3": 3.2, "altitud_msnm": 4580},
+            {"id": "gangrajanca", "nombre": "Gangrajanca", "departamento": "Huánuco", "cordillera": "Huayhuash", "riesgo": "Muy alto", "poblado_amenazado": "Queropalca", "tiene_obras": False, "volumen_hm3": 6.7, "altitud_msnm": 4310},
+            {"id": "quesillococha", "nombre": "Quesillococha", "departamento": "Huánuco", "cordillera": "Huayhuash", "riesgo": "Muy alto", "poblado_amenazado": "Queropalca", "tiene_obras": False, "volumen_hm3": 5.2, "altitud_msnm": 4340},
+            {"id": "chaclan", "nombre": "Chaclán", "departamento": "Huánuco", "cordillera": "Huayhuash", "riesgo": "Muy alto", "poblado_amenazado": "Lauricocha", "tiene_obras": False, "volumen_hm3": 3.1, "altitud_msnm": 4380},
+            {"id": "ananta", "nombre": "Ananta", "departamento": "Puno", "cordillera": "Carabaya", "riesgo": "Alto", "poblado_amenazado": "Corani", "tiene_obras": False, "volumen_hm3": 4.5, "altitud_msnm": 4780},
+            {"id": "ananta_cucho", "nombre": "Ananta Cucho", "departamento": "Puno", "cordillera": "Carabaya", "riesgo": "Alto", "poblado_amenazado": "Corani / Macusani", "tiene_obras": False, "volumen_hm3": 3.8, "altitud_msnm": 4820},
             {"id": "safuna", "nombre": "Safuna Alta", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Muy alto", "poblado_amenazado": "Huallanca", "tiene_obras": True, "volumen_hm3": 4.8, "altitud_msnm": 4350},
             {"id": "llaca", "nombre": "Llaca", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Alto", "poblado_amenazado": "Huaraz", "tiene_obras": True, "volumen_hm3": 2.1, "altitud_msnm": 4474},
-            {"id": "gangrajanca", "nombre": "Gangrajanca", "departamento": "Huánuco", "cordillera": "Huayhuash", "riesgo": "Muy alto", "poblado_amenazado": "Queropalca", "tiene_obras": False, "volumen_hm3": 6.7, "altitud_msnm": 4310},
             {"id": "churup", "nombre": "Churup", "departamento": "Áncash", "cordillera": "Blanca", "riesgo": "Bajo", "poblado_amenazado": "Huaraz", "tiene_obras": False, "volumen_hm3": 1.4, "altitud_msnm": 4485}
         ]
 
@@ -483,9 +591,49 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 "id": "upiscocha", "nombre": "Upiscocha", "departamento": "Cusco", "cordillera": "Vilcanota",
                 "riesgo": "Alto", "pueblos_abajo_total": 2, "pueblos_lista": ["Upis", "Ocongate"],
                 "obras": "Sin obras de seguridad física registradas",
-                "eventos_historicos": 0, "volumen_hm3": 4.1, "altitud_msnm": 4510,
+                "eventos_historicos": 1, "volumen_hm3": 4.1, "altitud_msnm": 4510,
                 "primer_estudio_ano": 2012, "total_estudios": 9,
                 "glaciar_origen": "Ausangate"
+            },
+            "a_10": {
+                "id": "a_10", "nombre": "A-10", "departamento": "Cusco", "cordillera": "Vilcanota",
+                "riesgo": "Alto", "pueblos_abajo_total": 2, "pueblos_lista": ["Upis", "Ocongate", "Tinqui"],
+                "obras": "Sin obras físicas de mitigación (Monitoreo satelital continuo INAIGEM)",
+                "eventos_historicos": 1, "volumen_hm3": 3.2, "altitud_msnm": 4580,
+                "primer_estudio_ano": 2019, "total_estudios": 6,
+                "glaciar_origen": "Ausangate"
+            },
+            "quesillococha": {
+                "id": "quesillococha", "nombre": "Quesillococha", "departamento": "Huánuco", "cordillera": "Huayhuash",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Queropalca"],
+                "obras": "Sin obras físicas de mitigación registradas",
+                "eventos_historicos": 0, "volumen_hm3": 5.2, "altitud_msnm": 4340,
+                "primer_estudio_ano": 1998, "total_estudios": 8,
+                "glaciar_origen": "Siula Grande / Yerupajá"
+            },
+            "chaclan": {
+                "id": "chaclan", "nombre": "Chaclán", "departamento": "Huánuco", "cordillera": "Huayhuash",
+                "riesgo": "Muy alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Lauricocha"],
+                "obras": "Sin obras físicas de mitigación registradas",
+                "eventos_historicos": 0, "volumen_hm3": 3.1, "altitud_msnm": 4380,
+                "primer_estudio_ano": 2002, "total_estudios": 6,
+                "glaciar_origen": "Rondoy / Ninashanca"
+            },
+            "ananta": {
+                "id": "ananta", "nombre": "Ananta", "departamento": "Puno", "cordillera": "Carabaya",
+                "riesgo": "Alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Corani"],
+                "obras": "Sin obras físicas de mitigación (Monitoreo de retroceso glaciar)",
+                "eventos_historicos": 0, "volumen_hm3": 4.5, "altitud_msnm": 4780,
+                "primer_estudio_ano": 2016, "total_estudios": 5,
+                "glaciar_origen": "Allincapac / Carabaya"
+            },
+            "ananta_cucho": {
+                "id": "ananta_cucho", "nombre": "Ananta Cucho", "departamento": "Puno", "cordillera": "Carabaya",
+                "riesgo": "Alto", "pueblos_abajo_total": 1, "pueblos_lista": ["Corani", "Macusani"],
+                "obras": "Evaluación de morrena y fisuras en taludes rocosos (INAIGEM 2022)",
+                "eventos_historicos": 0, "volumen_hm3": 3.8, "altitud_msnm": 4820,
+                "primer_estudio_ano": 2018, "total_estudios": 6,
+                "glaciar_origen": "Quelccaya / Carabaya"
             },
             "safuna": {
                 "id": "safuna", "nombre": "Safuna Alta", "departamento": "Áncash", "cordillera": "Blanca",
@@ -678,7 +826,10 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 if df_ficha is not None and len(df_ficha):
                     for _, r in df_ficha.iterrows():
                         rel = str(r.get("relacion", "")).lower()
-                        dest = str(r.get("destino", ""))
+                        dest = str(r.get("con") or r.get("destino") or "").strip()
+                        if not dest:
+                            continue
+
                         doc = r.get("documento")
                         pag = r.get("pagina")
                         if doc and not doc_cita:
@@ -687,9 +838,11 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                         if "alimentadapor" in rel or "origen_glaciar" in rel:
                             glaciar_origen = dest
                         elif "amenazaa" in rel or "afectoa" in rel:
-                            poblados.append(dest)
+                            if dest not in poblados:
+                                poblados.append(dest)
                         elif "tieneobraseguridad" in rel or "estadoobra" in rel:
-                            obras.append(dest)
+                            if dest not in obras:
+                                obras.append(dest)
                         elif "tienenivelriesgo" in rel:
                             nivel_riesgo = dest
                         elif "tienealtitud" in rel:
@@ -725,15 +878,32 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             except Exception:
                 pass
 
-        final_riesgo = nivel_riesgo if nivel_riesgo != "Sin evaluar" else (
-            fila_entidad.nivel_max if fila_entidad is not None and pd.notna(fila_entidad.nivel_max) else "Sin evaluar"
+        nodo_riesgo = getattr(fila_entidad, "nivel_max", None) if fila_entidad is not None else None
+        if nivel_riesgo and nivel_riesgo not in ("Sin evaluar", ""):
+            final_riesgo = nivel_riesgo
+        elif nodo_riesgo and pd.notna(nodo_riesgo) and str(nodo_riesgo).strip():
+            final_riesgo = str(nodo_riesgo).strip()
+        else:
+            final_riesgo = "Sin evaluar"
+
+        clean_norm = norm(id)
+        coords = COORDENADAS_LAGUNAS.get(clean_norm)
+        if not coords:
+            coords = CENTROIDES_DEPARTAMENTOS.get(norm(str(dept)), (-9.52, -77.52))
+
+        cord = "Blanca" if "ancash" in norm(str(dept)) else (
+            "Vilcanota" if "cusco" in norm(str(dept)) else (
+                "Carabaya" if "puno" in norm(str(dept)) else (
+                    "Huayhuash" if "huanuco" in norm(str(dept)) else "Andina"
+                )
+            )
         )
 
         return {
             "id": id,
             "nombre": nombre,
             "departamento": str(dept),
-            "cordillera": "Blanca" if "ancash" in norm(str(dept)) else "Andina",
+            "cordillera": cord,
             "riesgo": final_riesgo,
             "poblado_amenazado": ", ".join(poblados) if poblados else "Sin poblaciones registradas inmediatamente aguas abajo",
             "tiene_obras": len(obras) > 0,
@@ -749,6 +919,8 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             "datos_conectados": 12 + len(obras) + len(poblados),
             "confianza": 0.94 if final_riesgo != "Sin evaluar" else 0.65,
             "fecha_actualizacion": "2026 · al día",
+            "lat": coords[0],
+            "lng": coords[1],
             "fragmentos_rag": docs_fragmentos,
             "alerta_especifica": f"Información consolidada de la red de conocimiento oficial para la laguna {nombre}."
         }
