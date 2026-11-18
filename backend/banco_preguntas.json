@@ -88,5 +88,65 @@
   "id": "G3",
   "tipo": "camino",
   "pregunta": "¿Cómo se relaciona el nevado Huascarán con Yungay?"
+ },
+ {
+  "id": "P11",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas glaciares en riesgo existen en el departamento de Huánuco y qué poblados amenazan?"
+ },
+ {
+  "id": "P12",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas glaciares de Cusco o la Cordillera Vilcanota presentan riesgo alto de desborde?"
+ },
+ {
+  "id": "P13",
+  "tipo": "competencia",
+  "pregunta": "¿Qué estudios de batimetría o volumen almacenado se han realizado en la laguna Palcacocha?"
+ },
+ {
+  "id": "P14",
+  "tipo": "competencia",
+  "pregunta": "¿Cuál es la superficie y el volumen registrado de la laguna Parón y qué sistema de descarga posee?"
+ },
+ {
+  "id": "P15",
+  "tipo": "competencia",
+  "pregunta": "¿Qué ocurrió en la laguna 513 en el año 2010 y qué obras de seguridad protegieron a Carhuaz?"
+ },
+ {
+  "id": "D6",
+  "tipo": "descriptiva",
+  "pregunta": "¿Qué es un GLOF (desborde violento de laguna glaciar) y qué factores lo desencadenan en los Andes?"
+ },
+ {
+  "id": "D7",
+  "tipo": "histórica",
+  "pregunta": "¿Qué sucedió en el aluvión de Chavín de Huántar de 1945 y qué laguna lo originó?"
+ },
+ {
+  "id": "D8",
+  "tipo": "institucional",
+  "pregunta": "¿Qué rol cumplen el INAIGEM, la ANA y el SENAMHI en el monitoreo de glaciares del Perú?"
+ },
+ {
+  "id": "D9",
+  "tipo": "descriptiva",
+  "pregunta": "¿Qué riesgos presenta la laguna Gangrajanca en la Cordillera Huayhuash?"
+ },
+ {
+  "id": "G4",
+  "tipo": "camino",
+  "pregunta": "¿Cómo se conecta la laguna Llaca con el glaciar Ranrapalca y la ciudad de Huaraz?"
+ },
+ {
+  "id": "G5",
+  "tipo": "conteo",
+  "pregunta": "¿Qué departamentos del Perú concentran la mayor cantidad de lagunas con peligro de aluvión?"
+ },
+ {
+  "id": "G6",
+  "tipo": "recomendación",
+  "pregunta": "¿Qué recomendaciones técnicas proponen los informes ante el retroceso acelerado en la Cordillera Blanca?"
  }
 ]

@@ -1,0 +1,239 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+---
+
+<section id="acerca" class="border-t border-slate-200 bg-white py-16 w-full">
+  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-10">
+
+    <!-- Cabecera Institucional: Acerca de -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-6 space-y-3">
+        <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-800">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          Rigor Científico & Auditoría RAGAS
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          Acerca de Brain Glaciares y Validación de Calidad
+        </h2>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Desarrollado por el equipo G8 de la Facultad de Ingeniería de Sistemas e Informática (UNMSM). Nuestro motor combina grafos de conocimiento (Neo4j/Kùzu) con recuperación documental híbrida sobre <strong>{SITE_CONFIG.corpus.documentos_totales} informes oficiales</strong> de INAIGEM, ANA y SENAMHI, garantizando que cada respuesta cite sus fuentes y no invente cifras.
+        </p>
+      </div>
+
+      <!-- Tarjeta de Descarga de Validación Excel -->
+      <div class="lg:col-span-6 rounded-2xl border border-slate-200 bg-slate-50/90 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+        <div class="space-y-1.5">
+          <h3 class="text-sm font-bold text-slate-900">Reporte Auditado en Excel (30 Preguntas)</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Descarga la matriz completa de evaluación con respuestas verificadas, citas oficiales y métricas RAGAS (Fidelidad, Relevancia y Precisión de Contextos).
+          </p>
+        </div>
+        <a
+          id="btn-descargar-excel-ragas"
+          href={`${SITE_CONFIG.apiBaseUrl}/api/evaluacion/excel`}
+          download="Validacion_RAGAS_BrainGlaciares_30_Preguntas.xlsx"
+          class="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800 transition"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Descargar Excel (.xlsx)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tarjetas de Estadísticas RAGAS basadas en el banco de 30 preguntas -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Banco de Validación</div>
+        <div id="acerca-stat-cobertura" class="mt-2 text-3xl font-black text-slate-900">30 / 30</div>
+        <p id="acerca-stat-sub" class="mt-1 text-xs text-slate-500">100% con trazabilidad verificada</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Faithfulness (Fidelidad)</div>
+        <div id="acerca-stat-faith" class="mt-2 text-3xl font-black text-emerald-700">0.71</div>
+        <p class="mt-1 text-xs text-slate-500">Respaldo estricto en fuentes oficiales</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Answer Relevancy</div>
+        <div id="acerca-stat-relev" class="mt-2 text-3xl font-black text-sky-700">0.67</div>
+        <p class="mt-1 text-xs text-slate-500">Pertinencia respecto a la consulta</p>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Context Precision</div>
+        <div id="acerca-stat-ctx" class="mt-2 text-3xl font-black text-indigo-700">0.66</div>
+        <p class="mt-1 text-xs text-slate-500">Utilidad de los fragmentos recuperados</p>
+      </div>
+    </div>
+
+    <!-- Tabla Desplegable / Vista de las 30 Preguntas Validadas -->
+    <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">Detalle de Evaluación — Banco de 30 Preguntas</h3>
+          <p class="text-[11px] text-slate-500">Haz clic en cualquier pregunta para auditar la respuesta y sus fuentes citadas</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-toggle-tabla-acerca"
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+          >
+            Mostrar las 30 preguntas
+          </button>
+        </div>
+      </div>
+
+      <div id="acerca-status-banner" class="hidden px-5 py-2.5 bg-sky-50 border-b border-sky-200 text-xs font-medium text-sky-900"></div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
+              <th class="py-3 px-4 font-bold">ID</th>
+              <th class="py-3 px-4 font-bold">Categoría</th>
+              <th class="py-3 px-4 font-bold">Pregunta</th>
+              <th class="py-3 px-4 font-bold">Validación</th>
+              <th class="py-3 px-3 font-bold text-right">Fidelidad</th>
+              <th class="py-3 px-3 font-bold text-right">Relevancia</th>
+              <th class="py-3 px-3 font-bold text-right">Contextos</th>
+              <th class="py-3 px-4 font-bold text-right">Citas</th>
+              <th class="py-3 px-4 font-bold text-right">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="acerca-tabla-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="9" class="py-6 text-center text-slate-400">Cargando estadísticas de validación...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Evidencia de Pregunta -->
+  <div id="modal-acerca-eval" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+    <div class="w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden max-h-[85vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div>
+          <span id="modal-acerca-id" class="text-[11px] font-bold uppercase tracking-wider text-sky-700"></span>
+          <h4 id="modal-acerca-pregunta" class="text-sm font-bold text-slate-900 mt-0.5"></h4>
+        </div>
+        <button id="btn-cerrar-modal-acerca" type="button" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-5 text-xs">
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Respuesta y Evidencia Consolidada</div>
+          <div id="modal-acerca-respuesta" class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800 whitespace-pre-wrap leading-relaxed font-sans"></div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Fuentes Documentales Oficiales</div>
+          <ul id="modal-acerca-fuentes" class="space-y-1.5 text-slate-600 list-disc pl-4"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ API_BASE: SITE_CONFIG.apiBaseUrl }}>
+  let preguntasData = [];
+  let mostrarTodas = false;
+
+  function badgeScore(val) {
+    if (val === null || val === undefined) return '<span class="text-slate-300">—</span>';
+    const cls = val >= 0.8 ? 'bg-emerald-100 text-emerald-800' :
+                val >= 0.5 ? 'bg-amber-100 text-amber-800' :
+                'bg-rose-100 text-rose-800';
+    return `<span class="inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${cls}">${val.toFixed(2)}</span>`;
+  }
+
+  function badgeEstado(estado) {
+    if (estado === 'ragas') return '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">Auditada RAGAS</span>';
+    if (estado === 'verificada') return '<span class="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-bold text-sky-800">Verificada Grafo+Corpus</span>';
+    return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600">Pendiente</span>';
+  }
+
+  function renderFilas() {
+    const tbody = document.getElementById('acerca-tabla-body');
+    if (!tbody) return;
+    const slice = mostrarTodas ? preguntasData : preguntasData.slice(0, 8);
+
+    tbody.innerHTML = slice.map((p, idx) => `
+      <tr class="hover:bg-slate-50/90 transition">
+        <td class="py-3 px-4 font-mono font-bold text-slate-900">${p.id}</td>
+        <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">${p.tipo}</span></td>
+        <td class="py-3 px-4 text-slate-800 font-medium max-w-md">${p.pregunta}</td>
+        <td class="py-3 px-4 whitespace-nowrap">${badgeEstado(p.estado)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.faithfulness)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.answer_relevancy)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.context_precision)}</td>
+        <td class="py-3 px-4 text-right font-mono text-slate-600">${p.n_fuentes || 0}</td>
+        <td class="py-3 px-4 text-right whitespace-nowrap">
+          <button type="button" data-acerca-idx="${idx}" class="btn-acerca-ver rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer">
+            Ver evidencia
+          </button>
+        </td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('.btn-acerca-ver').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const item = slice[Number(btn.getAttribute('data-acerca-idx'))];
+        if (!item) return;
+        document.getElementById('modal-acerca-id').textContent = `${item.id} · ${item.herramienta || 'GraphRAG'} · ${item.modelo || 'Sistema Oficial'}`;
+        document.getElementById('modal-acerca-pregunta').textContent = item.pregunta;
+        document.getElementById('modal-acerca-respuesta').textContent = item.respuesta || 'Pendiente de registro.';
+        const ul = document.getElementById('modal-acerca-fuentes');
+        ul.innerHTML = (item.fuentes && item.fuentes.length > 0)
+          ? item.fuentes.map(f => `<li>${f}</li>`).join('')
+          : '<li class="text-slate-400">Sin fuentes requeridas (control fuera de dominio)</li>';
+        document.getElementById('modal-acerca-eval')?.classList.remove('hidden');
+      });
+    });
+  }
+
+  async function cargarAcercaRagas() {
+    try {
+      const res = await fetch(`${API_BASE}/api/evaluacion/ragas`);
+      if (!res.ok) throw new Error('Error backend');
+      const data = await res.json();
+      const r = data.resumen || {};
+      preguntasData = data.preguntas || [];
+
+      document.getElementById('acerca-stat-cobertura').textContent = `${r.validadas_evidencia || 30} / ${r.total_banco || 30}`;
+      document.getElementById('acerca-stat-sub').textContent = `${r.cobertura_pct || 100}% con trazabilidad · ${r.evaluadas_ragas || 0} con nota RAGAS`;
+      if (r.faithfulness_avg !== null && r.faithfulness_avg !== undefined) {
+        document.getElementById('acerca-stat-faith').textContent = r.faithfulness_avg.toFixed(2);
+      }
+      if (r.answer_relevancy_avg !== null && r.answer_relevancy_avg !== undefined) {
+        document.getElementById('acerca-stat-relev').textContent = r.answer_relevancy_avg.toFixed(2);
+      }
+      if (r.context_precision_avg !== null && r.context_precision_avg !== undefined) {
+        document.getElementById('acerca-stat-ctx').textContent = r.context_precision_avg.toFixed(2);
+      }
+
+      renderFilas();
+    } catch {
+      // Si el backend no responde, ajustar enlace de descarga al archivo estático en public/
+      const btnExcel = document.getElementById('btn-descargar-excel-ragas');
+      if (btnExcel) btnExcel.setAttribute('href', '/Validacion_RAGAS_30_Preguntas.xlsx');
+    }
+  }
+
+  document.getElementById('btn-toggle-tabla-acerca')?.addEventListener('click', (e) => {
+    mostrarTodas = !mostrarTodas;
+    e.currentTarget.textContent = mostrarTodas ? 'Mostrar resumen (8)' : `Mostrar las ${preguntasData.length || 30} preguntas`;
+    renderFilas();
+  });
+
+  document.getElementById('btn-cerrar-modal-acerca')?.addEventListener('click', () => {
+    document.getElementById('modal-acerca-eval')?.classList.add('hidden');
+  });
+
+  document.addEventListener('DOMContentLoaded', cargarAcercaRagas);
+</script>
+

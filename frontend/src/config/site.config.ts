@@ -23,7 +23,6 @@ export const SITE_CONFIG = {
     { label: "Buscar", href: "/buscar" },
     { label: "Comparar", href: "/#comparar" },
     { label: "Panorama", href: "/#panorama" },
-    { label: "Informes", href: "/#informes" },
     { label: "Acerca de", href: "/#acerca" }
   ],
 
