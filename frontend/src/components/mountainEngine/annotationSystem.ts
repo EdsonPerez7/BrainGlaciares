@@ -70,18 +70,18 @@ export class AnnotationSystem {
       peakEl.style.zIndex = '15';
       peakEl.innerHTML = `
         <div class="flex flex-col items-center">
-          <div class="group relative flex items-center gap-2 bg-slate-950/90 hover:bg-slate-900 border border-sky-400/40 hover:border-sky-300/90 px-3 py-1.5 rounded-xl shadow-2xl backdrop-blur-md transition-all scale-95 hover:scale-105 ring-1 ring-white/10">
-            <div class="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-400/40 flex items-center justify-center shrink-0">
-              <svg class="w-3.5 h-3.5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="group relative flex items-center gap-1.5 sm:gap-2 bg-slate-950/90 hover:bg-slate-900 border border-sky-400/40 hover:border-sky-300/90 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl shadow-2xl backdrop-blur-md transition-all scale-95 hover:scale-105 ring-1 ring-white/10">
+            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-sky-500/20 border border-sky-400/40 flex items-center justify-center shrink-0">
+              <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 22h20L12 2zm0 6l4 8H8l4-8z" />
               </svg>
             </div>
             <div class="flex flex-col text-left whitespace-nowrap">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-white tracking-tight">${basin.peakName || 'Nevado'}</span>
-                <span class="text-[10px] font-mono font-bold bg-sky-500/25 text-sky-300 border border-sky-400/30 px-1.5 py-0.2 rounded">${basin.peakRealAltitude?.toLocaleString() || '6,000'} m</span>
+                <span class="text-[11px] sm:text-xs font-bold text-white tracking-tight">${basin.peakName || 'Nevado'}</span>
+                <span class="text-[9px] sm:text-[10px] font-mono font-bold bg-sky-500/25 text-sky-300 border border-sky-400/30 px-1 sm:px-1.5 py-0.2 rounded">${basin.peakRealAltitude?.toLocaleString() || '6,000'} m</span>
               </div>
-              <div class="flex items-center gap-1.5 text-[9px] text-slate-400">
+              <div class="hidden sm:flex items-center gap-1.5 text-[9px] text-slate-400">
                 <span class="text-amber-300 font-semibold">${basin.colosoRank || basin.cordillera}</span>
                 <span>·</span>
                 <span class="text-slate-300">${basin.departamento || 'Andes'}</span>
@@ -123,21 +123,21 @@ export class AnnotationSystem {
 
       lagoonEl.innerHTML = `
         <div class="flex flex-col items-center">
-          <div class="group relative flex items-center gap-2 bg-slate-950/90 hover:bg-slate-900 border border-cyan-400/40 hover:border-cyan-300/90 px-3 py-1.5 rounded-xl shadow-2xl backdrop-blur-md transition-all scale-95 hover:scale-105 ring-1 ring-white/10">
-            <div class="w-6 h-6 rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0">
-              <svg class="w-3.5 h-3.5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="group relative flex items-center gap-1.5 sm:gap-2 bg-slate-950/90 hover:bg-slate-900 border border-cyan-400/40 hover:border-cyan-300/90 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl shadow-2xl backdrop-blur-md transition-all scale-95 hover:scale-105 ring-1 ring-white/10">
+            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0">
+              <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
               </svg>
             </div>
             <div class="flex flex-col text-left whitespace-nowrap">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-white tracking-tight">${basin.name}</span>
-                <span class="text-[10px] font-mono font-bold bg-cyan-500/25 text-cyan-300 border border-cyan-400/30 px-1.5 py-0.2 rounded">${basin.lagoonRealAltitude?.toLocaleString() || '4,500'} m</span>
-                <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${riskClass}">
+                <span class="text-[11px] sm:text-xs font-bold text-white tracking-tight">${basin.name}</span>
+                <span class="text-[9px] sm:text-[10px] font-mono font-bold bg-cyan-500/25 text-cyan-300 border border-cyan-400/30 px-1 sm:px-1.5 py-0.2 rounded">${basin.lagoonRealAltitude?.toLocaleString() || '4,500'} m</span>
+                <span class="text-[8px] sm:text-[9px] font-mono font-bold px-1 sm:px-1.5 py-0.2 rounded border ${riskClass}">
                   ${basin.lagoonRisk || 'Alerta'}
                 </span>
               </div>
-              <div class="text-[9px] text-slate-400 flex items-center gap-1">
+              <div class="hidden sm:flex text-[9px] text-slate-400 items-center gap-1">
                 <span class="text-sky-300 font-medium">Alimentada por ${basin.peakName}</span>
                 ${basin.lagoonVolumeTexto ? `<span class="text-slate-400">· ${basin.lagoonVolumeTexto.split('(')[0]}</span>` : ''}
               </div>

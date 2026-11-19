@@ -3,7 +3,7 @@ import SearchBox from './SearchBox.astro';
 import { SITE_CONFIG } from '../config/site.config';
 ---
 
-<section id="inicio" class="relative isolate overflow-hidden bg-noche-950 text-white min-h-[640px] lg:min-h-[740px] xl:min-h-[820px] flex flex-col justify-between" data-contexto="portada">
+<section id="inicio" class="relative isolate overflow-hidden bg-noche-950 text-white min-h-[640px] sm:min-h-[660px] lg:min-h-[740px] xl:min-h-[820px] flex flex-col justify-between" data-contexto="portada">
   <!-- Capa 1: póster ilustrado andino (aparece al instante, 0ms de retardo visual) -->
   <img src="/marca/cordillera-noche.svg" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover select-none pointer-events-none" fetchpriority="high" />
 
@@ -18,11 +18,11 @@ import { SITE_CONFIG } from '../config/site.config';
   <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-noche-950/90 via-noche-950/45 to-transparent" aria-hidden="true"></div>
   <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-noche-950/85 to-transparent" aria-hidden="true"></div>
 
-  <div class="relative z-20 mx-auto flex w-full flex-1 flex-col justify-between px-4 pb-10 pt-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-    <!-- Barra superior: Telemetría de vuelo Three.js, Botón 3D Activo y Hora local -->
-    <div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="relative z-20 mx-auto flex w-full flex-1 flex-col justify-start sm:justify-between px-3.5 pb-4 pt-2.5 sm:px-8 sm:pb-10 sm:pt-6 lg:px-12 xl:px-16 2xl:px-20">
+    <!-- Barra superior: visible en tablets y computadoras, oculta en móvil para dar protagonismo al 3D -->
+    <div class="hidden sm:flex flex-wrap items-center justify-between gap-3">
       <!-- HUD de telemetría de vuelo Three.js -->
-      <div id="hud-vuelo-container" class="cristal !rounded-2xl hidden sm:flex items-center gap-3 px-3.5 py-2 text-xs">
+      <div id="hud-vuelo-container" class="cristal !rounded-2xl flex items-center gap-3 px-3.5 py-2 text-xs">
         <span class="flex items-center gap-1.5 font-mono text-[11px] text-emerald-400 font-semibold tracking-wider">
           <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
           SOBREVUELO 3D
@@ -57,24 +57,24 @@ import { SITE_CONFIG } from '../config/site.config';
       </div>
     </div>
 
-    <!-- Contenido principal: Consola Cockpit a la izquierda, paisaje 3D despejado al centro y derecha -->
-    <div class="my-auto grid items-center gap-8 py-8 lg:grid-cols-[minmax(0,620px)_1fr]">
-      <!-- Tarjeta principal de cristal (Cockpit interactivo) -->
-      <div class="cristal p-6 sm:p-9 max-w-2xl">
-        <span class="etiqueta border border-white/20 bg-white/10 text-slate-100">
-          <span class="h-2 w-2 rounded-full bg-hielo-300"></span>
-          {SITE_CONFIG.corpus.documentos_totales} informes oficiales · cada dato con su fuente
+    <!-- Contenido principal: en móvil se ancla arriba (mt-1 mb-auto) para despejar el 3D inferior; en escritorio se centra -->
+    <div class="mt-1 mb-auto sm:my-auto grid items-center gap-6 py-1 sm:py-8 lg:grid-cols-[minmax(0,620px)_1fr]">
+      <!-- Tarjeta principal de cristal (Cockpit interactivo optimizado para móvil) -->
+      <div class="cristal p-3.5 sm:p-9 max-w-2xl">
+        <span class="etiqueta text-[10px] sm:text-xs py-0.5 px-2.5 sm:py-1 sm:px-3 border border-white/20 bg-white/10 text-slate-100">
+          <span class="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-hielo-300"></span>
+          {SITE_CONFIG.corpus.documentos_totales} informes oficiales
         </span>
-        <h1 class="mt-5 text-4xl font-bold leading-[1.02] sm:text-5xl xl:text-6xl">
-          ¿Hay riesgo<br />donde vives?
+        <h1 class="mt-2 sm:mt-5 text-2xl sm:text-5xl xl:text-6xl font-bold leading-tight sm:leading-[1.02]">
+          ¿Hay riesgo<br class="hidden sm:inline" /> donde vives?
         </h1>
-        <p class="mt-4 max-w-lg text-base leading-relaxed text-slate-200 sm:text-lg">
-          Escribe tu pueblo o una laguna. Te mostramos qué hay aguas arriba y qué dicen los informes científicos oficiales.
+        <p class="hidden sm:block mt-4 max-w-lg text-sm sm:text-lg leading-relaxed text-slate-200">
+          Escribe tu pueblo o una laguna. Te mostramos qué hay aguas arriba y qué dicen los informes oficiales.
         </p>
-        <div class="mt-6">
-          <SearchBox inputId="hero-search-input" theme="dark" mode="navigate" maxWidthClass="max-w-full" placeholder="Tu pueblo o una laguna…" />
+        <div class="mt-2.5 sm:mt-6">
+          <SearchBox inputId="hero-search-input" theme="dark" mode="navigate" maxWidthClass="max-w-full" placeholder="Buscar pueblo o laguna…" />
         </div>
-        <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+        <div class="hidden sm:flex mt-4 flex-wrap items-center gap-2 text-sm">
           <span class="text-slate-400">Prueba:</span>
           {[['Huaraz', '/buscar?q=Huaraz'], ['Laguna 513', '/buscar?id=513'], ['Parón', '/buscar?id=paron'], ['Cusco', '/buscar?dept=cusco']].map(([t, h]) => (
             <a href={h} class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-slate-100 transition hover:bg-white/20">{t}</a>
@@ -86,8 +86,8 @@ import { SITE_CONFIG } from '../config/site.config';
       <div class="hidden lg:block pointer-events-none"></div>
     </div>
 
-    <!-- Espacio inferior limpio para permitir ver el relieve completo -->
-    <div class="h-4"></div>
+    <!-- Espacio inferior amplio en móvil para que las cumbres nevadas y lagunas se vean centradas -->
+    <div class="h-28 sm:h-4"></div>
   </div>
 
   <div class="franja-tejida relative z-20" aria-hidden="true"></div>
@@ -144,15 +144,15 @@ import { SITE_CONFIG } from '../config/site.config';
     }
   }
 
-  // En computadoras de escritorio, se inicializa automáticamente cuando el hilo principal está libre
-  const esEscritorio = window.matchMedia('(min-width: 1024px)').matches;
+  // Inicialización automática diferida (tanto en móvil como en escritorio)
+  // Permite que la tarjeta y el campo de búsqueda se pinten de inmediato sin congelar la UI
   const conexion = (navigator as any).connection;
-  if (!reducido && esEscritorio && !conexion?.saveData) {
-    const cuandoLibre = (window as any).requestIdleCallback || ((f: () => void) => setTimeout(f, 300));
+  if (!reducido && !conexion?.saveData) {
+    const cuandoLibre = (window as any).requestIdleCallback || ((f: () => void) => setTimeout(f, 250));
     cuandoLibre(() => iniciarThree3D());
   }
 
-  // En móvil o interacción explícita, se puede iniciar al pulsar el botón
+  // Interacción explícita por si el usuario pulsa el botón antes de la carga diferida
   btn3d?.addEventListener('click', () => {
     if (!engineInstance) {
       iniciarThree3D();
