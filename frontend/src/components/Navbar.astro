@@ -1,93 +1,114 @@
 ---
 import { SITE_CONFIG } from '../config/site.config';
+import Logo from './Logo.astro';
+
+const rutaActual = Astro.url.pathname;
+const ruta = rutaActual.replace(/\/$/, '') || '/';
+const esActivo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(href));
 ---
 
 <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-  <div class="w-full flex h-16 items-center justify-between px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-    <div class="flex items-center gap-6">
-      <a href="/" class="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white font-semibold text-sm tracking-wider shadow-sm">
-          BG
-        </div>
-        <div class="flex flex-col">
-          <span class="text-sm font-bold tracking-tight text-slate-900">{SITE_CONFIG.name}</span>
-          <span class="text-[10px] text-slate-500 font-medium tracking-wide">UNMSM · FISI · G8</span>
-        </div>
-      </a>
+  <div class="w-full flex h-16 items-center justify-between gap-4 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+    <!-- Marca -->
+    <a href="/" class="flex items-center gap-2.5 rounded-lg" aria-label={`${SITE_CONFIG.name}, ir al inicio`}>
+      <Logo />
+      <span class="flex flex-col leading-tight">
+        <span class="font-marca text-xl tracking-[0.2em] text-noche-900">{SITE_CONFIG.name}</span>
+        <span class="text-[11px] text-slate-500 font-medium">{SITE_CONFIG.tagline}</span>
+      </span>
+    </a>
 
-      <div 
-        id="backend-status-pill"
-        title="Verificando estado del backend..."
-        class="hidden lg:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/80 px-3 py-1 text-xs text-slate-600 transition-colors"
-      >
-        <span id="backend-status-dot" class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-        <span id="backend-status-text" class="font-medium text-slate-700">398 informes oficiales</span>
-        <span class="text-slate-300">|</span>
-        <span id="backend-status-subtext">Citas con evidencia</span>
-      </div>
-    </div>
-
-    <!-- Navegación sobria -->
-    <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+    <!-- Navegación de escritorio -->
+    <nav aria-label="Principal" class="hidden lg:flex items-center gap-1 text-sm font-medium text-slate-600">
       {SITE_CONFIG.navigation.map(item => (
-        <a 
-          href={item.href} 
-          class="transition-colors hover:text-slate-900 hover:border-b-2 hover:border-slate-900 py-1"
+        <a
+          href={item.href}
+          aria-current={esActivo(item.href) ? 'page' : undefined}
+          class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:text-laguna-700 aria-[current=page]:bg-laguna-50"
         >
           {item.label}
         </a>
       ))}
     </nav>
 
-    <!-- Acceso rápido al Asistente -->
-    <div class="flex items-center gap-3">
-      <button 
-        id="btn-abrir-asistente"
-        type="button"
-        class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+    <div class="flex items-center gap-2">
+      <!-- Estado del servidor: discreto, solo informa -->
+      <span
+        id="backend-status-pill"
+        role="status"
+        class="hidden md:inline-flex items-center gap-2 rounded-full border border-laguna-200 bg-laguna-50 px-3 py-1.5 text-xs font-medium text-laguna-900"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 8V4H8" />
-          <rect width="16" height="12" x="4" y="8" rx="2" />
-          <path d="M2 14h2" />
-          <path d="M20 14h2" />
-          <path d="M15 13v2" />
-          <path d="M9 13v2" />
+        <span id="backend-status-dot" class="inline-block h-2 w-2 rounded-full bg-slate-300" aria-hidden="true"></span>
+        <span id="backend-status-subtext">Comprobando…</span>
+      </span>
+
+      <!-- Menú móvil -->
+      <button
+        id="btn-menu-movil"
+        type="button"
+        class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+        aria-controls="menu-movil"
+        aria-expanded="false"
+        aria-label="Abrir menú"
+      >
+        <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
-        <span>Consultar</span>
       </button>
     </div>
   </div>
+
+  <nav id="menu-movil" aria-label="Principal (móvil)" class="lg:hidden hidden border-t border-slate-200 bg-white px-4 py-3">
+    <ul class="grid gap-1 text-sm font-medium text-slate-700">
+      {SITE_CONFIG.navigation.map(item => (
+        <li>
+          <a href={item.href} aria-current={esActivo(item.href) ? 'page' : undefined} class="block rounded-lg px-3 py-2.5 hover:bg-slate-100 aria-[current=page]:bg-laguna-50 aria-[current=page]:font-semibold aria-[current=page]:text-laguna-700">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
 </header>
 
 <script>
   import { ApiService } from '../services/api';
 
+  // Menú móvil
+  const btnMenu = document.getElementById('btn-menu-movil');
+  const menu = document.getElementById('menu-movil');
+  btnMenu?.addEventListener('click', () => {
+    const abierto = btnMenu.getAttribute('aria-expanded') === 'true';
+    btnMenu.setAttribute('aria-expanded', String(!abierto));
+    btnMenu.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+    menu?.classList.toggle('hidden', abierto);
+  });
+  menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menu.classList.add('hidden');
+    btnMenu?.setAttribute('aria-expanded', 'false');
+  }));
+
+  // Estado del backend
   async function verificarSaludBackend() {
     const pill = document.getElementById('backend-status-pill');
     const dot = document.getElementById('backend-status-dot');
-    const text = document.getElementById('backend-status-text');
     const subtext = document.getElementById('backend-status-subtext');
+    if (!pill || !dot || !subtext) return;
 
-    if (!pill || !dot || !text) return;
+    const marcar = (enLinea: boolean, texto: string, detalle: string) => {
+      dot.className = `inline-block h-2 w-2 rounded-full ${enLinea ? 'bg-laguna-500' : 'bg-ocre-400'}`;
+      window.dispatchEvent(new CustomEvent('arqen:estado', { detail: { enLinea } }));
+      subtext.textContent = texto;
+      pill.title = detalle;
+    };
 
     try {
       const salud = await ApiService.getSalud();
       if (salud && salud.estado === 'vivo') {
-        dot.className = 'inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse';
-        if (subtext) subtext.textContent = salud.grafo_listo ? 'Grafo conectado' : (salud.agente === 'listo' ? 'Servidor activo' : 'Citas RAG');
-        pill.title = 'Backend en línea · GraphRAG e índice semántico activos';
-        pill.classList.remove('bg-slate-50/80');
-        pill.classList.add('bg-emerald-50/60', 'border-emerald-200');
+        marcar(true, 'Asistente con IA', 'Servidor en línea: respuestas con IA y citas');
       } else {
-        dot.className = 'inline-block h-2 w-2 rounded-full bg-slate-400';
-        if (subtext) subtext.textContent = 'Catálogo local';
-        pill.title = 'Modo contingencia · Visualización local activa';
+        marcar(false, 'Asistente por reglas', 'Sin conexión al servidor: el asistente responde con reglas y datos oficiales locales');
       }
     } catch {
-      dot.className = 'inline-block h-2 w-2 rounded-full bg-slate-400';
-      if (subtext) subtext.textContent = 'Catálogo local';
-      pill.title = 'Modo contingencia · Visualización local activa';
+      marcar(false, 'Asistente por reglas', 'Sin conexión al servidor: el asistente responde con reglas y datos oficiales locales');
     }
   }
 
@@ -96,5 +117,4 @@ import { SITE_CONFIG } from '../config/site.config';
   } else {
     verificarSaludBackend();
   }
-  document.addEventListener('astro:page-load', verificarSaludBackend);
 </script>

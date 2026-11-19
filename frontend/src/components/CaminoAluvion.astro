@@ -1,0 +1,313 @@
+---
+import { LAGUNAS_ESCENAS } from '../config/scenes.data';
+import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+
+const lagunas = Object.values(LAGUNAS_ESCENAS);
+const inicial = lagunas[0];
+
+// Línea de tiempo de eventos históricos (catálogo + escenas, sin duplicados)
+const eventos = new Map<string, { ano: number; nombre: string; id: string; riesgo: string }>();
+for (const l of LAGUNAS_DESTACADAS) if (l.ano_evento_critico) eventos.set(l.id, { ano: l.ano_evento_critico, nombre: l.nombre, id: l.id, riesgo: l.riesgo });
+for (const l of lagunas) if (l.anoEvento && !eventos.has(l.id)) eventos.set(l.id, { ano: l.anoEvento, nombre: l.nombre, id: l.id, riesgo: l.riesgo });
+const lineaEventos = [...eventos.values()].sort((a, b) => a.ano - b.ano);
+const anoMin = 1930, anoMax = 2030;
+const pos = (a: number) => ((a - anoMin) / (anoMax - anoMin)) * 100;
+const colorRiesgo = (r: string) => (r === 'Muy alto' ? '#e11d48' : r === 'Alto' ? '#f97316' : r === 'Medio' ? '#eab308' : '#16a34a');
+---
+
+<section id="camino" data-contexto="El camino de un aluvión" class="fondo-tejido w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <!-- Encabezado -->
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div class="max-w-2xl">
+        <span class="sobretitulo">Aluvión</span>
+        <h1 class="seccion-titulo mt-2">El camino de un aluvión</h1>
+        <p class="seccion-sub">Del glaciar al pueblo, sobre el relieve real. Elige una laguna y avanza paso a paso.</p>
+      </div>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Elige una laguna">
+        {lagunas.map((l, i) => (
+          <button type="button" class="btn-camino-laguna btn btn-sm" data-id={l.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <span class="h-2 w-2 rounded-full" style={`background:${colorRiesgo(l.riesgo)}`}></span>
+            {l.nombre.startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`}{l.anoEvento ? ` · ${l.anoEvento}` : ''}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- 3D + relato -->
+    <div class="mt-7 grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div class="tarjeta tarjeta-noche relative h-[460px] overflow-hidden p-0 sm:h-[540px]">
+        <img src="/marca/cordillera-noche.svg" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" />
+        <div id="camino-3d" class="absolute inset-0 opacity-0 transition-opacity duration-1000"></div>
+        <div id="camino-marcas" class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700"></div>
+        <div class="trama-andina pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+        <div class="cristal !rounded-2xl absolute left-4 top-4 px-4 py-2.5">
+          <p id="camino-paso-num" class="text-xs font-semibold uppercase tracking-wider text-hielo-300">Paso 1 de 5</p>
+          <p id="camino-paso-titulo" class="font-display text-lg font-bold">El hielo</p>
+        </div>
+        <button id="camino-cargar-3d" type="button" class="btn btn-sm btn-cristal absolute right-4 top-4">Ver relieve 3D</button>
+
+        <!-- Pasos -->
+        <div class="cristal !rounded-2xl absolute inset-x-4 bottom-4 flex items-center gap-3 px-3 py-2.5">
+          <button id="camino-ant" type="button" class="btn btn-sm btn-cristal !px-3" aria-label="Paso anterior">←</button>
+          <ol class="grid flex-1 grid-cols-5 gap-2">
+            {['El hielo', 'La laguna', 'El día que pasó', 'Aguas abajo', 'Hoy'].map((t, i) => (
+              <li><button type="button" class="btn-camino-paso group flex w-full flex-col gap-1.5" data-paso={i} aria-current={i === 0 ? 'step' : undefined}>
+                <span class="h-1 w-full rounded-full bg-white/25 group-aria-[current=step]:bg-hielo-300"></span>
+                <span class="hidden truncate text-left text-xs text-slate-300 group-aria-[current=step]:font-semibold group-aria-[current=step]:text-white md:block">{i + 1}. {t}</span>
+              </button></li>
+            ))}
+          </ol>
+          <button id="camino-sig" type="button" class="btn btn-sm btn-pri !px-3" aria-label="Paso siguiente">→</button>
+        </div>
+      </div>
+
+      <article class="tarjeta tejida flex flex-col p-6">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="camino-laguna-nombre" class="font-display text-2xl font-bold text-noche-900">Laguna</h2>
+          <span id="camino-riesgo" class="etiqueta riesgo-sin">–</span>
+        </div>
+        <p id="camino-laguna-lugar" class="text-sm text-slate-500">–</p>
+        <p id="camino-texto" class="mt-5 text-base leading-relaxed text-slate-800" aria-live="polite">–</p>
+        <div id="camino-alerta" class="mt-4 hidden rounded-xl bg-ocre-50 p-3 text-sm text-ocre-700 ring-1 ring-amber-100"></div>
+        <p id="camino-fuente" class="fuente mt-5">–</p>
+        <div class="mt-auto pt-5">
+        <p class="mb-3 rounded-xl bg-hielo-50 px-3 py-2 text-sm text-hielo-700 ring-1 ring-sky-100">💧 Equivale a <b id="camino-piscinas">–</b> piscinas olímpicas · <span id="camino-docs">–</span></p>
+        <dl class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl bg-hielo-50 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Volumen</dt><dd id="camino-vol" class="font-mono text-sm font-medium text-noche-900">–</dd></div>
+          <div class="rounded-xl bg-ocre-50 p-2.5 ring-1 ring-amber-100"><dt class="text-[11px] text-slate-500">Aguas abajo</dt><dd id="camino-pob" class="truncate text-sm font-semibold text-noche-900">–</dd></div>
+          <div class="rounded-xl bg-laguna-50 p-2.5 ring-1 ring-laguna-100"><dt class="text-[11px] text-slate-500">Obras</dt><dd id="camino-obras" class="text-sm font-semibold text-noche-900">–</dd></div>
+        </dl>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button id="camino-preguntar" type="button" class="btn btn-sec">Preguntar</button>
+          <a id="camino-ficha" href="/buscar" class="btn btn-hielo">Ver ficha</a>
+        </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Perfil de caída + línea de tiempo -->
+    <div class="mt-5 grid gap-5 lg:grid-cols-2">
+      <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5" data-arqen-grafico="perfil" id="camino-perfil-tarjeta">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="font-display text-lg font-bold text-noche-900">Perfil de caída</h3>
+          <span id="camino-perfil-tipo" class="etiqueta bg-white text-hielo-700 ring-1 ring-sky-100">Puntos clave</span>
+        </div>
+        <p class="mt-1 text-sm text-slate-600">Cuánto baja el terreno desde el glaciar hasta el pueblo.</p>
+        <svg id="camino-perfil" class="mt-3 h-72 w-full" viewBox="0 0 600 220" preserveAspectRatio="none" role="img" aria-label="Perfil de altura del recorrido"></svg>
+        <dl class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Desnivel</dt><dd id="perfil-desnivel" class="font-display text-xl font-bold text-noche-900 tabular">–</dd></div>
+          <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Distancia</dt><dd id="perfil-distancia" class="font-display text-xl font-bold text-noche-900 tabular">–</dd></div>
+          <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Pendiente media</dt><dd id="perfil-pendiente" class="font-display text-xl font-bold text-noche-900 tabular">–</dd></div>
+        </dl>
+        <p class="fuente mt-3">Lagunas: catálogo oficial · cumbres y pueblos: ubicación aproximada · terreno: Cesium World Terrain</p>
+      </article>
+
+      <article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+        <h3 class="font-display text-lg font-bold text-noche-900">Aluviones y desbordes registrados</h3>
+        <p class="mt-1 text-sm text-slate-600">Lagunas del catálogo con un evento crítico en su historia.</p>
+        <div class="relative mt-6 h-10">
+          <div class="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-ocre-100 via-ocre-400 to-cochinilla-500"></div>
+          {lineaEventos.map((e) => (
+            <span class="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ring-white" style={`left:${pos(e.ano)}%;background:${colorRiesgo(e.riesgo)}`} title={`${e.ano} · ${e.nombre}`}></span>
+          ))}
+        </div>
+        <div class="flex justify-between font-mono text-[11px] text-slate-400"><span>{anoMin}</span><span>1980</span><span>{anoMax}</span></div>
+        <ol class="mt-4 flex-1 divide-y divide-amber-100">
+          {lineaEventos.map((e) => {
+            const cat = LAGUNAS_DESTACADAS.find((x) => x.id === e.id);
+            return (
+              <li>
+                <button type="button" data-arqen-grafico="aluviones" data-arqen-valor={String(e.ano)} data-arqen-laguna={e.nombre} data-arqen-laguna-id={e.id} class="grid w-full grid-cols-[52px_1fr_auto] items-center gap-3 py-2.5 text-left">
+                  <span class="font-mono text-sm font-medium text-ocre-700">{e.ano}</span>
+                  <span class="min-w-0">
+                    <span class="block truncate font-semibold text-noche-900">{e.nombre.startsWith('Laguna') ? e.nombre : `Laguna ${e.nombre}`}</span>
+                    <span class="block truncate text-xs text-slate-500">{cat ? `${cat.departamento} · aguas abajo: ${cat.poblado_amenazado}` : ''}</span>
+                  </span>
+                  <span class="etiqueta" style={`background:${colorRiesgo(e.riesgo)}22;color:${colorRiesgo(e.riesgo)}`}>{e.riesgo}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        <p class="fuente mt-3">Catálogo de lagunas INAIGEM / ANA</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { LAGUNAS_ESCENAS } from '../config/scenes.data';
+  import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { CAMINOS, distanciaKm, rumbo } from '../config/camino.data';
+  import { formatoMiles } from '../config/recorrido.data';
+  import { fijarContexto, abrirAsistente } from '../scripts/contexto';
+  import type { Escena3D } from '../scripts/hero3d';
+
+  const $ = (id: string) => document.getElementById(id);
+  const TITULOS = ['El hielo', 'La laguna', 'El día que pasó', 'Aguas abajo', 'Hoy'];
+  let lagunaId = Object.keys(LAGUNAS_ESCENAS)[0];
+  let paso = 0;
+  let escena: Escena3D | null = null;
+  const claseRiesgo = (r: string) => r === 'Muy alto' ? 'riesgo-muy-alto' : r === 'Alto' ? 'riesgo-alto' : r === 'Medio' ? 'riesgo-medio' : 'riesgo-bajo';
+
+  const datos = () => {
+    const esc = LAGUNAS_ESCENAS[lagunaId];
+    const cat = LAGUNAS_DESTACADAS.find((x) => x.id === lagunaId)!;
+    const camino = CAMINOS[lagunaId] || { lagunaId };
+    const laguna = { nombre: cat.nombre, lat: cat.lat, lng: cat.lng, alt: cat.altitud_msnm };
+    return { esc, cat, camino, laguna };
+  };
+
+  // Cámara para cada paso, calculada a partir de cumbre, laguna y pueblo
+  function camara(i: number) {
+    const { camino, laguna } = datos();
+    const haciaCumbre = camino.cumbre ? rumbo(laguna, camino.cumbre) : 60;
+    const haciaPueblo = camino.pueblo ? rumbo(laguna, camino.pueblo) : (haciaCumbre + 180) % 360;
+    const base = { id: '', titulo: '', mensaje: '' };
+    switch (i) {
+      case 0: { const c = camino.cumbre || laguna; return { ...base, lat: c.lat, lng: c.lng, alt: c.alt, rumbo: haciaCumbre, inclinacion: -14, distancia: 7500 }; }
+      case 1: return { ...base, ...laguna, rumbo: haciaCumbre, inclinacion: -24, distancia: 4800 };
+      case 2: return { ...base, ...laguna, rumbo: (haciaCumbre + 25) % 360, inclinacion: -38, distancia: 3200 };
+      case 3: {
+        const p = camino.pueblo;
+        const m = p ? { lat: (laguna.lat + p.lat) / 2, lng: (laguna.lng + p.lng) / 2, alt: (laguna.alt + p.alt) / 2 } : laguna;
+        return { ...base, ...m, rumbo: haciaPueblo, inclinacion: -22, distancia: p ? 9000 : 12000 };
+      }
+      default: { const p = camino.pueblo || laguna; return { ...base, lat: p.lat, lng: p.lng, alt: p.alt, rumbo: (haciaPueblo + 180) % 360, inclinacion: -16, distancia: camino.pueblo ? 11000 : 15000 }; }
+    }
+  }
+
+  function pintarPaso() {
+    const { esc, cat } = datos();
+    const e = esc.escenas[paso];
+    const set = (id: string, t: string) => { const x = $(id); if (x) x.textContent = t; };
+    set('camino-paso-num', `Paso ${paso + 1} de 5`);
+    set('camino-paso-titulo', TITULOS[paso]);
+    set('camino-texto', e?.texto || '');
+    set('camino-fuente', e?.fuente || '');
+    const alerta = $('camino-alerta');
+    if (alerta) { alerta.textContent = e?.alertaFalta || ''; alerta.classList.toggle('hidden', !e?.alertaFalta); }
+    document.querySelectorAll<HTMLButtonElement>('.btn-camino-paso').forEach((b, i) => i === paso ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
+    escena?.volarA(camara(paso), 3.5);
+    fijarContexto({ seccion: 'El camino de un aluvión', laguna: cat.nombre, lagunaId: cat.id }, true);
+  }
+
+  function pintarLaguna() {
+    const { esc, cat } = datos();
+    const set = (id: string, t: string) => { const x = $(id); if (x) x.textContent = t; };
+    set('camino-laguna-nombre', cat.nombre.startsWith('Laguna') ? cat.nombre : `Laguna ${cat.nombre}`);
+    set('camino-laguna-lugar', `${cat.departamento} · glaciar ${esc.glaciarCabecera} · ${formatoMiles(cat.altitud_msnm)} m`);
+    const r = $('camino-riesgo'); if (r) { r.textContent = `Riesgo ${cat.riesgo.toLowerCase()}`; r.className = `etiqueta ${claseRiesgo(cat.riesgo)}`; }
+    set('camino-vol', `${cat.volumen_hm3} hm³`);
+    set('camino-pob', cat.poblado_amenazado);
+    set('camino-obras', cat.tiene_obras ? 'Sí' : 'No');
+    set('camino-piscinas', formatoMiles(Math.round(cat.volumen_hm3 * 400)));
+    set('camino-docs', `${cat.total_documentos} informes la estudian`);
+    $('camino-ficha')?.setAttribute('href', `/buscar?id=${encodeURIComponent(cat.id)}`);
+    const t = $('camino-perfil-tarjeta'); if (t) { t.dataset.arqenLaguna = cat.nombre; t.dataset.arqenLagunaId = cat.id; }
+    document.querySelectorAll<HTMLButtonElement>('.btn-camino-laguna').forEach((b) => {
+      const activo = b.dataset.id === lagunaId;
+      b.setAttribute('aria-pressed', String(activo));
+      b.className = `btn-camino-laguna btn btn-sm ${activo ? 'bg-noche-900 text-white' : 'bg-white text-noche-900 ring-1 ring-slate-200 hover:bg-slate-50'}`;
+    });
+    pintarPerfil();
+    pintarPaso();
+  }
+
+  // ---------- Perfil de caída ----------
+  async function pintarPerfil() {
+    const svg = $('camino-perfil') as unknown as SVGSVGElement | null;
+    if (!svg) return;
+    const { camino, laguna } = datos();
+    const ruta = [camino.cumbre, { ...laguna, nombre: laguna.nombre }, camino.pueblo].filter(Boolean) as { nombre: string; lat: number; lng: number; alt: number }[];
+    const set = (id: string, t: string) => { const x = $(id); if (x) x.textContent = t; };
+    if (ruta.length < 2) {
+      svg.innerHTML = '<text x="300" y="110" text-anchor="middle" fill="#64748b" font-size="14">Aún no hay datos de cumbre y poblado para esta laguna.</text>';
+      ['perfil-desnivel', 'perfil-distancia', 'perfil-pendiente'].forEach((id) => set(id, '–'));
+      return;
+    }
+    const tramos = ruta.slice(1).map((p, i) => distanciaKm(ruta[i], p));
+    const total = tramos.reduce((a, b) => a + b, 0);
+    const acumulado = [0, ...tramos.map((_, i) => tramos.slice(0, i + 1).reduce((a, b) => a + b, 0))];
+    let puntos = ruta.map((p, i) => ({ d: acumulado[i], h: p.alt }));
+    let real = false;
+    if (escena) {
+      const alturas = await escena.perfilTerreno(ruta, 80);
+      if (alturas && alturas.some((h) => h > 100)) { puntos = alturas.map((h, i) => ({ d: (i / 79) * total, h })); real = true; }
+    }
+    const hMax = Math.max(...puntos.map((p) => p.h), ...ruta.map((r) => r.alt)) + 200;
+    const hMin = Math.min(...puntos.map((p) => p.h), ...ruta.map((r) => r.alt)) - 300;
+    const X = (d: number) => 40 + (d / total) * 540;
+    const Y = (h: number) => 200 - ((h - hMin) / (hMax - hMin)) * 180;
+    const linea = puntos.map((p, i) => `${i ? 'L' : 'M'}${X(p.d).toFixed(1)},${Y(p.h).toFixed(1)}`).join(' ');
+    const marcas = ruta.map((p, i) => {
+      const x = X(acumulado[i]), y = Y(p.alt) ;
+      const ancla = i === 0 ? 'start' : i === ruta.length - 1 ? 'end' : 'start';
+      const dx = i === 0 ? 8 : i === ruta.length - 1 ? -8 : 10;
+      return `<circle cx="${x}" cy="${y}" r="5" fill="#fff" stroke="#0369a1" stroke-width="2.5"/>
+        <text x="${x + dx}" y="${Math.max(14, y - 12)}" text-anchor="${ancla}" font-size="12" font-weight="600" fill="#0b1838" paint-order="stroke" stroke="#f0f9ff" stroke-width="5" stroke-linejoin="round">${p.nombre.replace(/[<>&]/g, '')}</text>
+        <text x="${x + dx}" y="${Math.max(28, y - 12) + 14}" text-anchor="${ancla}" font-size="11" fill="#475569" font-family="IBM Plex Mono" paint-order="stroke" stroke="#f0f9ff" stroke-width="5" stroke-linejoin="round">${formatoMiles(Math.round(p.alt))} m</text>`;
+    }).join('');
+    svg.innerHTML = `
+      <defs><linearGradient id="grad-perfil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".55"/><stop offset="1" stop-color="#38bdf8" stop-opacity=".04"/></linearGradient></defs>
+      ${[0, 1, 2, 3].map((k) => `<line x1="40" x2="580" y1="${20 + k * 60}" y2="${20 + k * 60}" stroke="#dbeafe"/>`).join('')}
+      <path d="${linea} L${X(total)},200 L40,200 Z" fill="url(#grad-perfil)"/>
+      <path d="${linea}" fill="none" stroke="#0369a1" stroke-width="2.5" stroke-linejoin="round"/>
+      ${marcas}
+      <text x="40" y="216" font-size="11" fill="#94a3b8" font-family="IBM Plex Mono">0 km</text>
+      <text x="580" y="216" text-anchor="end" font-size="11" fill="#94a3b8" font-family="IBM Plex Mono">${total.toFixed(1)} km</text>`;
+    const desnivel = ruta[0].alt - ruta[ruta.length - 1].alt;
+    set('perfil-desnivel', `${formatoMiles(Math.round(desnivel))} m`);
+    set('perfil-distancia', `${total.toFixed(1)} km`);
+    set('perfil-pendiente', `${Math.round((desnivel / (total * 1000)) * 100)} %`);
+    set('camino-perfil-tipo', real ? 'Terreno real · línea recta' : 'Puntos clave');
+  }
+
+  // ---------- Controles ----------
+  document.querySelectorAll<HTMLButtonElement>('.btn-camino-laguna').forEach((b) => b.addEventListener('click', () => { lagunaId = b.dataset.id!; paso = 0; pintarLaguna(); }));
+  document.querySelectorAll<HTMLButtonElement>('.btn-camino-paso').forEach((b) => b.addEventListener('click', () => { paso = Number(b.dataset.paso); pintarPaso(); }));
+  $('camino-ant')?.addEventListener('click', () => { paso = (paso + 4) % 5; pintarPaso(); });
+  $('camino-sig')?.addEventListener('click', () => { paso = (paso + 1) % 5; pintarPaso(); });
+  $('camino-preguntar')?.addEventListener('click', () => {
+    const { cat } = datos();
+    abrirAsistente({ seccion: 'El camino de un aluvión', laguna: cat.nombre, lagunaId: cat.id });
+  });
+
+  // ---------- 3D real ----------
+  const contenedor = $('camino-3d'), capa = $('camino-marcas'), btn3d = $('camino-cargar-3d') as HTMLButtonElement | null;
+  async function cargar3D() {
+    if (escena || !contenedor || !capa) return;
+    if (btn3d) { btn3d.disabled = true; btn3d.textContent = 'Cargando 3D…'; }
+    const marcas = Object.values(CAMINOS).flatMap((c) => {
+      const l = LAGUNAS_DESTACADAS.find((x) => x.id === c.lagunaId)!;
+      return [
+        ...(c.cumbre ? [{ nombre: c.cumbre.nombre.replace('Nevado ', ''), tipo: 'cumbre' as const, lat: c.cumbre.lat, lng: c.cumbre.lng, alt: c.cumbre.alt, dato: `${formatoMiles(c.cumbre.alt)} m` }] : []),
+        { nombre: l.nombre, tipo: 'laguna' as const, lat: l.lat, lng: l.lng, alt: l.altitud_msnm, riesgo: l.riesgo },
+        ...(c.pueblo ? [{ nombre: c.pueblo.nombre, tipo: 'ciudad' as const, lat: c.pueblo.lat, lng: c.pueblo.lng, alt: c.pueblo.alt, dato: 'pueblo' }] : []),
+      ];
+    });
+    const { iniciarEscena3D } = await import('../scripts/hero3d');
+    escena = await iniciarEscena3D(contenedor, capa, marcas, () => {
+      contenedor.classList.remove('opacity-0'); capa.classList.remove('opacity-0');
+      btn3d?.classList.add('hidden');
+      pintarPerfil();
+    });
+    if (!escena) { if (btn3d) { btn3d.disabled = false; btn3d.textContent = 'Ver relieve 3D'; } return; }
+    escena.volarA(camara(paso), 0);
+    setTimeout(() => {
+      if (!contenedor.classList.contains('opacity-0') || !escena) return;
+      escena.destruir(); escena = null;
+      if (btn3d) { btn3d.disabled = false; btn3d.textContent = 'Reintentar 3D'; }
+    }, 25000);
+  }
+  btn3d?.addEventListener('click', cargar3D);
+  if (window.matchMedia('(min-width: 1024px)').matches && !(navigator as any).connection?.saveData) {
+    ((window as any).requestIdleCallback || ((f: () => void) => setTimeout(f, 1000)))(() => cargar3D());
+  }
+
+  const pedido = new URLSearchParams(location.search).get('laguna');
+  if (pedido && LAGUNAS_ESCENAS[pedido]) lagunaId = pedido;
+  pintarLaguna();
+</script>

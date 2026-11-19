@@ -1,0 +1,24 @@
+---
+const ACCESOS = [
+  { href: '/buscar', titulo: 'Busca tu zona', texto: 'Ficha de cada laguna con su fuente y su informe PDF.', clase: 'tarjeta-laguna', icono: 'icono-laguna', path: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4.3-4.3' },
+  { href: '/aluvion', titulo: 'El camino de un aluvión', texto: 'Del glaciar al pueblo, sobre el relieve real.', clase: 'tarjeta-hielo', icono: 'icono-hielo', path: 'M3 20 10 8l4 6 3-4 4 10H3z' },
+  { href: '/comparar', titulo: 'Compara dos lagunas', texto: 'Riesgo, agua, historia y lo que las conecta.', clase: 'tarjeta-historia', icono: 'icono-historia', path: 'M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7z' },
+  { href: '/aluvion#preparate', titulo: 'Prepárate', texto: 'Qué hacer ante un aluvión y a quién llamar.', clase: 'tarjeta-marca', icono: 'icono-marca', path: 'M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z' },
+];
+---
+<section class="w-full pb-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <span class="sobretitulo">Explora</span>
+    <h2 class="seccion-titulo mt-2">¿Qué quieres hacer?</h2>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {ACCESOS.map((a) => (
+        <a href={a.href} class={`tarjeta ${a.clase} tejida group flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-lg`}>
+          <span class={`icono ${a.icono}`}><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={a.path} /></svg></span>
+          <h3 class="mt-4 font-display text-lg font-bold text-noche-900">{a.titulo}</h3>
+          <p class="mt-1 flex-1 text-sm text-slate-600">{a.texto}</p>
+          <span class="mt-4 text-sm font-semibold text-laguna-700 group-hover:text-laguna-900">Entrar →</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

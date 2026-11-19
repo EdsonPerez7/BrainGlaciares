@@ -18,85 +18,56 @@ function scoreClass(val: number | null | undefined): string {
 }
 ---
 
-<section id="acerca" class="border-t border-slate-200 bg-white py-16 w-full">
-  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-10">
+<section id="acerca" data-contexto="Metodología" class="relative w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] space-y-6 px-4 sm:px-8 lg:px-12">
 
-    <!-- Cabecera Institucional: Acerca de -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <div class="lg:col-span-6 space-y-3">
-        <div class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-800">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          Rigor Científico & Auditoría RAGAS
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          Acerca de Brain Glaciares y Validación de Calidad
-        </h2>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          Desarrollado por el equipo G8 de la Facultad de Ingeniería de Sistemas e Informática (UNMSM). Nuestro motor combina grafos de conocimiento (Neo4j/Kùzu) con recuperación documental híbrida sobre <strong>{SITE_CONFIG.corpus.documentos_totales} informes oficiales</strong> de INAIGEM, ANA y SENAMHI, garantizando que cada respuesta cite sus fuentes y no invente cifras.
-        </p>
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="max-w-2xl">
+        <span class="sobretitulo">Metodología</span>
+        <h1 class="seccion-titulo mt-2">¿Por qué confiar en ARQEN?</h1>
+        <p class="seccion-sub">Respondemos solo con {SITE_CONFIG.corpus.documentos_totales} informes oficiales del INAIGEM, la ANA y el SENAMHI, y medimos cada respuesta.</p>
       </div>
-
-      <!-- Tarjeta de Descarga de Validación Excel -->
-      <div class="lg:col-span-6 rounded-2xl border border-slate-200 bg-slate-50/90 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-        <div class="space-y-1.5">
-          <h3 class="text-sm font-bold text-slate-900">Reporte Auditado en Excel (30 Preguntas)</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">
-            Descarga la matriz completa de evaluación con respuestas verificadas, citas oficiales y métricas de auditoría científica (Fidelidad, Relevancia y Precisión de Contextos).
-          </p>
-        </div>
-        <a
-          id="btn-descargar-excel-ragas"
-          href="/Validacion_RAGAS_30_Preguntas.xlsx"
-          download="Validacion_RAGAS_BrainGlaciares_30_Preguntas.xlsx"
-          class="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-800 transition"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          <span>Descargar Excel (.xlsx)</span>
-        </a>
-      </div>
+      <a id="btn-descargar-excel-ragas" href="/Validacion_RAGAS_30_Preguntas.xlsx" download="Validacion_RAGAS_ARQEN_30_Preguntas.xlsx" class="btn btn-pri">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+        Descargar la evaluación (Excel)
+      </a>
     </div>
 
-    <!-- Tarjetas de Estadísticas RAGAS basadas en el banco de 30 preguntas (Pre-renderizadas) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Banco de Validación</div>
-        <div id="acerca-stat-cobertura" class="mt-2 text-3xl font-black text-slate-900">{resumen.validadas_exito} / {resumen.total_banco}</div>
-        <p id="acerca-stat-sub" class="mt-1 text-xs text-slate-500">{resumen.cobertura_pct}% validadas · {resumen.observadas} con observaciones</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Fidelidad Documental</div>
-        <div id="acerca-stat-faith" class="mt-2 text-3xl font-black text-emerald-700">{resumen.fidelidad_promedio.toFixed(2)}</div>
-        <p class="mt-1 text-xs text-slate-500">Respaldo estricto en fuentes oficiales (sin alucinación)</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Relevancia de la Respuesta</div>
-        <div id="acerca-stat-relev" class="mt-2 text-3xl font-black text-sky-700">{resumen.relevancia_promedio.toFixed(2)}</div>
-        <p class="mt-1 text-xs text-slate-500">Pertinencia directa respecto a la consulta</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Precisión del Contexto</div>
-        <div id="acerca-stat-ctx" class="mt-2 text-3xl font-black text-indigo-700">{resumen.precision_contexto_promedio.toFixed(2)}</div>
-        <p class="mt-1 text-xs text-slate-500">Utilidad de los fragmentos recuperados</p>
-      </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Banco de preguntas">
+        <p class="text-sm font-semibold text-slate-600">Preguntas validadas</p>
+        <p id="acerca-stat-cobertura" class="mt-2 font-display text-4xl font-bold text-noche-900 tabular">{resumen.validadas_exito} / {resumen.total_banco}</p>
+        <p id="acerca-stat-sub" class="mt-auto pt-2 text-sm text-slate-600">{resumen.cobertura_pct}% validadas · {resumen.observadas} con observaciones</p>
+      </article>
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Fidelidad">
+        <p class="text-sm font-semibold text-slate-600">Fidelidad</p>
+        <p id="acerca-stat-faith" class="mt-2 font-display text-4xl font-bold text-laguna-700 tabular">{resumen.fidelidad_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">No inventa: se apoya en las fuentes.</p>
+      </article>
+      <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Relevancia">
+        <p class="text-sm font-semibold text-slate-600">Relevancia</p>
+        <p id="acerca-stat-relev" class="mt-2 font-display text-4xl font-bold text-hielo-700 tabular">{resumen.relevancia_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">Responde lo que se preguntó.</p>
+      </article>
+      <article class="tarjeta tarjeta-marca tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Precisión del contexto">
+        <p class="text-sm font-semibold text-slate-600">Precisión del contexto</p>
+        <p id="acerca-stat-ctx" class="mt-2 font-display text-4xl font-bold text-cochinilla-600 tabular">{resumen.precision_contexto_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">Usa los fragmentos correctos.</p>
+      </article>
     </div>
 
     <!-- Tabla Desplegable / Vista de las 30 Preguntas Validadas -->
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+    <div class="tarjeta overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80">
         <div>
-          <h3 class="text-sm font-bold text-slate-900">Detalle de Evaluación — Banco de 30 Preguntas</h3>
-          <p class="text-[11px] text-slate-500">Haz clic en cualquier pregunta para auditar la respuesta y sus fuentes citadas</p>
+          <h3 class="font-display text-lg font-bold text-noche-900">Las 30 preguntas de prueba</h3>
+          <p class="text-sm text-slate-500">Abre cualquiera para ver la respuesta y sus fuentes.</p>
         </div>
         <div class="flex items-center gap-2">
           <button
             id="btn-toggle-tabla-acerca"
             type="button"
-            class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            class="btn btn-sec btn-sm"
           >
             Mostrar las 30 preguntas
           </button>
@@ -106,7 +77,7 @@ function scoreClass(val: number | null | undefined): string {
       <div id="acerca-status-banner" class="hidden px-5 py-2.5 bg-sky-50 border-b border-sky-200 text-xs font-medium text-sky-900"></div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="tabla-eval w-full text-left border-collapse text-sm">
           <thead>
             <tr class="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
               <th class="py-3 px-4 font-bold">ID</th>
@@ -124,17 +95,17 @@ function scoreClass(val: number | null | undefined): string {
             {preguntasIniciales.map((p, idx) => (
               <tr class="hover:bg-slate-50/90 transition">
                 <td class="py-3 px-4 font-mono font-bold text-slate-900">{p.id}</td>
-                <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">{p.tipo}</span></td>
+                <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{p.tipo}</span></td>
                 <td class="py-3 px-4 text-slate-800 font-medium max-w-md">{p.pregunta}</td>
                 <td class="py-3 px-4 whitespace-nowrap">
                   {p.estado === 'validada' && (
-                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">Validada con Fuentes</span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">Validada con Fuentes</span>
                   )}
                   {p.estado === 'observada' && (
-                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">{p.estado_label}</span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">{p.estado_label}</span>
                   )}
                   {p.estado === 'fuera_dominio' && (
-                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-700">Fuera de Dominio</span>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Fuera de Dominio</span>
                   )}
                 </td>
                 <td class="py-3 px-3 text-right">
@@ -154,7 +125,7 @@ function scoreClass(val: number | null | undefined): string {
                 </td>
                 <td class="py-3 px-4 text-right font-mono text-slate-600">{p.n_fuentes || 0}</td>
                 <td class="py-3 px-4 text-right whitespace-nowrap">
-                  <button type="button" data-acerca-idx={idx} class="btn-acerca-ver rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer">
+                  <button type="button" data-acerca-idx={idx} class="btn-acerca-ver btn btn-hielo btn-sm">
                     Ver evidencia
                   </button>
                 </td>
@@ -192,6 +163,7 @@ function scoreClass(val: number | null | undefined): string {
 </section>
 
 <script define:vars={{ API_BASE: SITE_CONFIG.apiBaseUrl, PREGUNTAS_LOCALES: PREGUNTAS_EVALUACION }}>
+  const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"'`]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
   let preguntasData = PREGUNTAS_LOCALES || [];
   let mostrarTodas = false;
 
@@ -200,20 +172,20 @@ function scoreClass(val: number | null | undefined): string {
     const cls = val >= 0.8 ? 'bg-emerald-100 text-emerald-800' :
                 val >= 0.5 ? 'bg-amber-100 text-amber-800' :
                 'bg-rose-100 text-rose-800';
-    return `<span class="inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${cls}">${val.toFixed(2)}</span>`;
+    return `<span class="inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${cls}">${Number(val).toFixed(2)}</span>`;
   }
 
   function badgeEstado(p) {
     if (p.estado === 'validada') {
-      return '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">Validada con Fuentes</span>';
+      return '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">Validada con Fuentes</span>';
     }
     if (p.estado === 'observada') {
-      return `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">${p.estado_label || 'Evidencia Parcial'}</span>`;
+      return `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">${esc(p.estado_label || 'Evidencia parcial')}</span>`;
     }
     if (p.estado === 'fuera_dominio') {
-      return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-700">Fuera de Dominio</span>';
+      return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Fuera de Dominio</span>';
     }
-    return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600">Pendiente</span>';
+    return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">Pendiente</span>';
   }
 
   function vincularEventosVer(slice) {
@@ -228,7 +200,7 @@ function scoreClass(val: number | null | undefined): string {
         document.getElementById('modal-acerca-respuesta').textContent = item.respuesta || 'Sin respuesta registrada.';
         const ul = document.getElementById('modal-acerca-fuentes');
         ul.innerHTML = (item.fuentes && item.fuentes.length > 0)
-          ? item.fuentes.map(f => `<li>${f}</li>`).join('')
+          ? item.fuentes.map(f => `<li>${esc(f)}</li>`).join('')
           : '<li class="text-slate-400">Sin fuentes requeridas (control negativo fuera de dominio)</li>';
         document.getElementById('modal-acerca-eval')?.classList.remove('hidden');
       });
@@ -242,16 +214,16 @@ function scoreClass(val: number | null | undefined): string {
 
     tbody.innerHTML = slice.map((p, idx) => `
       <tr class="hover:bg-slate-50/90 transition">
-        <td class="py-3 px-4 font-mono font-bold text-slate-900">${p.id}</td>
-        <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">${p.tipo}</span></td>
-        <td class="py-3 px-4 text-slate-800 font-medium max-w-md">${p.pregunta}</td>
+        <td class="py-3 px-4 font-mono font-bold text-slate-900">${esc(p.id)}</td>
+        <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">${esc(p.tipo)}</span></td>
+        <td class="py-3 px-4 text-slate-800 font-medium max-w-md">${esc(p.pregunta)}</td>
         <td class="py-3 px-4 whitespace-nowrap">${badgeEstado(p)}</td>
         <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.faithfulness)}</td>
         <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.answer_relevancy)}</td>
         <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.context_precision)}</td>
-        <td class="py-3 px-4 text-right font-mono text-slate-600">${p.n_fuentes || 0}</td>
+        <td class="py-3 px-4 text-right font-mono text-slate-600">${esc(p.n_fuentes || 0)}</td>
         <td class="py-3 px-4 text-right whitespace-nowrap">
-          <button type="button" data-acerca-idx="${idx}" class="btn-acerca-ver rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer">
+          <button type="button" data-acerca-idx="${idx}" class="btn-acerca-ver btn btn-hielo btn-sm">
             Ver evidencia
           </button>
         </td>
@@ -326,3 +298,18 @@ function scoreClass(val: number | null | undefined): string {
   document.addEventListener('DOMContentLoaded', sincronizarConBackend);
 </script>
 
+
+<style is:global>
+  /* En pantallas medianas y pequeñas se ocultan columnas secundarias: nada se corta */
+  @media (max-width: 1023px) {
+    .tabla-eval th:nth-child(2), .tabla-eval td:nth-child(2),
+    .tabla-eval th:nth-child(6), .tabla-eval td:nth-child(6),
+    .tabla-eval th:nth-child(7), .tabla-eval td:nth-child(7),
+    .tabla-eval th:nth-child(8), .tabla-eval td:nth-child(8) { display: none; }
+  }
+  @media (max-width: 639px) {
+    .tabla-eval th:nth-child(4), .tabla-eval td:nth-child(4),
+    .tabla-eval th:nth-child(5), .tabla-eval td:nth-child(5) { display: none; }
+    .tabla-eval td, .tabla-eval th { padding-left: .6rem !important; padding-right: .6rem !important; }
+  }
+</style>

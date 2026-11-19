@@ -117,7 +117,7 @@ class Limitador:
 
 
 class Pregunta(BaseModel):
-    pregunta: str = Field(min_length=2, description="La pregunta en lenguaje natural.")
+    pregunta: str = Field(min_length=2, max_length=2000, description="La pregunta en lenguaje natural.")
     sesion_id: Optional[str] = Field(default=None, pattern=r"^[A-Za-z0-9_-]{8,64}$",
                                      description="Identificador de la conversación, para preguntas de seguimiento.")
 
@@ -166,8 +166,22 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         return JSONResponse(status_code=500, content={"detail": f"Error interno. Referencia: {ident}"})
 
     def _ip(request):
-        reenviada = request.headers.get("x-forwarded-for", "")
-        return reenviada.split(",")[0].strip() or (request.client.host if request.client else "desconocida")
+        # Cloudflare fija CF-Connecting-IP y el cliente no puede falsificarla detrás del túnel.
+        cf = request.headers.get("cf-connecting-ip", "").strip()
+        if cf:
+            return cf
+        # X-Forwarded-For: el ÚLTIMO valor lo añade el proxy de confianza; el primero lo controla el cliente
+        # (tomar el primero permitía saltarse el límite por IP enviando cabeceras falsas).
+        reenviada = [x.strip() for x in request.headers.get("x-forwarded-for", "").split(",") if x.strip()]
+        if reenviada:
+            return reenviada[-1]
+        return request.client.host if request.client else "desconocida"
+
+    def _solo_admin(request):
+        """Endpoints que gastan tokens del LLM o escriben en disco: exigen ADMIN_API_KEY."""
+        clave = os.environ.get("ADMIN_API_KEY", "")
+        if not clave or not hmac.compare_digest(request.headers.get("x-api-key", ""), clave):
+            raise HTTPException(403, "Endpoint administrativo.")
 
     def _admitir(request, p):
         if cfg.api_key and not hmac.compare_digest(request.headers.get("x-api-key", ""), cfg.api_key):
@@ -446,7 +460,8 @@ def crear_app(cfg=None, servicio=None, cargar=True):
     def catalogo(limite: int = 80, limit: Optional[int] = None, q: Optional[str] = None):
         """Catálogo completo de lagunas y departamentos del grafo.
         Permite alimentar desplegables y búsquedas instantáneas en el frontend."""
-        eff_limite = limit if limit is not None else limite
+        eff_limite = max(1, min(limit if limit is not None else limite, 300))
+        q = q[:120] if q else q
         cat = _cargar_catalogo()
         lagunas = cat.get("lagunas", [])
         departamentos = cat.get("departamentos", [])
@@ -505,6 +520,8 @@ def crear_app(cfg=None, servicio=None, cargar=True):
     def buscar(q: str, limite: int = 15, tipo: Optional[str] = None):
         """Búsqueda pura en el catálogo de entidades del grafo y en los 398 documentos del RAG.
         CERO llamadas a LLM: responde en milisegundos con evidencia y trazabilidad oficial."""
+        q = (q or "")[:120]
+        limite = max(1, min(limite, 50))
         q_norm = norm(q)
         resultados = {
             "consulta": q,
@@ -1285,8 +1302,9 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         )
 
     @app.post("/api/evaluacion/simular", tags=["evaluacion"])
-    def simular_banco_sin_tokens():
+    def simular_banco_sin_tokens(request: Request):
         """Simula y valida las 18 preguntas contra Kùzu y el índice BM25 usando 0 tokens de LLM."""
+        _solo_admin(request)
         if servicio.estado != "listo" or servicio.motor is None:
             raise HTTPException(503, "El grafo y el motor aún están cargando; intenta en unos segundos.")
 
@@ -1341,8 +1359,9 @@ def crear_app(cfg=None, servicio=None, cargar=True):
         id: str
 
     @app.post("/api/evaluacion/evaluar-uno", tags=["evaluacion"])
-    def evaluar_una_pregunta_ragas(req: EvalItemReq):
+    def evaluar_una_pregunta_ragas(req: EvalItemReq, request: Request):
         """Evalúa incrementalmente 1 pregunta con el LLM + RAGAS juez y guarda el resultado en disco."""
+        _solo_admin(request)
         if servicio.estado != "listo":
             raise HTTPException(503, "El agente aún está cargando.")
 

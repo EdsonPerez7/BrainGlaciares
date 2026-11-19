@@ -66,6 +66,7 @@ const isDark = theme === 'dark';
 
 <script>
   import { ApiService } from '../services/api';
+  import { esc, urlSegura } from '../utils/seguridad';
   import type { CatalogoResponse } from '../models/types';
 
   let catalogoCompartido: CatalogoResponse | null = null;
@@ -74,15 +75,15 @@ const isDark = theme === 'dark';
     if (!riesgo || riesgo === 'Sin evaluar' || riesgo === 'Oficial') return '';
     const r = riesgo.toLowerCase();
     if (isDark) {
-      if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Muy alto</span>';
-      if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Alto</span>';
-      if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Medio</span>';
-      return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Bajo</span>';
+      if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Muy alto</span>';
+      if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Alto</span>';
+      if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">Medio</span>';
+      return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Bajo</span>';
     }
-    if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800">Muy alto</span>';
-    if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">Alto</span>';
-    if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-yellow-100 text-yellow-800">Medio</span>';
-    return '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Bajo</span>';
+    if (r.includes('muy')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">Muy alto</span>';
+    if (r.includes('alto')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">Alto</span>';
+    if (r.includes('medio')) return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-yellow-100 text-yellow-800">Medio</span>';
+    return '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Bajo</span>';
   }
 
   function getIconoTipo(tipo: string): string {
@@ -134,27 +135,27 @@ const isDark = theme === 'dark';
 
         grupos.forEach((grupo) => {
           if (grupo.items.length === 0) return;
-          html += `<div class="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-400 border-white/10' : 'text-slate-500 border-slate-100'} flex items-center justify-between border-b mt-1 first:mt-0 mb-1">
-            <span>${grupo.titulo}</span>
-            ${grupo.badge ? `<span class="text-[9px] ${isDark ? 'text-sky-400' : 'text-sky-700'} font-semibold">${grupo.badge}</span>` : ''}
+          html += `<div class="px-3 py-1.5 text-[11px] uppercase font-bold tracking-wider ${isDark ? 'text-slate-400 border-white/10' : 'text-slate-500 border-slate-100'} flex items-center justify-between border-b mt-1 first:mt-0 mb-1">
+            <span>${esc(grupo.titulo)}</span>
+            ${grupo.badge ? `<span class="text-[11px] ${isDark ? 'text-sky-400' : 'text-sky-700'} font-semibold">${esc(grupo.badge)}</span>` : ''}
           </div>`;
 
           html += grupo.items.map((item, idx) => {
             const payload = encodeURIComponent(JSON.stringify(item));
             return `
               <a
-                href="${item.url}"
+                href="${urlSegura(item.url)}"
                 data-search-item="${payload}"
                 data-idx="${idx}"
                 class="flex items-center gap-3 px-3 py-2 rounded-xl ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'} transition group text-left block"
               >
-                <span class="text-base select-none">${item.icon || '📍'}</span>
+                <span class="text-base select-none">${esc(item.icon || '📍')}</span>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold ${isDark ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-700'} transition truncate">${item.title}</span>
+                    <span class="text-xs font-bold ${isDark ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-700'} transition truncate">${esc(item.title)}</span>
                     ${getBadgeRiesgo(item.riesgo, isDark)}
                   </div>
-                  <div class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${item.subtitle}</div>
+                  <div class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${esc(item.subtitle)}</div>
                 </div>
                 <span class="${isDark ? 'text-slate-500 group-hover:text-sky-300' : 'text-slate-400 group-hover:text-slate-900'} text-xs">→</span>
               </a>
@@ -163,9 +164,9 @@ const isDark = theme === 'dark';
         });
 
         if (docs.length > 0) {
-          html += `<div class="pt-2 pb-1 px-3 border-t ${isDark ? 'border-white/10 text-sky-400' : 'border-slate-100 text-sky-700'} text-[10px] uppercase font-bold tracking-wider flex items-center justify-between mt-1">
+          html += `<div class="pt-2 pb-1 px-3 border-t ${isDark ? 'border-white/10 text-sky-400' : 'border-slate-100 text-sky-700'} text-[11px] uppercase font-bold tracking-wider flex items-center justify-between mt-1">
             <span>Evidencia Documental RAG (398 Informes)</span>
-            <span class="text-[9px] ${isDark ? 'text-slate-400' : 'text-slate-500'} font-normal">Cero LLM</span>
+            <span class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} font-normal">Cero LLM</span>
           </div>`;
 
           html += docs.slice(0, 5).map((doc) => {
@@ -179,9 +180,9 @@ const isDark = theme === 'dark';
               >
                 <span class="text-sm select-none">📄</span>
                 <div class="flex-1 min-w-0">
-                  <div class="text-[11px] font-semibold ${isDark ? 'text-slate-200 group-hover:text-sky-300' : 'text-slate-800 group-hover:text-sky-700'} truncate">${doc.titulo}</div>
-                  <div class="text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
-                  <p class="text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} italic line-clamp-1 mt-0.5">"${doc.extracto}"</p>
+                  <div class="text-[11px] font-semibold ${isDark ? 'text-slate-200 group-hover:text-sky-300' : 'text-slate-800 group-hover:text-sky-700'} truncate">${esc(doc.titulo)}</div>
+                  <div class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate">${esc(doc.fuente)} · ${esc(doc.anio)} ${doc.pagina ? `(p. ${esc(doc.pagina)})` : ''}</div>
+                  <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'} italic line-clamp-1 mt-0.5">“${esc(doc.extracto)}”</p>
                 </div>
               </a>
             `;
@@ -291,7 +292,7 @@ const isDark = theme === 'dark';
         }
 
         if (dropdown) {
-          dropdown.innerHTML = `<div class="px-3.5 py-3 text-xs ${isDark ? 'text-sky-300' : 'text-slate-600'} text-center animate-pulse">Consultando 13,829 entidades y 398 informes para "${q}"...</div>`;
+          dropdown.innerHTML = `<div class="px-3.5 py-3 text-xs ${isDark ? 'text-sky-300' : 'text-slate-600'} text-center animate-pulse">Consultando 13,829 entidades y 398 informes para “${esc(q)}”…</div>`;
           dropdown.classList.remove('hidden');
         }
 

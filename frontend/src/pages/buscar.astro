@@ -2,331 +2,154 @@
 import Layout from '../layouts/Layout.astro';
 import SearchBox from '../components/SearchBox.astro';
 import GlacierMap from '../components/GlacierMap.astro';
+import Visor3D from '../components/Visor3D.astro';
 import { LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
 import { SITE_CONFIG } from '../config/site.config';
 ---
 
-<Layout title="Buscar lagunas y zonas de riesgo · Brain Glaciares">
-  <main class="min-h-screen bg-slate-50/70 pb-20 pt-6">
-    <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-6">
+<Layout title="Buscar lagunas y zonas de riesgo · ARQEN">
+  <div class="min-h-screen pb-12 pt-8" data-contexto="Ficha de laguna">
+    <div class="mx-auto w-full max-w-[1400px] space-y-5 px-4 sm:px-8 lg:px-12">
 
-      <!-- ======================================================== -->
-      <!-- 1. BARRA SUPERIOR DE FILTRO TERRITORIAL ("Lugar elegido") -->
-      <!-- ======================================================== -->
-      <div class="rounded-xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="flex items-center gap-2">
-            <span class="text-rose-600 text-sm">📍</span>
-            <span class="text-xs font-bold text-slate-800">Lugar elegido</span>
-          </div>
-
-          <!-- Selector de departamento -->
-          <div class="relative">
-            <select 
-              id="filtro-departamento"
-              class="appearance-none rounded-lg border border-slate-300 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-900 shadow-2xs focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600 cursor-pointer"
-            >
-              <option value="todos">Todo el Perú (19 lagunas en riesgo)</option>
-              {DEPARTAMENTOS_RIESGO.map(d => (
-                <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total} {d.total === 1 ? 'laguna crítica' : 'lagunas críticas'})</option>
-              ))}
-            </select>
-            <span class="pointer-events-none absolute right-2.5 top-2 text-[10px] text-slate-400">▼</span>
-          </div>
-
-          <!-- Botón Quitar filtro -->
-          <button 
-            id="btn-quitar-filtro"
-            type="button"
-            class="inline-flex items-center gap-1 rounded-lg border border-cyan-200 bg-cyan-50/70 px-2.5 py-1.5 text-xs font-semibold text-cyan-800 hover:bg-cyan-100 transition shadow-2xs cursor-pointer"
-          >
-            <span>✕</span>
-            <span>Quitar</span>
-          </button>
-        </div>
-
-        <div class="text-[11px] text-slate-400 hidden md:block">
-          Se aplica en Buscar, Comparar, Panorama e Informes
-        </div>
-      </div>
-
-      <!-- ======================================================== -->
-      <!-- 2. BARRA DE BÚSQUEDA RÁPIDA CON AUTOCOMPLETADO            -->
-      <!-- ======================================================== -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Encabezado + buscador -->
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-            Busca tu zona o una laguna
-          </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Exploración territorial, fichas técnicas auditadas y análisis de cuencas glaciares
-          </p>
+          <span class="sobretitulo">Buscar</span>
+          <h1 class="seccion-titulo mt-2">Busca tu zona o una laguna</h1>
+          <p class="seccion-sub">Fichas con la fuente de cada dato. Escribe con o sin tildes.</p>
         </div>
-
-        <!-- Buscador reutilizable conectado al backend -->
-        <div class="w-full md:w-96">
-          <SearchBox
-            inputId="buscar-input"
-            theme="light"
-            mode="event"
-            maxWidthClass="max-w-full"
-            placeholder="Pueblo, departamento o laguna (con o sin tildes)..."
-          />
+        <div class="w-full lg:w-[420px]">
+          <SearchBox inputId="buscar-input" theme="light" mode="event" maxWidthClass="max-w-full" placeholder="Pueblo, departamento o laguna…" />
         </div>
       </div>
 
-      <!-- Barra de Toggle de Vistas: Mapa Territorial vs Ficha Técnica -->
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-        <div class="flex items-center gap-2">
-          <button 
-            id="tab-ficha"
-            type="button"
-            class="rounded-lg px-3 py-1.5 text-xs font-bold transition bg-slate-900 text-white shadow-xs"
-          >
-            📋 Ficha de Laguna
-          </button>
-          <button 
-            id="tab-mapa"
-            type="button"
-            class="rounded-lg px-3 py-1.5 text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200"
-          >
-            🗺️ Mapa del Lugar
-          </button>
+      <!-- Filtro + vistas -->
+      <div class="tarjeta flex flex-wrap items-center justify-between gap-3 p-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="filtro-departamento" class="pl-1 text-sm font-semibold text-slate-600">Zona</label>
+          <select id="filtro-departamento" class="h-10 cursor-pointer rounded-xl border border-laguna-200 bg-laguna-50 px-3 pr-8 text-sm font-semibold text-laguna-900 focus:border-laguna-500 focus:outline-none">
+            <option value="todos">Todo el Perú</option>
+            {DEPARTAMENTOS_RIESGO.map(d => (<option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total})</option>))}
+          </select>
+          <button id="btn-quitar-filtro" type="button" class="btn btn-sm btn-ter">Quitar filtro</button>
         </div>
-
-        <label class="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer select-none">
-          <input type="checkbox" id="toggle-ver-mapa" class="rounded text-cyan-600 focus:ring-cyan-500" />
-          <span>Ver el mapa del lugar</span>
-        </label>
+        <div class="flex gap-1 rounded-xl bg-slate-100 p-1" role="group" aria-label="Vista">
+          <button id="tab-ficha" type="button" class="rounded-lg px-4 py-2 text-sm font-semibold transition bg-slate-900 text-white">Ficha</button>
+          <button id="tab-mapa" type="button" class="rounded-lg px-4 py-2 text-sm font-semibold transition bg-slate-100 text-slate-700">Mapa</button>
+        </div>
+        <input type="checkbox" id="toggle-ver-mapa" class="hidden" aria-hidden="true" tabindex="-1" />
       </div>
 
       <!-- ======================================================== -->
       <!-- VISTA A: FICHA TÉCNICA DETALLADA DE LAGUNA               -->
       <!-- ======================================================== -->
-      <div id="seccion-ficha" class="space-y-6">
+      <div id="seccion-ficha" class="space-y-4">
         
-        <!-- Tarjeta Principal de la Laguna -->
-        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xs">
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100">
-            <!-- Título y Badges -->
-            <div class="space-y-2">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="rounded bg-cyan-100/80 px-2 py-0.5 text-[11px] font-bold text-cyan-900">
-                  Ficha de laguna
-                </span>
-                <span id="badge-breadcrumb" class="text-xs font-medium text-slate-500">
-                  • Laguna Cancahua · Áncash
-                </span>
-              </div>
-
-              <div id="ficha-cordillera" class="text-xs font-semibold text-slate-500">
-                Áncash • cordillera Blanca
-              </div>
-
-              <h2 id="ficha-nombre" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-950">
-                Laguna <span class="text-cyan-700">Cancahua</span>
-              </h2>
-
-              <!-- Metadatos de auditoría -->
-              <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
-                <span id="badge-riesgo-pill" class="rounded-full px-2.5 py-0.5 font-bold bg-slate-200 text-slate-700">
-                  Sin evaluar
-                </span>
-                <span id="badge-docs" class="text-slate-500">• 3 documentos</span>
-                <span id="badge-datos" class="text-slate-500">• 14 datos conectados</span>
-                <span id="badge-confianza" class="text-emerald-700 font-semibold">• Confianza 0.62</span>
-                <span id="badge-fecha" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 font-medium">
-                  Último dato: 2025 · al día
-                </span>
+        <!-- Cabecera de la ficha -->
+        <div class="tarjeta tejida p-6 sm:p-7">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0 space-y-2">
+              <p class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                <span id="badge-breadcrumb">Laguna · Áncash</span>
+                <span id="ficha-cordillera" class="hidden"></span>
+              </p>
+              <h2 id="ficha-nombre" class="font-display text-3xl font-bold tracking-tight text-noche-900 sm:text-4xl">Laguna</h2>
+              <div class="flex flex-wrap items-center gap-2 pt-1 text-sm">
+                <span id="badge-riesgo-pill" class="etiqueta riesgo-sin">Sin evaluar</span>
+                <span id="badge-docs" class="etiqueta bg-hielo-50 text-hielo-700">0 informes</span>
+                <span id="badge-datos" class="etiqueta bg-laguna-50 text-laguna-700">0 datos conectados</span>
+                <span id="badge-confianza" class="etiqueta bg-ocre-50 text-ocre-700">Confianza –</span>
+                <span id="badge-fecha" class="etiqueta bg-slate-100 text-slate-600">Último dato: –</span>
               </div>
             </div>
-
-            <!-- Velocímetro Semicircular de Riesgo -->
-            <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 min-w-[210px]">
-              <div class="relative w-40 h-24 overflow-hidden flex items-end justify-center">
-                <!-- Arco Semicircular Vectorial (Verde -> Amarillo -> Naranja -> Rojo) -->
-                <svg class="w-40 h-40 transform" viewBox="0 0 100 100">
-                  <!-- Segmento Verde (Bajo) -->
-                  <path d="M 15 50 A 35 35 0 0 1 26 26" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round" />
-                  <!-- Segmento Amarillo (Medio) -->
-                  <path d="M 26 26 A 35 35 0 0 1 50 15" fill="none" stroke="#eab308" stroke-width="10" />
-                  <!-- Segmento Naranja (Alto) -->
-                  <path d="M 50 15 A 35 35 0 0 1 74 26" fill="none" stroke="#f97316" stroke-width="10" />
-                  <!-- Segmento Rojo (Muy Alto) -->
-                  <path d="M 74 26 A 35 35 0 0 1 85 50" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round" />
-                  <!-- Aguja central -->
-                  <line 
-                    id="velocimetro-aguja"
-                    x1="50" y1="50" x2="50" y2="20" 
-                    stroke="#0f172a" 
-                    stroke-width="3" 
-                    stroke-linecap="round" 
-                    class="transition-transform duration-1000 ease-out origin-[50px_50px]"
-                    style="transform: rotate(-45deg);"
-                  />
-                  <circle cx="50" cy="50" r="4" fill="#0f172a" />
-                </svg>
-              </div>
-              <div id="velocimetro-etiqueta" class="text-xs font-bold text-slate-800 -mt-2">
-                Riesgo sin evaluar
-              </div>
+            <div class="flex flex-wrap gap-2 lg:justify-end">
+              <button id="btn-preguntar-mayu" type="button" class="btn btn-sec">Preguntar al asistente</button>
+              <button id="btn-ver-3d-ficha" type="button" class="btn btn-hielo">◈ Ver en 3D real</button>
+              <button id="btn-generar-informe" type="button" class="btn btn-marca">↓ Informe PDF</button>
             </div>
           </div>
-
-          <!-- DIAGRAMA DE FLUJO DE CUENCA EN 4 ETAPAS -->
-          <div class="mt-6">
-            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-              Sistema morfodinámico de cuenca
-            </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
-              
-              <!-- Etapa 1: Hielo -->
-              <div class="rounded-xl border border-cyan-200 bg-cyan-50/40 p-4 flex flex-col justify-between">
-                <div>
-                  <span class="text-[11px] font-bold text-cyan-900 block">Hielo que la alimenta</span>
-                  <p id="flujo-glaciar" class="text-sm font-extrabold text-slate-900 mt-1">Vallunaraju</p>
-                </div>
-                <div class="text-[10px] text-cyan-800/80 mt-2 font-medium">Glaciar de cabecera</div>
-              </div>
-
-              <!-- Etapa 2: Laguna -->
-              <div class="rounded-xl border border-slate-200 bg-white p-4 flex flex-col justify-between shadow-2xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-700 block">Laguna</span>
-                  <p id="flujo-laguna" class="text-sm font-extrabold text-slate-900 mt-1">Cancahua</p>
-                </div>
-                <div id="flujo-laguna-estado" class="text-[10px] text-slate-500 mt-2 font-medium">Sin evaluar</div>
-              </div>
-
-              <!-- Etapa 3: Pueblos aguas abajo -->
-              <div class="rounded-xl border border-rose-200 bg-rose-50/40 p-4 flex flex-col justify-between">
-                <div>
-                  <span class="text-[11px] font-bold text-rose-900 block">Pueblos aguas abajo</span>
-                  <p id="flujo-pueblos" class="text-sm font-extrabold text-slate-900 mt-1">Nadie registrado abajo</p>
-                </div>
-                <div class="text-[10px] text-rose-800/80 mt-2 font-medium">Población bajo la cota de riesgo</div>
-              </div>
-
-              <!-- Etapa 4: Obras que la protegen -->
-              <div class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 flex flex-col justify-between">
-                <div>
-                  <span class="text-[11px] font-bold text-emerald-900 block">La protege</span>
-                  <p id="flujo-obras" class="text-xs font-bold text-slate-900 mt-1 leading-snug">Dique, Presa, Túnel de desagüe</p>
-                </div>
-                <div class="text-[10px] text-emerald-800/80 mt-2 font-medium">Infraestructura de seguridad</div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- 3 TARJETAS DE DATOS MÉTRICOS CLAVE -->
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
-              <div class="flex items-baseline gap-1.5">
-                <span id="metrica-superficie" class="text-2xl font-black text-slate-900">0.15</span>
-                <span class="text-xs font-bold text-slate-600">km²</span>
-              </div>
-              <div class="text-xs font-semibold text-slate-700 mt-0.5">Superficie</div>
-              <div id="metrica-superficie-doc" class="text-[11px] text-slate-400 mt-1 truncate">doc. 20.500.12748/628 - p. 7</div>
-            </div>
-
-            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
-              <span id="metrica-pueblos-num" class="text-2xl font-black text-slate-900">0</span>
-              <div class="text-xs font-semibold text-slate-700 mt-0.5">pueblos aguas abajo</div>
-              <div class="text-[11px] text-slate-400 mt-1">Asentamientos directos</div>
-            </div>
-
-            <div class="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
-              <span id="metrica-eventos-num" class="text-2xl font-black text-slate-900">2</span>
-              <div class="text-xs font-semibold text-slate-700 mt-0.5">eventos en su historia</div>
-              <div class="text-[11px] text-slate-400 mt-1">Desbordes o aluviones documentados</div>
-            </div>
-
-          </div>
-
-          <!-- BANNER DE RIGOR / ALERTA CIENTÍFICA -->
-          <div id="banner-alerta" class="mt-6 rounded-xl border border-amber-300 bg-amber-50/80 p-3.5 text-xs text-amber-900 flex items-start gap-2.5">
-            <span class="text-amber-600 text-base leading-none">⚠️</span>
-            <span id="banner-alerta-texto" class="font-medium">
-              No hay un nivel de riesgo registrado (no evaluado no es lo mismo que sin riesgo).
-            </span>
-          </div>
-
-          <!-- EVIDENCIA DOCUMENTAL RECUPERADA DEL RAG (398 INFORMES OFICIALES - CERO LLM) -->
-          <div id="contenedor-docs-rag" class="mt-6 pt-5 border-t border-slate-100 space-y-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-sm select-none">📑</span>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Evidencia y citas documentales recuperadas del RAG
-                </h3>
-              </div>
-              <span class="rounded bg-sky-50 text-sky-800 px-2.5 py-0.5 text-[10px] font-bold border border-sky-200">
-                398 Informes oficiales · Cero LLM
-              </span>
-            </div>
-
-            <div id="lista-docs-rag" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <!-- Inyectado dinámicamente desde /api/lagunas/{id} o /api/buscar -->
-            </div>
-          </div>
-
-          <!-- BOTONES DE ACCIÓN RÁPIDA -->
-          <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
-            <button 
-              type="button" 
-              class="btn-accion-chat rounded-xl border border-rose-200 bg-rose-50/70 px-3.5 py-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition shadow-2xs cursor-pointer"
-              data-prompt="¿Y si se desborda esta laguna? Explica el escenario físico de impacto."
-            >
-              ¿Y si se desborda?
-            </button>
-
-            <button 
-              type="button" 
-              class="btn-accion-chat rounded-xl bg-cyan-700 hover:bg-cyan-800 px-3.5 py-2 text-xs font-bold text-white transition shadow-2xs cursor-pointer"
-              data-prompt="Explícame en términos simples los riesgos y situación de esta laguna."
-            >
-              Explícamela en simple
-            </button>
-
-            <button 
-              type="button" 
-              id="btn-generar-informe"
-              class="rounded-xl border border-purple-200 bg-purple-50/70 px-3.5 py-2 text-xs font-bold text-purple-800 hover:bg-purple-100 transition shadow-2xs cursor-pointer"
-            >
-              Generar informe
-            </button>
-
-            <div class="relative ml-auto">
-              <button 
-                type="button" 
-                class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition shadow-2xs cursor-pointer"
-              >
-                ¿Está mal? ▼
-              </button>
-            </div>
-          </div>
-
-          <!-- BARRA DE CONSULTA DIRECTA CON MAYU -->
-          <div class="mt-5 relative flex items-center">
-            <input 
-              id="input-pregunta-laguna"
-              type="text" 
-              placeholder="Pregunta algo sobre esta laguna..."
-              class="w-full rounded-2xl border border-slate-300 bg-slate-50/60 py-3 pl-4 pr-36 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
-            />
-            <button 
-              id="btn-preguntar-mayu"
-              type="button" 
-              class="absolute right-1.5 rounded-xl bg-cyan-700 hover:bg-cyan-800 px-3.5 py-2 text-xs font-bold text-white transition shadow-xs cursor-pointer"
-            >
-              Pregúntale a MAYU
-            </button>
-          </div>
-
         </div>
 
+        <!-- Indicadores -->
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="tarjeta tarjeta-riesgo flex items-center gap-4 p-5">
+            <div class="relative h-[70px] w-[120px] flex-none overflow-hidden">
+              <svg class="absolute -top-[2px] left-0 h-[120px] w-[120px]" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M 15 50 A 35 35 0 0 1 26 26" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round" />
+                <path d="M 26 26 A 35 35 0 0 1 50 15" fill="none" stroke="#eab308" stroke-width="10" />
+                <path d="M 50 15 A 35 35 0 0 1 74 26" fill="none" stroke="#f97316" stroke-width="10" />
+                <path d="M 74 26 A 35 35 0 0 1 85 50" fill="none" stroke="#e11d48" stroke-width="10" stroke-linecap="round" />
+                <line id="velocimetro-aguja" x1="50" y1="50" x2="50" y2="22" stroke="#0b1838" stroke-width="3.5" stroke-linecap="round" class="transition-transform duration-1000 ease-out origin-[50px_50px]" style="transform: rotate(-45deg);" />
+                <circle cx="50" cy="50" r="4.5" fill="#0b1838" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm text-slate-500">Nivel de riesgo</p>
+              <p id="velocimetro-etiqueta" class="font-display text-xl font-bold text-noche-900">Sin evaluar</p>
+            </div>
+          </article>
+          <article class="tarjeta tarjeta-hielo flex flex-col p-5" data-arqen-grafico="volumen" id="kpi-volumen">
+            <p class="text-sm text-slate-500">Agua almacenada</p>
+            <p class="font-display text-3xl font-bold text-noche-900 tabular"><span id="kpi-volumen-valor">–</span> <span class="text-base font-medium text-slate-500">hm³</span></p>
+            <p class="mt-auto pt-1 text-sm text-hielo-700">💧 ≈ <b id="kpi-piscinas">–</b> piscinas olímpicas</p>
+          </article>
+          <article class="tarjeta tarjeta-historia flex flex-col p-5">
+            <p class="text-sm text-slate-500">Aguas abajo</p>
+            <p id="flujo-pueblos" class="truncate font-display text-2xl font-bold text-noche-900">–</p>
+            <p class="mt-auto pt-1 text-sm text-slate-600"><b id="metrica-pueblos-num">0</b> poblado(s) · <b id="metrica-eventos-num">0</b> evento(s) en su historia</p>
+          </article>
+          <article class="tarjeta tarjeta-laguna flex flex-col p-5">
+            <p class="text-sm text-slate-500">Obras de seguridad</p>
+            <p id="kpi-obras-si" class="font-display text-2xl font-bold text-laguna-700">–</p>
+            <p id="flujo-obras" class="mt-auto line-clamp-2 pt-1 text-sm text-slate-600">–</p>
+          </article>
+        </div>
+
+        <!-- Alerta -->
+        <div id="banner-alerta" class="tarjeta tarjeta-historia flex items-start gap-3 p-4 text-sm text-ocre-700">
+          <span class="icono icono-historia h-9 w-9 text-base" aria-hidden="true">!</span>
+          <span id="banner-alerta-texto" class="pt-1.5 font-medium">–</span>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid gap-4 lg:grid-cols-2">
+          <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-display text-lg font-bold text-noche-900">Volumen frente a otras lagunas críticas</h3>
+              <span class="text-xs text-slate-500">hm³ · toca una barra</span>
+            </div>
+            <div id="grafico-volumen" class="mt-4 space-y-2"></div>
+            <p class="fuente mt-4">Catálogo de lagunas INAIGEM / ANA</p>
+          </article>
+          <article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-display text-lg font-bold text-noche-900">De dónde viene el agua</h3>
+              <span class="text-xs text-slate-500">recorrido de la cuenca</span>
+            </div>
+            <ol class="mt-4 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+              <li class="flex flex-col rounded-xl bg-hielo-50 p-3 ring-1 ring-sky-100"><span class="text-xs font-semibold text-hielo-700">1 · Glaciar</span><b id="flujo-glaciar" class="mt-1 text-sm text-noche-900">–</b></li>
+              <li class="flex flex-col rounded-xl bg-laguna-50 p-3 ring-1 ring-laguna-100"><span class="text-xs font-semibold text-laguna-700">2 · Laguna</span><b id="flujo-laguna" class="mt-1 text-sm text-noche-900">–</b><span id="flujo-laguna-estado" class="mt-auto pt-1 text-xs text-slate-500">–</span></li>
+              <li class="flex flex-col rounded-xl bg-rose-50 p-3 ring-1 ring-rose-100"><span class="text-xs font-semibold text-rose-700">3 · Superficie</span><b class="mt-1 text-sm text-noche-900"><span id="metrica-superficie">–</span> km²</b><span id="metrica-superficie-doc" class="mt-auto break-words pt-1 font-mono text-[10.5px] leading-snug text-slate-500">–</span></li>
+              <li class="flex flex-col rounded-xl bg-ocre-50 p-3 ring-1 ring-amber-100"><span class="text-xs font-semibold text-ocre-700">4 · Historia</span><div id="linea-tiempo" class="mt-1 space-y-1 text-xs text-slate-700"></div></li>
+            </ol>
+            <p class="fuente mt-4">Ficha técnica del catálogo oficial</p>
+          </article>
+        </div>
+
+        <!-- Evidencia documental -->
+        <div id="contenedor-docs-rag" class="tarjeta p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-display text-lg font-bold text-noche-900">Lo que dicen los informes</h3>
+            <span class="etiqueta bg-hielo-50 text-hielo-700">Fragmentos originales · sin IA</span>
+          </div>
+          <div id="lista-docs-rag" class="mt-4 grid gap-3 md:grid-cols-2"></div>
+          <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+            <span class="self-center text-sm text-slate-500">Pregúntale al asistente:</span>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="¿Y si se desborda esta laguna? ¿Qué zonas se verían afectadas?">¿Y si se desborda?</button>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="Explícame en términos simples el riesgo de esta laguna.">Explícamela en simple</button>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="¿Qué obras de seguridad tiene esta laguna y funcionan?">¿Está protegida?</button>
+          </div>
+        </div>
       </div>
 
       <!-- ======================================================== -->
@@ -338,7 +161,7 @@ import { SITE_CONFIG } from '../config/site.config';
           <!-- Lado Izquierdo: Resumen Departamental -->
           <div class="lg:col-span-4 space-y-4">
             
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+            <div class="tarjeta tarjeta-marca tejida space-y-4 p-6">
               <div>
                 <label for="select-colorear" class="text-xs font-bold text-slate-700 block mb-1.5">
                   Colorear por
@@ -355,7 +178,7 @@ import { SITE_CONFIG } from '../config/site.config';
 
               <!-- Tarjeta de métricas departamentales -->
               <div class="pt-3 border-t border-slate-100">
-                <h3 id="mapa-dept-nombre" class="text-2xl font-black text-slate-900">Áncash</h3>
+                <h3 id="mapa-dept-nombre" class="font-display text-2xl font-bold text-noche-900">Áncash</h3>
                 <div class="flex items-baseline gap-2 mt-1">
                   <span id="mapa-dept-num" class="text-4xl font-black text-rose-600">9</span>
                   <span class="text-xs font-semibold text-slate-600">lagunas en riesgo</span>
@@ -368,7 +191,7 @@ import { SITE_CONFIG } from '../config/site.config';
                   <button 
                     id="btn-ver-todo-peru"
                     type="button" 
-                    class="w-full rounded-xl border border-cyan-300 bg-cyan-50/70 py-2 text-xs font-bold text-cyan-900 hover:bg-cyan-100 transition shadow-2xs cursor-pointer"
+                    class="btn btn-sec w-full"
                   >
                     Ver todo el Perú
                   </button>
@@ -381,7 +204,7 @@ import { SITE_CONFIG } from '../config/site.config';
             </div>
 
             <!-- Lista de lagunas del departamento seleccionado -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-3">
+            <div class="tarjeta space-y-3 p-5">
               <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Lagunas en esta zona
               </h4>
@@ -394,7 +217,7 @@ import { SITE_CONFIG } from '../config/site.config';
 
           <!-- Lado Derecho: Mapa Interactivo con Leaflet + CARTO Positron -->
           <div class="lg:col-span-8">
-            <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs flex flex-col">
+            <div class="tarjeta tarjeta-hielo flex flex-col overflow-hidden">
               <div class="p-3.5 border-b border-slate-200 flex items-center justify-between text-xs text-slate-700 bg-slate-50">
                 <span class="font-bold">Distribución geográfica de lagunas de alta montaña</span>
                 <span class="text-slate-400 text-[11px]">Cartografía Esri Topo / OSM</span>
@@ -425,11 +248,15 @@ import { SITE_CONFIG } from '../config/site.config';
       </div>
 
     </div>
-  </main>
+  </div>
+  <Visor3D />
 </Layout>
 
 <!-- Script de Datos, Ficha Técnica y Mapa -->
 <script define:vars={{ LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO, API_BASE: SITE_CONFIG.apiBaseUrl }}>
+  // Escape HTML: todo dato del backend/URL se escapa antes de ir a innerHTML (anti-XSS)
+  const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"'`]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
+
   // Normalizador para búsqueda insensible a acentos
   const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
@@ -443,35 +270,62 @@ import { SITE_CONFIG } from '../config/site.config';
   // ========================================================
   // RENDERIZAR FICHA TÉCNICA
   // ========================================================
+
+  const claseRiesgo = (r) => r === 'Muy alto' ? 'riesgo-muy-alto' : r === 'Alto' ? 'riesgo-alto' : r === 'Medio' ? 'riesgo-medio' : r === 'Bajo' ? 'riesgo-bajo' : 'riesgo-sin';
+  const colorRiesgo = (r) => r === 'Muy alto' ? '#e11d48' : r === 'Alto' ? '#f97316' : r === 'Medio' ? '#eab308' : r === 'Bajo' ? '#16a34a' : '#94a3b8';
+
+  function pintarGraficoVolumen(laguna) {
+    const cont = document.getElementById('grafico-volumen');
+    if (!cont) return;
+    const orden = { 'Muy alto': 4, 'Alto': 3 };
+    let filas = LAGUNAS_DESTACADAS.filter((x) => orden[x.riesgo] || x.id === laguna.id).sort((a, b) => b.volumen_hm3 - a.volumen_hm3).slice(0, 6);
+    if (!filas.some((x) => x.id === laguna.id)) { const propia = LAGUNAS_DESTACADAS.find((x) => x.id === laguna.id); if (propia) filas = [...filas.slice(0, 5), propia]; }
+    const max = Math.max(...filas.map((x) => x.volumen_hm3), 1);
+    cont.innerHTML = filas.map((x) => {
+      const propia = x.id === laguna.id;
+      return `<button type="button" data-arqen-grafico="volumen" data-arqen-valor="${esc(x.nombre)}" data-arqen-laguna="${esc(x.nombre)}" data-arqen-laguna-id="${esc(x.id)}" class="grid w-full grid-cols-[110px_1fr_52px] items-center gap-3 rounded-lg text-left text-sm">
+        <span class="truncate ${propia ? 'font-semibold text-noche-900' : 'text-slate-600'}">${esc(x.nombre)}</span>
+        <span class="h-5 overflow-hidden rounded-md bg-white ring-1 ring-slate-100"><span class="block h-full rounded-md" style="width:${Math.max(3, (x.volumen_hm3 / max) * 100)}%;background:${propia ? 'linear-gradient(90deg,#14b8a6,#0d9488)' : colorRiesgo(x.riesgo)};opacity:${propia ? 1 : .55}"></span></span>
+        <span class="text-right font-mono text-xs ${propia ? 'font-medium text-noche-900' : 'text-slate-500'}">${esc(x.volumen_hm3)}</span>
+      </button>`;
+    }).join('');
+  }
+
+  function pintarLineaTiempo(laguna) {
+    const cont = document.getElementById('linea-tiempo');
+    if (!cont) return;
+    const hitos = [];
+    if (laguna.primer_estudio_ano) hitos.push([laguna.primer_estudio_ano, 'primer estudio']);
+    if (laguna.ano_evento_critico) hitos.push([laguna.ano_evento_critico, 'evento crítico']);
+    hitos.push([String(laguna.fecha_actualizacion || '').slice(0, 4) || '–', 'último dato']);
+    hitos.sort((a, b) => Number(a[0]) - Number(b[0]));
+    cont.innerHTML = hitos.map(([a, t]) => `<p><b class="font-mono text-noche-900">${esc(a)}</b> ${esc(t)}</p>`).join('');
+  }
+
   function renderFicha(laguna) {
     if (!laguna) return;
     currentLaguna = laguna;
 
     // Encabezado
-    document.getElementById('badge-breadcrumb').textContent = `• Laguna ${laguna.nombre} · ${laguna.departamento}`;
+    document.getElementById('badge-breadcrumb').textContent = `${laguna.departamento} · Cordillera ${laguna.cordillera} · ${Number(laguna.altitud_msnm || 0).toLocaleString('es-PE')} m`;
     document.getElementById('ficha-cordillera').textContent = `${laguna.departamento} • cordillera ${laguna.cordillera}`;
-    document.getElementById('ficha-nombre').innerHTML = `Laguna <span class="text-cyan-700">${laguna.nombre}</span>`;
+    document.getElementById('ficha-nombre').innerHTML = `Laguna <span class="text-laguna-700">${esc(String(laguna.nombre).replace(/^Laguna\s+/i, ''))}</span>`;
 
     // Badges
     const badgeRiesgo = document.getElementById('badge-riesgo-pill');
     badgeRiesgo.textContent = laguna.riesgo;
-    badgeRiesgo.className = `rounded-full px-2.5 py-0.5 font-bold text-xs ${
-      laguna.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
-      laguna.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-      laguna.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-      laguna.riesgo === 'Bajo' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-      'bg-slate-200 text-slate-700'
-    }`;
+    badgeRiesgo.textContent = `Riesgo ${String(laguna.riesgo).toLowerCase()}`;
+    badgeRiesgo.className = `etiqueta ${claseRiesgo(laguna.riesgo)}`;
 
-    document.getElementById('badge-docs').textContent = `• ${laguna.total_documentos} documentos`;
-    document.getElementById('badge-datos').textContent = `• ${laguna.datos_conectados} datos conectados`;
-    document.getElementById('badge-confianza').textContent = `• Confianza ${laguna.confianza}`;
+    document.getElementById('badge-docs').textContent = `${laguna.total_documentos} informes la respaldan`;
+    document.getElementById('badge-datos').textContent = `${laguna.datos_conectados} datos conectados`;
+    document.getElementById('badge-confianza').textContent = `Confianza ${laguna.confianza}`;
     document.getElementById('badge-fecha').textContent = `Último dato: ${laguna.fecha_actualizacion}`;
 
     // Velocímetro y aguja
     const aguja = document.getElementById('velocimetro-aguja');
     const etiqueta = document.getElementById('velocimetro-etiqueta');
-    etiqueta.textContent = `Riesgo ${laguna.riesgo.toLowerCase()}`;
+    etiqueta.textContent = laguna.riesgo;
 
     let rotacion = -45; // default sin evaluar
     if (laguna.riesgo === 'Bajo') rotacion = -65;
@@ -507,11 +361,19 @@ import { SITE_CONFIG } from '../config/site.config';
       banner.classList.add('hidden');
     }
 
-    // Actualizar input de pregunta
-    const inputPregunta = document.getElementById('input-pregunta-laguna');
-    if (inputPregunta) {
-      inputPregunta.placeholder = `Pregunta algo sobre la laguna ${laguna.nombre}...`;
-    }
+    // Indicadores con equivalencias que se entienden
+    const vol = Number(laguna.volumen_hm3);
+    document.getElementById('kpi-volumen-valor').textContent = Number.isFinite(vol) ? String(vol) : '–';
+    document.getElementById('kpi-piscinas').textContent = Number.isFinite(vol) ? Math.round(vol * 400).toLocaleString('es-PE') : '–';
+    const kv = document.getElementById('kpi-volumen');
+    if (kv) { kv.dataset.arqenValor = laguna.nombre; kv.dataset.arqenLaguna = laguna.nombre; kv.dataset.arqenLagunaId = laguna.id; }
+    const obrasSi = document.getElementById('kpi-obras-si');
+    if (obrasSi) { obrasSi.textContent = laguna.tiene_obras ? 'Sí' : 'No'; obrasSi.className = `font-display text-2xl font-bold ${laguna.tiene_obras ? 'text-laguna-700' : 'text-cochinilla-600'}`; }
+    pintarGraficoVolumen(laguna);
+    pintarLineaTiempo(laguna);
+
+    // Contexto para el asistente único
+    window.ARQEN?.fijarContexto({ seccion: 'Ficha de laguna', laguna: laguna.nombre, lagunaId: laguna.id, departamento: laguna.departamento }, true);
 
     // Consultar evidencia y citas documentales en vivo desde el RAG (398 Informes oficiales - Cero LLM)
     cargarDetalleRAG(laguna);
@@ -523,7 +385,7 @@ import { SITE_CONFIG } from '../config/site.config';
     contDocs.innerHTML = `<div class="col-span-2 py-3 text-xs text-slate-400 text-center animate-pulse">Consultando 398 documentos del RAG en milisegundos (Cero LLM)...</div>`;
 
     try {
-      const res = await fetch(`${API_BASE}/api/lagunas/${laguna.id}`);
+      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(laguna.id)}`);
       if (!res.ok) throw new Error("API offline");
       const data = await res.json();
 
@@ -537,10 +399,10 @@ import { SITE_CONFIG } from '../config/site.config';
         contDocs.innerHTML = data.fragmentos_rag.map(f => `
           <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 hover:bg-white hover:border-cyan-300 transition shadow-2xs">
             <div class="flex items-center justify-between text-[11px] font-bold text-slate-800">
-              <span class="truncate pr-2">${f.titulo || 'Informe Glaciológico Oficial'}</span>
-              <span class="rounded bg-slate-200/90 px-1.5 py-0.5 text-[9px] text-slate-700 font-semibold shrink-0">${f.fuente} · ${f.anio} ${f.pagina ? `p. ${f.pagina}` : ''}</span>
+              <span class="truncate pr-2">${esc(f.titulo || 'Informe glaciológico oficial')}</span>
+              <span class="rounded bg-slate-200/90 px-1.5 py-0.5 text-[11px] text-slate-700 font-semibold shrink-0">${esc(f.fuente)} · ${esc(f.anio)} ${f.pagina ? `p. ${esc(f.pagina)}` : ''}</span>
             </div>
-            <p class="text-xs text-slate-600 italic line-clamp-3 mt-1.5 leading-relaxed">"${f.extracto}"</p>
+            <p class="text-xs text-slate-600 italic line-clamp-3 mt-1.5 leading-relaxed">“${esc(f.extracto)}”</p>
           </div>
         `).join('');
         return;
@@ -552,7 +414,7 @@ import { SITE_CONFIG } from '../config/site.config';
     contDocs.innerHTML = `
       <div class="col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500 flex items-center justify-between">
         <span>Registro oficial indexado en el Inventario Nacional de Glaciares y Lagunas (ANA / INAIGEM).</span>
-        <span class="text-[10px] font-semibold text-emerald-700">Evidencia verificada</span>
+        <span class="text-[11px] font-semibold text-emerald-700">Evidencia verificada</span>
       </div>
     `;
   }
@@ -582,34 +444,37 @@ import { SITE_CONFIG } from '../config/site.config';
       const esActiva = currentLaguna && currentLaguna.id.toLowerCase() === l.id.toLowerCase();
       return `
         <div 
-          id="item-laguna-${l.id}"
+          id="item-laguna-${esc(l.id)}"
+          data-laguna-id="${esc(l.id)}"
+          role="button"
+          tabindex="0"
           class="p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2 ${
             esActiva 
               ? 'border-cyan-500 bg-cyan-50/70 shadow-xs ring-1 ring-cyan-400' 
               : 'border-slate-200 hover:border-slate-400 hover:bg-slate-50'
           }"
-          onclick="window.enfocarLagunaEnMapa('${l.id}')"
           title="Clic para enfocar en el mapa"
         >
           <div class="min-w-0 flex-1">
             <div class="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
-              <span>Laguna ${l.nombre}</span>
+              <span>Laguna ${esc(l.nombre)}</span>
               ${esActiva ? '<span class="inline-block h-1.5 w-1.5 rounded-full bg-cyan-600"></span>' : ''}
             </div>
-            <div class="text-[11px] text-slate-500 truncate">${l.departamento} · C. ${l.cordillera}</div>
+            <div class="text-[11px] text-slate-500 truncate">${esc(l.departamento)} · C. ${esc(l.cordillera)}</div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded ${
               l.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800' :
               l.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800' :
               l.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800' :
               'bg-slate-100 text-slate-700'
             }">
-              ${l.riesgo}
+              ${esc(l.riesgo)}
             </span>
             <button 
               type="button"
-              onclick="event.stopPropagation(); window.selectLagunaById('${l.id}')"
+              data-abrir-ficha="${esc(l.id)}"
+              aria-label="Abrir ficha de la laguna ${esc(l.nombre)}"
               class="rounded-lg p-1 text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 transition"
               title="Abrir ficha técnica detallada"
             >
@@ -619,6 +484,29 @@ import { SITE_CONFIG } from '../config/site.config';
         </div>
       `;
     }).join('');
+  }
+
+  // Delegación de eventos (reemplaza los onclick inline, que permitían inyectar JS)
+  const listaDelegada = document.getElementById('lista-lagunas-dept');
+  if (listaDelegada) {
+    listaDelegada.addEventListener('click', (e) => {
+      const btnFicha = e.target.closest('[data-abrir-ficha]');
+      if (btnFicha) {
+        e.stopPropagation();
+        window.selectLagunaById(btnFicha.getAttribute('data-abrir-ficha'));
+        return;
+      }
+      const item = e.target.closest('[data-laguna-id]');
+      if (item) window.enfocarLagunaEnMapa(item.getAttribute('data-laguna-id'));
+    });
+    listaDelegada.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const item = e.target.closest('[data-laguna-id]');
+      if (item && !e.target.closest('[data-abrir-ficha]')) {
+        e.preventDefault();
+        window.enfocarLagunaEnMapa(item.getAttribute('data-laguna-id'));
+      }
+    });
   }
 
   function resaltarLagunaEnLista(id) {
@@ -695,9 +583,9 @@ import { SITE_CONFIG } from '../config/site.config';
           if (contDocs) {
             contDocs.innerHTML = data.fragmentos_rag.map(doc => `
               <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
-                <div class="font-bold text-slate-900 text-xs">${doc.titulo}</div>
-                <div class="text-[10px] text-slate-500 font-semibold">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
-                <p class="text-[11px] text-slate-600 italic">"${doc.extracto}..."</p>
+                <div class="font-bold text-slate-900 text-xs">${esc(doc.titulo)}</div>
+                <div class="text-[11px] text-slate-500 font-semibold">${esc(doc.fuente)} · ${esc(doc.anio)} ${doc.pagina ? `(p. ${esc(doc.pagina)})` : ''}</div>
+                <p class="text-[11px] text-slate-600 italic">“${esc(doc.extracto)}…”</p>
               </div>
             `).join('');
           }
@@ -781,9 +669,9 @@ import { SITE_CONFIG } from '../config/site.config';
         if (contDocs) {
           contDocs.innerHTML = docs.map(doc => `
             <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
-              <div class="font-bold text-slate-900 text-xs">${doc.titulo}</div>
-              <div class="text-[10px] text-slate-500 font-semibold">${doc.fuente} · ${doc.anio} ${doc.pagina ? `(p. ${doc.pagina})` : ''}</div>
-              <p class="text-[11px] text-slate-600 italic">"${doc.extracto}..."</p>
+              <div class="font-bold text-slate-900 text-xs">${esc(doc.titulo)}</div>
+              <div class="text-[11px] text-slate-500 font-semibold">${esc(doc.fuente)} · ${esc(doc.anio)} ${doc.pagina ? `(p. ${esc(doc.pagina)})` : ''}</div>
+              <p class="text-[11px] text-slate-600 italic">“${esc(doc.extracto)}…”</p>
             </div>
           `).join('');
         }
@@ -871,7 +759,7 @@ import { SITE_CONFIG } from '../config/site.config';
             const totalLagunas = dataDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
             select.innerHTML = `
               <option value="todos">Todo el Perú (${totalLagunas} lagunas críticas)</option>
-              ${dataDeptos.map(d => `<option value="${d.departamento.toLowerCase()}">${d.departamento} (${d.total} lagunas · ${d.muy_alto} muy alto)</option>`).join('')}
+              ${dataDeptos.map(d => `<option value="${esc(String(d.departamento).toLowerCase())}">${esc(d.departamento)} (${esc(d.total)} lagunas · ${esc(d.muy_alto)} muy alto)</option>`).join('')}
             `;
             if (dataDeptos.some(d => d.departamento.toLowerCase() === currentVal)) {
               select.value = currentVal;
@@ -950,19 +838,19 @@ import { SITE_CONFIG } from '../config/site.config';
       filtrarPorDepartamento('todos');
     });
 
-    // Preguntar con asistente
-    const btnMayu = document.getElementById('btn-preguntar-mayu');
-    const inputMayu = document.getElementById('input-pregunta-laguna');
-    btnMayu?.addEventListener('click', () => {
-      const q = inputMayu?.value.trim() || `¿Cuál es la situación actual de riesgo en la laguna ${currentLaguna.nombre}?`;
-      abrirChatConPregunta(q);
+    // Un solo asistente: estos botones lo abren con el contexto de la laguna
+    const ctxLaguna = () => ({ seccion: 'Ficha de laguna', laguna: currentLaguna.nombre, lagunaId: currentLaguna.id, departamento: currentLaguna.departamento });
+    document.getElementById('btn-preguntar-mayu')?.addEventListener('click', () => window.ARQEN?.abrirAsistente(ctxLaguna()));
+    document.getElementById('btn-generar-informe')?.addEventListener('click', () => window.ARQEN?.informeLaguna(currentLaguna.id));
+    document.getElementById('btn-ver-3d-ficha')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('arqen:ver3d', { detail: { nombre: currentLaguna.nombre, lat: currentLaguna.lat, lng: currentLaguna.lng, alt: currentLaguna.altitud_msnm } }));
     });
 
     document.querySelectorAll('.btn-accion-chat').forEach(btn => {
       btn.addEventListener('click', () => {
         const prompt = btn.getAttribute('data-prompt');
         if (prompt) {
-          abrirChatConPregunta(`${prompt} (Laguna ${currentLaguna.nombre}, ${currentLaguna.departamento})`);
+          window.ARQEN?.abrirAsistente(ctxLaguna(), `${prompt} (Laguna ${currentLaguna.nombre}, ${currentLaguna.departamento})`, true);
         }
       });
     });
@@ -996,17 +884,4 @@ import { SITE_CONFIG } from '../config/site.config';
     }
   });
 
-  function abrirChatConPregunta(pregunta) {
-    // Abrir ChatDrawer flotante si existe
-    const btnAsistente = document.getElementById('btn-abrir-asistente');
-    btnAsistente?.click();
-
-    setTimeout(() => {
-      const chatInput = document.getElementById('chat-input') || document.querySelector('textarea[name="chat-input"]');
-      if (chatInput) {
-        chatInput.value = pregunta;
-        chatInput.focus();
-      }
-    }, 300);
-  }
 </script>

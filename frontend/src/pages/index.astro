@@ -1,33 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroSection from '../components/HeroSection.astro';
-import CordilleraSimulatorSection from '../components/CordilleraSimulatorSection.astro';
 import CountryMetrics from '../components/CountryMetrics.astro';
-import ExploreCards from '../components/ExploreCards.astro';
-import SearchAndMap from '../components/SearchAndMap.astro';
-import ComparatorSection from '../components/ComparatorSection.astro';
-import AcercaDeSection from '../components/AcercaDeSection.astro';
+import AccesosRapidos from '../components/AccesosRapidos.astro';
 ---
-
+<!-- Inicio: portada 3D, el país en cuatro datos y accesos a cada sección (cada una es su propia página) -->
 <Layout>
-  <!-- 1. Hero con recorrido infinito vectorial (SVG), difuminado y buscador institucional -->
   <HeroSection />
-
-  <!-- 2. Simulador morfodinámico en 5 escenas (Cámara dinámica, aluvión y SAT) -->
-  <CordilleraSimulatorSection />
-
-  <!-- 3. El país en tres datos (Cifras auditadas con citas exactas) -->
   <CountryMetrics />
-
-  <!-- 4. Módulos de Exploración -->
-  <ExploreCards />
-
-  <!-- 5. Búsqueda territorial y Mapa vectorial del Perú -->
-  <SearchAndMap />
-
-  <!-- 6. Compara y descubre (Barras, serie histórica de estudios y red de relaciones) -->
-  <ComparatorSection />
-
-  <!-- 7. Acerca de: Validación Científica, Estadísticas RAGAS y Descarga Excel -->
-  <AcercaDeSection />
+  <AccesosRapidos />
 </Layout>

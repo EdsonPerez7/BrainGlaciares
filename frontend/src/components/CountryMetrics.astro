@@ -1,303 +1,146 @@
 ---
-import { METRICAS_PAIS } from '../config/metrics.data';
+import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
+import { formatoMiles } from '../config/recorrido.data';
 
-const HISTOGRAM_BARS = [
-  { label: "1868–1920", events: 8, height: 30, color: "bg-amber-300 hover:bg-amber-400" },
-  { label: "1920–1940", events: 12, height: 45, color: "bg-amber-300 hover:bg-amber-400" },
-  { label: "1940–1960", events: 24, height: 90, color: "bg-amber-400 hover:bg-amber-500", note: "Huaraz 1941" },
-  { label: "1960–1980", events: 27, height: 100, color: "bg-amber-500 hover:bg-amber-600", note: "Huascarán 1970" },
-  { label: "1980–2000", events: 15, height: 55, color: "bg-amber-400 hover:bg-amber-500" },
-  { label: "2000–2020", events: 11, height: 40, color: "bg-amber-300 hover:bg-amber-400", note: "Laguna 513" },
-  { label: "2020s", events: 3, height: 15, color: "bg-amber-200 hover:bg-amber-300" }
+const h = METRICAS_PAIS.hielo_perdido;
+const r = METRICAS_PAIS.lagunas_riesgo;
+const a = METRICAS_PAIS.aluviones_historicos;
+
+// Aluviones por época (catálogo histórico)
+const EPOCAS = [
+  { label: '1868–1920', corto: '1900', eventos: 8 },
+  { label: '1920–1940', corto: '1930', eventos: 12 },
+  { label: '1940–1960', corto: '1950', eventos: 24, nota: 'Huaraz 1941' },
+  { label: '1960–1980', corto: '1970', eventos: 27, nota: 'Yungay 1970' },
+  { label: '1980–2000', corto: '1990', eventos: 15 },
+  { label: '2000–2020', corto: '2010', eventos: 11, nota: 'Laguna 513' },
+  { label: '2020–hoy', corto: 'hoy', eventos: 3 },
 ];
+const maxEv = Math.max(...EPOCAS.map((e) => e.eventos));
+const deptos = DEPARTAMENTOS_RIESGO.filter((d) => d.total > 0);
+const maxDep = Math.max(...deptos.map((d) => d.total));
+const circ = 2 * Math.PI * 42;
+interface Props { comoPagina?: boolean }
+const { comoPagina = false } = Astro.props;
 ---
 
-<section id="panorama" class="border-b border-slate-200 bg-slate-50/60 py-12 sm:py-16 w-full">
-  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-    <!-- Encabezado de la Sección -->
-    <div class="mb-6 flex items-center justify-between">
+<section id="panorama" data-contexto="Panorama" class="relative w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">El país en tres datos</h2>
-        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Cifras consolidadas del inventario nacional y compendios históricos oficiales</p>
+        <span class="sobretitulo">Panorama nacional</span>
+        {comoPagina ? <h1 class="seccion-titulo mt-2">El país en cuatro datos</h1> : <h2 class="seccion-titulo mt-2">El país en cuatro datos</h2>}
+        <p class="seccion-sub">Toca cualquier gráfico y el asistente te sugiere qué preguntar.</p>
       </div>
-      <span class="rounded bg-slate-200/80 px-2.5 py-1 text-[11px] font-medium text-slate-700">Evidencia auditable</span>
+      <a href="/metodologia" class="btn btn-sec">¿De dónde salen los datos?</a>
     </div>
 
-    <!-- Rejilla de Métricas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- Dato 1: Retroceso Glaciar (Radial Gauge) -->
-      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:border-slate-300">
-        <div class="flex items-center gap-5 sm:gap-6 my-auto py-2">
-          <!-- Radial Gauge más grande y centrado verticalmente con su texto -->
-          <div class="relative flex h-24 w-24 sm:h-28 sm:w-28 flex-shrink-0 items-center justify-center">
-            <svg class="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
-              <!-- Círculo de fondo -->
-              <path
-                class="text-slate-100"
-                stroke-width="3.5"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <!-- Arco animado -->
-              <path
-                id="gauge-progress-circle"
-                class="text-cyan-600"
-                stroke-dasharray="0, 100"
-                stroke-width="3.5"
-                stroke-linecap="round"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-            </svg>
-            <span id="counter-metric-1" class="absolute text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              0%
-            </span>
-          </div>
-
-          <!-- Texto descriptivo alineado y más grande -->
-          <div class="space-y-1.5">
-            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-              del hielo glaciar se ha perdido
-            </h3>
-            <p id="txt-superficie-glaciar" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              De {METRICAS_PAIS.hielo_perdido.superficie_1962_km2.toLocaleString('es-PE')} a {METRICAS_PAIS.hielo_perdido.superficie_2016_km2.toLocaleString('es-PE')} km² ({METRICAS_PAIS.hielo_perdido.periodo})
-            </p>
-          </div>
+    <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <!-- 1. Hielo perdido -->
+      <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-hielo"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 4l3 3 3-3M9 20l3-3 3 3"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Hielo perdido</h3>
         </div>
+        <button type="button" data-arqen-grafico="hielo" data-arqen-valor={`${h.porcentaje} %`} class="mt-4 flex items-center gap-4 rounded-xl text-left" aria-label={`Se perdió el ${h.porcentaje} % del hielo. Preguntar sobre esto`}>
+          <svg class="h-24 w-24 flex-none -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e0f2fe" stroke-width="12" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#grad-hielo)" stroke-width="12" stroke-linecap="round" stroke-dasharray={`${(h.porcentaje / 100) * circ} ${circ}`} />
+            <defs><linearGradient id="grad-hielo"><stop offset="0" stop-color="#38bdf8" /><stop offset="1" stop-color="#0369a1" /></linearGradient></defs>
+          </svg>
+          <span>
+            <span class="block font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={h.porcentaje} data-sufijo=" %">{h.porcentaje} %</span>
+            <span class="mt-1 block text-sm text-slate-600">de {formatoMiles(h.superficie_1962_km2)} a {formatoMiles(h.superficie_2016_km2)} km²</span>
+          </span>
+        </button>
+        <p class="mt-4 text-sm text-slate-600">El Perú perdió la mitad de su hielo entre {h.periodo}.</p>
+        <p class="fuente">ANA · Inventario Nacional, {h.pagina}</p>
+      </article>
 
-        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span id="txt-fuente-hielo">Fuente: {METRICAS_PAIS.hielo_perdido.fuente}</span>
-          <span class="font-semibold text-slate-600">{METRICAS_PAIS.hielo_perdido.pagina}</span>
+      <!-- 2. Lagunas en riesgo -->
+      <article class="tarjeta tarjeta-riesgo tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-riesgo"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Lagunas en riesgo crítico</h3>
         </div>
-      </div>
-
-      <!-- Dato 2: Lagunas en Riesgo Crítico -->
-      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:border-slate-300">
-        <div>
-          <div class="flex items-baseline gap-2">
-            <span id="counter-metric-2" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
-              0
-            </span>
-            <span class="text-sm font-semibold text-slate-800">lagunas en riesgo crítico</span>
-          </div>
-
-          <!-- Barra de distribución animada -->
-          <div class="mt-4 h-3 w-full rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
-            <div id="bar-riesgo-muy-alto" class="bg-rose-600 h-full w-0" title="8 Muy alto"></div>
-            <div id="bar-riesgo-alto" class="bg-amber-500 h-full w-0" title="10 Alto"></div>
-          </div>
-
-          <div class="mt-3 flex items-center justify-between text-xs text-slate-600">
-            <div class="flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-rose-600"></span>
-              <span id="txt-detalle-muy-alto">8 muy alto</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-              <span id="txt-detalle-alto">10 alto</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-slate-400"></span>
-              <span id="txt-detalle-sin-obra" class="font-medium text-slate-900">3 sin obra</span>
-            </div>
-          </div>
+        <span class="mt-4 font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={r.total}>{r.total}</span>
+        <div class="mt-4 flex h-4 overflow-hidden rounded-full" role="group" aria-label="Lagunas por nivel de riesgo">
+          <button type="button" data-arqen-grafico="riesgo-pais" data-arqen-valor="Muy alto" class="bg-rose-600" style={`flex:${r.muy_alto}`} aria-label={`${r.muy_alto} de riesgo muy alto`}></button>
+          <button type="button" data-arqen-grafico="riesgo-pais" data-arqen-valor="Alto" class="bg-orange-500" style={`flex:${r.alto}`} aria-label={`${r.alto} de riesgo alto`}></button>
         </div>
-
-        <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
-          <span>Fuente: {METRICAS_PAIS.lagunas_riesgo.fuente}</span>
+        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
+          <span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-full bg-rose-600"></i>{r.muy_alto} muy alto</span>
+          <span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-full bg-orange-500"></i>{r.alto} alto</span>
         </div>
-      </div>
+        <p class="mt-3 text-sm font-medium text-cochinilla-700">{r.sin_obras_seguridad} todavía sin obras de seguridad.</p>
+        <p class="fuente">INAIGEM · {r.pagina}</p>
+      </article>
 
-      <!-- Dato 3: Histórico de Aluviones y Desbordes -->
-      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:border-slate-300">
-        <div>
-          <div class="flex items-baseline gap-2">
-            <span id="counter-metric-3" class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
-              0
-            </span>
-            <span class="text-sm font-semibold text-slate-800">aluviones y desbordes</span>
-          </div>
-
-          <!-- Histograma animado por décadas -->
-          <div class="mt-4 flex items-end gap-2 h-12 pt-2">
-            {HISTOGRAM_BARS.map((bar, idx) => (
-              <div class="flex-1 h-full flex items-end group/bar relative">
-                <div
-                  class={`histogram-bar w-full rounded-t ${bar.color} cursor-pointer transition-transform duration-700 ease-out`}
-                  style={`height: ${bar.height}%; transform: scaleY(0); transform-origin: bottom; transition-delay: ${idx * 60}ms;`}
-                  title={`${bar.label}: ${bar.events} eventos${bar.note ? ` (${bar.note})` : ''}`}
-                ></div>
-              </div>
-            ))}
-          </div>
-
-          <div class="mt-1 flex justify-between text-[10px] text-slate-400 font-medium">
-            <span>1868</span>
-            <span>Por década</span>
-            <span>2020s</span>
-          </div>
+      <!-- 3. Aluviones por época -->
+      <article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-historia"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Aluviones desde {a.primer_registro_ano}</h3>
         </div>
-
-        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Registrados en documentos oficiales</span>
-          <span class="font-medium text-slate-600">Más antiguo: 1868</span>
+        <span class="mt-4 font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={a.total_registrados}>{a.total_registrados}</span>
+        <div class="mt-4 flex h-24 items-end gap-1.5" role="group" aria-label="Aluviones por época">
+          {EPOCAS.map((e) => (
+            <button type="button" data-arqen-grafico="aluviones" data-arqen-valor={e.label} class="group relative flex h-full flex-1 flex-col justify-end" aria-label={`${e.eventos} aluviones entre ${e.label}`} title={`${e.label}: ${e.eventos}${e.nota ? ` · ${e.nota}` : ''}`}>
+              <span class={`block w-full rounded-t-md ${e.eventos > 20 ? 'bg-ocre-600' : 'bg-ocre-400'} transition group-hover:brightness-110`} style={`height:${Math.max(8, (e.eventos / maxEv) * 100)}%`}></span>
+            </button>
+          ))}
         </div>
-      </div>
+        <div class="mt-1.5 flex gap-1.5 font-mono text-[10.5px] text-slate-500">
+          {EPOCAS.map((e) => <span class="flex-1 text-center">{e.corto}</span>)}
+        </div>
+        <p class="fuente mt-3">ANA · INAIGEM · SENAMHI</p>
+      </article>
 
+      <!-- 4. Por departamento -->
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-laguna"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">¿Dónde están?</h3>
+        </div>
+        <ul class="mt-4 space-y-2">
+          {deptos.map((d) => (
+            <li>
+              <button type="button" data-arqen-grafico="departamento" data-arqen-valor={d.departamento} data-arqen-departamento={d.departamento} class="flex w-full items-center gap-2 rounded-lg text-left text-sm">
+                <span class="w-20 flex-none truncate text-slate-700">{d.departamento}</span>
+                <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white">
+                  <span class="bg-rose-600" style={`width:${(d.muy_alto / maxDep) * 100}%`}></span>
+                  <span class="bg-orange-500" style={`width:${(d.alto / maxDep) * 100}%`}></span>
+                </span>
+                <span class="w-5 flex-none text-right font-mono text-xs font-medium text-slate-700">{d.total}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p class="fuente mt-3">INAIGEM · lagunas críticas</p>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- Script de Animaciones de Entrada -->
 <script>
-  import { ApiService } from '../services/api';
-
-  async function initMetricsAnimation() {
-    const section = document.getElementById('panorama');
-    if (!section) return;
-
-    let hasAnimated = false;
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
-    // Obtener datos frescos del backend (con fallback automático a los datos de verdad local)
-    let TARGET_1 = 52;
-    let TARGET_2 = 18;
-    let TARGET_3 = 100;
-    let TARGET_BAR_MUY_ALTO = 44.444;
-    let TARGET_BAR_ALTO = 55.556;
-
-    try {
-      const metricas = await ApiService.getMetricasPais();
-      if (metricas) {
-        TARGET_1 = metricas.hielo_perdido.porcentaje || 52;
-        TARGET_2 = metricas.lagunas_riesgo.total || 18;
-        TARGET_3 = metricas.aluviones_historicos.total_registrados || 100;
-
-        const muyAlto = metricas.lagunas_riesgo.muy_alto || 8;
-        const alto = metricas.lagunas_riesgo.alto || 10;
-        const sinObra = metricas.lagunas_riesgo.sin_obra || 3;
-
-        TARGET_BAR_MUY_ALTO = (muyAlto / Math.max(TARGET_2, 1)) * 100;
-        TARGET_BAR_ALTO = (alto / Math.max(TARGET_2, 1)) * 100;
-
-        // Actualizar textos en el DOM si el backend tiene datos frescos
-        const txtSup = document.getElementById('txt-superficie-glaciar');
-        if (txtSup && metricas.hielo_perdido.superficie_historica_km2) {
-          txtSup.textContent = `De ${metricas.hielo_perdido.superficie_historica_km2.toLocaleString('es-PE')} a ${metricas.hielo_perdido.superficie_actual_km2.toLocaleString('es-PE')} km² (${metricas.hielo_perdido.periodo})`;
-        }
-        const txtMuyAlto = document.getElementById('txt-detalle-muy-alto');
-        if (txtMuyAlto) txtMuyAlto.textContent = `${muyAlto} muy alto`;
-        const txtAlto = document.getElementById('txt-detalle-alto');
-        if (txtAlto) txtAlto.textContent = `${alto} alto`;
-        const txtSinObra = document.getElementById('txt-detalle-sin-obra');
-        if (txtSinObra) txtSinObra.textContent = `${sinObra} sin obra`;
-      }
-    } catch {
-      // Mantiene los targets de fallback
-    }
-
-    function startAnimation() {
-      if (hasAnimated) return;
-      hasAnimated = true;
-
-      const counter1 = document.getElementById('counter-metric-1');
-      const gaugeRing = document.getElementById('gauge-progress-circle');
-
-      const counter2 = document.getElementById('counter-metric-2');
-      const barMuyAlto = document.getElementById('bar-riesgo-muy-alto');
-      const barAlto = document.getElementById('bar-riesgo-alto');
-
-      const counter3 = document.getElementById('counter-metric-3');
-      const histogramBars = document.querySelectorAll<HTMLElement>('.histogram-bar');
-
-      // Animación de las barras del histograma (elevación en ola escalonada)
-      histogramBars.forEach(bar => {
-        bar.style.transform = 'scaleY(1)';
+  // Contadores que suben al aparecer (sin animación si se pidió menos movimiento)
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = document.querySelectorAll<HTMLElement>('[data-contador]');
+  if (!reducido && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const el = e.target as HTMLElement, fin = Number(el.dataset.contador), suf = el.dataset.sufijo || '';
+        const t0 = performance.now();
+        const paso = (t: number) => {
+          const p = Math.min(1, (t - t0) / 900);
+          el.textContent = `${Math.round(fin * (1 - Math.pow(1 - p, 3)))}${suf}`;
+          if (p < 1) requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
       });
-
-      // Animación fluida con requestAnimationFrame
-      const duration = 1800;
-      let startTime: number | null = null;
-
-      function step(timestamp: number) {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easedProgress = easeOutCubic(progress);
-
-        // 1. Contador y Dona de Retroceso Glaciar
-        const val1 = Math.round(easedProgress * TARGET_1);
-        if (counter1) {
-          counter1.textContent = `${val1}%`;
-        }
-        if (gaugeRing) {
-          const currentDash = (easedProgress * TARGET_1).toFixed(2);
-          gaugeRing.setAttribute('stroke-dasharray', `${currentDash}, 100`);
-        }
-
-        // 2. Contador y Barra de Lagunas en Riesgo
-        const val2 = Math.round(easedProgress * TARGET_2);
-        if (counter2) {
-          counter2.textContent = `${val2}`;
-        }
-        if (barMuyAlto) {
-          barMuyAlto.style.width = `${(easedProgress * TARGET_BAR_MUY_ALTO).toFixed(1)}%`;
-        }
-        if (barAlto) {
-          barAlto.style.width = `${(easedProgress * TARGET_BAR_ALTO).toFixed(1)}%`;
-        }
-
-        // 3. Contador de Aluviones
-        const val3 = Math.round(easedProgress * TARGET_3);
-        if (counter3) {
-          counter3.textContent = `${val3}`;
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        } else {
-          if (counter1) counter1.textContent = `${TARGET_1}%`;
-          if (gaugeRing) gaugeRing.setAttribute('stroke-dasharray', `${TARGET_1}, 100`);
-          if (counter2) counter2.textContent = `${TARGET_2}`;
-          if (barMuyAlto) barMuyAlto.style.width = `${TARGET_BAR_MUY_ALTO}%`;
-          if (barAlto) barAlto.style.width = `${TARGET_BAR_ALTO}%`;
-          if (counter3) counter3.textContent = `${TARGET_3}`;
-        }
-      }
-
-      requestAnimationFrame(step);
-    }
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      startAnimation();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            startAnimation();
-            observer.disconnect();
-          }
-        });
-      },
-      {
-        threshold: 0.25,
-        rootMargin: '0px 0px -50px 0px'
-      }
-    );
-
-    observer.observe(section);
+    }, { threshold: 0.6 });
+    els.forEach((el) => io.observe(el));
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMetricsAnimation);
-  } else {
-    initMetricsAnimation();
-  }
-  document.addEventListener('astro:page-load', initMetricsAnimation);
 </script>

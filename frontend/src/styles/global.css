@@ -1,1 +1,168 @@
 @import "tailwindcss";
+
+/* ============================================================
+   ARQEN · Sistema visual
+   Tipografías: Aldrich (marca) · Space Grotesk (títulos) · IBM Plex Sans (interfaz) · IBM Plex Mono (datos)
+   Paleta: noche andina · turquesa laguna · hielo · cochinilla · ocre puna
+   ============================================================ */
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "IBM Plex Sans", ui-sans-serif, sans-serif;
+  --font-marca: "Aldrich", "Space Grotesk", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-noche-950: #050a1a;
+  --color-noche-900: #0b1838;
+  --color-noche-800: #13254f;
+  --color-noche-700: #1d3567;
+
+  --color-laguna-50: #effcf9;
+  --color-laguna-100: #cbf5ec;
+  --color-laguna-200: #99eadb;
+  --color-laguna-500: #14b8a6;
+  --color-laguna-600: #0d9488;
+  --color-laguna-700: #0f766e;
+  --color-laguna-900: #134e4a;
+
+  --color-hielo-50: #f0f9ff;
+  --color-hielo-100: #e0f2fe;
+  --color-hielo-300: #7dd3fc;
+  --color-hielo-500: #0ea5e9;
+  --color-hielo-700: #0369a1;
+
+  --color-cochinilla-50: #fdf2f8;
+  --color-cochinilla-100: #fce7f3;
+  --color-cochinilla-500: #db2777;
+  --color-cochinilla-600: #be185d;
+  --color-cochinilla-700: #9d174d;
+
+  --color-ocre-50: #fffbeb;
+  --color-ocre-100: #fef3c7;
+  --color-ocre-400: #fbbf24;
+  --color-ocre-600: #d97706;
+  --color-ocre-700: #b45309;
+}
+
+@layer base {
+  html { font-family: var(--font-sans); font-feature-settings: "ss01" on; }
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+  /* Ningún texto SVG cae en Arial/Helvetica */
+  svg text { font-family: var(--font-sans); }
+  .leaflet-container { font-family: var(--font-sans) !important; }
+  :focus-visible { outline: 2px solid var(--color-laguna-500); outline-offset: 2px; border-radius: 6px; }
+  section[id] { scroll-margin-top: 5rem; }
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  /* ---------- Botones ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    font: 600 .875rem/1.2 var(--font-sans); border-radius: .875rem; padding: .7rem 1.1rem;
+    border: 1px solid transparent; transition: background-color .2s, box-shadow .2s, color .2s, border-color .2s;
+    white-space: nowrap; cursor: pointer;
+  }
+  .btn-sm { padding: .5rem .8rem; font-size: .8125rem; border-radius: .75rem; }
+  .btn-pri { background: linear-gradient(180deg, #14b8a6, #0d9488); color: #fff; box-shadow: 0 6px 18px -6px rgb(13 148 136 / .6), inset 0 1px 0 rgb(255 255 255 / .25); }
+  .btn-pri:hover { background: linear-gradient(180deg, #2dd4bf, #0f9f92); box-shadow: 0 8px 24px -6px rgb(13 148 136 / .75), inset 0 1px 0 rgb(255 255 255 / .3); }
+  .btn-marca { background: linear-gradient(180deg, #db2777, #be185d); color: #fff; box-shadow: 0 6px 18px -6px rgb(190 24 93 / .55), inset 0 1px 0 rgb(255 255 255 / .25); }
+  .btn-marca:hover { background: linear-gradient(180deg, #ec4899, #c81e66); }
+  .btn-sec { background: var(--color-laguna-50); color: var(--color-laguna-700); border-color: var(--color-laguna-200); }
+  .btn-sec:hover { background: var(--color-laguna-100); }
+  .btn-hielo { background: var(--color-hielo-50); color: var(--color-hielo-700); border-color: #bae6fd; }
+  .btn-hielo:hover { background: var(--color-hielo-100); }
+  .btn-ter { background: transparent; color: var(--color-laguna-700); padding-inline: .25rem; }
+  .btn-ter:hover { color: var(--color-laguna-900); text-decoration: underline; text-underline-offset: 3px; }
+  .btn-cristal { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .28); backdrop-filter: blur(10px); }
+  .btn-cristal:hover { background: rgb(255 255 255 / .2); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* ---------- Tarjetas con color por tema ---------- */
+  .tarjeta {
+    position: relative; overflow: hidden; border-radius: 1.25rem; border: 1px solid #e3e8ef;
+    background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / .04), 0 8px 24px -12px rgb(15 23 42 / .12);
+  }
+  .tarjeta-hielo { background: linear-gradient(160deg, #f0f9ff 0%, #ffffff 60%); border-color: #cfe8fb; }
+  .tarjeta-laguna { background: linear-gradient(160deg, #effcf9 0%, #ffffff 60%); border-color: #bfeee4; }
+  .tarjeta-riesgo { background: linear-gradient(160deg, #fff1f4 0%, #ffffff 60%); border-color: #fbd0db; }
+  .tarjeta-historia { background: linear-gradient(160deg, #fffbeb 0%, #ffffff 60%); border-color: #fbe3a8; }
+  .tarjeta-marca { background: linear-gradient(160deg, #fdf2f8 0%, #ffffff 60%); border-color: #f9cfe3; }
+  .tarjeta-noche { background: linear-gradient(160deg, #13254f 0%, #0b1838 70%); border-color: #1d3567; color: #e2e8f0; }
+
+  /* Ribete tejido arriba de la tarjeta */
+  .tejida::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 6px;
+    background: url("/marca/franja.svg") repeat-x left top / auto 6px;
+  }
+  .tejida { padding-top: calc(1.25rem + 6px); }
+
+  /* Ícono redondo con color */
+  .icono { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: .875rem; flex: none; }
+  .icono-hielo { background: #e0f2fe; color: #0369a1; }
+  .icono-laguna { background: #cbf5ec; color: #0f766e; }
+  .icono-riesgo { background: #ffe4e6; color: #be123c; }
+  .icono-historia { background: #fef3c7; color: #b45309; }
+  .icono-marca { background: #fce7f3; color: #be185d; }
+
+  /* Etiquetas */
+  .etiqueta { display: inline-flex; align-items: center; gap: .375rem; border-radius: 999px; padding: .25rem .65rem; font: 600 .75rem/1.2 var(--font-sans); white-space: nowrap; }
+  .riesgo-muy-alto { background: #ffe4e6; color: #9f1239; }
+  .riesgo-alto { background: #ffedd5; color: #9a3412; }
+  .riesgo-medio { background: #fef9c3; color: #854d0e; }
+  .riesgo-bajo { background: #dcfce7; color: #166534; }
+  .riesgo-sin { background: #f1f5f9; color: #475569; }
+
+  /* Fuente citada al pie de cada tarjeta */
+  .fuente { margin-top: auto; padding-top: .75rem; border-top: 1px solid rgb(148 163 184 / .25); font: 400 .75rem/1.4 var(--font-mono); color: #64748b; }
+
+  /* Encabezado de sección uniforme */
+  .seccion-titulo { font: 700 clamp(1.6rem, 2.4vw, 2.1rem)/1.15 var(--font-display); letter-spacing: -0.025em; color: #0b1838; }
+  .seccion-sub { margin-top: .4rem; color: #475569; font-size: 1rem; }
+  .sobretitulo { display: inline-flex; align-items: center; gap: .5rem; font: 600 .75rem/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--color-cochinilla-600); }
+  .sobretitulo::before { content: ""; width: 18px; height: 6px; background: url("/marca/franja.svg") repeat-x left / auto 6px; border-radius: 2px; }
+
+  /* Cristal tipo hielo (sobre fondos oscuros) */
+  .cristal {
+    background: linear-gradient(180deg, rgb(255 255 255 / .16), rgb(255 255 255 / .06));
+    border: 1px solid rgb(255 255 255 / .26); color: #fff; border-radius: 1.5rem;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .45), 0 24px 64px -16px rgb(2 6 23 / .6);
+    backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
+  }
+
+  /* Gráficos interactivos: muestran que se pueden tocar */
+  [data-arqen-grafico] { cursor: pointer; transition: opacity .15s, filter .15s; }
+  [data-arqen-grafico]:hover { filter: brightness(1.06) saturate(1.1); }
+  [data-arqen-grafico].activo { outline: 2px solid var(--color-laguna-500); outline-offset: 2px; }
+}
+
+/* Fondo con trama tejida (portada) */
+.trama-andina {
+  background-image: url("/marca/tejido.svg");
+  background-size: 96px 96px;
+  opacity: .055;
+  mix-blend-mode: screen;
+}
+/* Fondo claro con el tejido andino muy sutil (todas las páginas) */
+.fondo-tejido { position: relative; isolation: isolate; }
+.fondo-tejido::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: url("/marca/tejido-claro.svg"); background-size: 120px 120px; opacity: .04;
+}
+.franja-tejida { height: 12px; background: url("/marca/franja.svg") repeat-x left center / auto 12px; }
+
+/* Accesibilidad: respeta a quien pide menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lista con scroll: se desvanece abajo para indicar que hay más */
+.lista-desvanecida { mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

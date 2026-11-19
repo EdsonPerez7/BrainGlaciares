@@ -1,254 +1,175 @@
 ---
-import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
+import { DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
 import GlacierMap from './GlacierMap.astro';
+const totalPais = DEPARTAMENTOS_RIESGO.reduce((s, d) => s + d.total, 0);
 ---
 
-<section id="buscar" class="border-b border-slate-200 bg-white py-14 w-full">
-  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<section id="buscar" data-contexto="Busca tu zona" class="relative w-full pb-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight text-slate-900">Busca tu zona o una laguna</h2>
-        <p class="text-sm text-slate-500 mt-1">Explora las lagunas de alta montaña y el nivel de riesgo por departamento</p>
+        <span class="sobretitulo">Tu zona</span>
+        <h2 class="seccion-titulo mt-2">Busca tu zona o una laguna</h2>
+        <p class="seccion-sub">Elige un departamento y te resumimos el riesgo en segundos.</p>
       </div>
-
-      <!-- Selector de departamento activo -->
-      <div class="flex items-center gap-3">
-        <label for="select-departamento" class="text-xs font-medium text-slate-600">Lugar elegido:</label>
-        <select 
-          id="select-departamento" 
-          class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm focus:border-slate-900 focus:outline-none"
-        >
-          <option value="todos">Todo el Perú (19 lagunas en riesgo)</option>
-          {DEPARTAMENTOS_RIESGO.map(d => (
-            <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total} lagunas)</option>
-          ))}
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="select-departamento" class="sr-only">Departamento</label>
+        <select id="select-departamento" class="h-11 rounded-xl border border-laguna-200 bg-laguna-50 px-3 pr-8 text-sm font-semibold text-laguna-900 focus:border-laguna-500 focus:outline-none">
+          <option value="todos">Todo el Perú ({totalPais} lagunas críticas)</option>
+          {DEPARTAMENTOS_RIESGO.filter((d) => d.total > 0).map((d) => <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total})</option>)}
         </select>
+        <button id="btn-informe-depto" type="button" class="btn btn-marca hidden">↓ Informe del departamento</button>
       </div>
     </div>
 
-    <!-- Contenedor del Mapa y Panel de Resultados -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- Lado Izquierdo: Resumen y Lista de Lugares -->
-      <div class="lg:col-span-5 space-y-6">
-        
-        <!-- Tarjeta de Información Territorial -->
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
-          <div class="flex items-center justify-between">
-            <h3 id="panel-titulo" class="font-bold text-slate-900 text-sm">Todo el Perú</h3>
-            <span id="panel-badge" class="rounded-full bg-rose-100 text-rose-800 px-2.5 py-0.5 text-xs font-bold">19 lagunas críticas</span>
+    <div class="mt-8 grid items-stretch gap-5 lg:grid-cols-12">
+      <!-- Resumen + lista -->
+      <div class="flex min-h-0 flex-col gap-4 lg:col-span-5 lg:h-[600px]">
+        <article class="tarjeta tarjeta-marca tejida flex-none p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-display text-lg font-bold text-noche-900"><span id="panel-titulo">Todo el Perú</span> en 30 segundos</h3>
+            <span id="panel-badge" class="etiqueta riesgo-muy-alto">– lagunas</span>
           </div>
-          <p id="panel-descripcion" class="mt-2 text-xs text-slate-600 leading-relaxed">
-            Áncash concentra la mayor cantidad de lagunas con riesgo muy alto de aluvión (9 lagunas), seguido por Huánuco (3) y Puno (2).
-          </p>
-          <div class="mt-3 pt-3 border-t border-slate-200 flex gap-2 text-xs">
-            <span class="text-slate-500">¿Por dónde empezar?</span>
-            <span class="font-medium text-slate-700">Áncash, Cusco, Huánuco</span>
-          </div>
-        </div>
+          <dl class="mt-4 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-rose-100"><dt class="text-[11px] text-slate-500">Muy alto</dt><dd id="res-muy-alto" class="font-display text-2xl font-bold text-rose-600 tabular">–</dd></div>
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-cochinilla-100"><dt class="text-[11px] text-slate-500">Sin obras</dt><dd id="res-sin-obras" class="font-display text-2xl font-bold text-cochinilla-600 tabular">–</dd></div>
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Agua total</dt><dd class="font-display text-2xl font-bold text-hielo-700 tabular"><span id="res-agua">–</span><span class="text-sm font-medium"> hm³</span></dd></div>
+          </dl>
+          <p id="panel-descripcion" class="mt-3 text-sm text-slate-700"></p>
+        </article>
 
-        <!-- Lista de lagunas filtrables -->
-        <div class="space-y-3">
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-500">Lagunas en la zona (clic para enfocar en mapa)</h4>
-          <div id="lista-lagunas" class="space-y-2 max-h-80 overflow-y-auto pr-1">
-            {LAGUNAS_DESTACADAS.map(l => (
-              <div 
-                class="item-laguna block rounded-lg border border-slate-200 bg-white p-3.5 hover:border-slate-400 hover:shadow-xs transition cursor-pointer"
-                data-id={l.id.toLowerCase()}
-                data-dept={l.departamento.toLowerCase()}
-                data-lat={l.lat}
-                data-lng={l.lng}
-              >
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-slate-900 text-sm">Laguna {l.nombre}</span>
-                  <span class={`rounded px-2 py-0.5 text-[10px] font-bold ${l.riesgo === 'Muy alto' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
-                    {l.riesgo}
-                  </span>
-                </div>
-                <div class="mt-1.5 flex items-center justify-between text-xs text-slate-500">
-                  <span>{l.departamento} · Cordillera {l.cordillera}</span>
-                  <span>Amenaza a: <strong class="text-slate-700">{l.poblado_amenazado}</strong></span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span class="text-cyan-700 font-medium">Ver en mapa ↗</span>
-                  <a href={`/buscar?id=${l.id}`} class="text-slate-500 hover:text-slate-900 font-semibold underline" onclick="event.stopPropagation()">Ficha técnica →</a>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div class="flex min-h-0 flex-1 flex-col">
+          <p class="mb-2 text-xs font-semibold text-slate-500">Lagunas · toca una para verla en el mapa</p>
+          <div id="lista-lagunas" class="lista-desvanecida max-h-[440px] flex-1 space-y-2 overflow-y-auto pb-6 pr-1 lg:max-h-none lg:min-h-0"></div>
         </div>
-
       </div>
 
-      <!-- Lado Derecho: Mapa Territorial Interactivo con Leaflet -->
+      <!-- Mapa -->
       <div class="lg:col-span-7">
-        <div class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-          <div class="flex items-center justify-between pb-2.5 px-1 text-xs">
-            <div class="flex items-center gap-2">
-              <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-              <span class="font-bold text-slate-800">Mapa Territorial de Lagunas en Riesgo</span>
-            </div>
-            <span class="text-[11px] text-slate-400">Haz clic en un punto para ver ficha técnica</span>
+        <div class="tarjeta tarjeta-hielo flex h-full flex-col p-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 px-1 pb-2.5 text-xs">
+            <span class="flex items-center gap-2 font-semibold text-noche-900"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>Mapa de lagunas en riesgo</span>
+            <span class="text-slate-500">Toca un punto para ver su ficha</span>
           </div>
-          <GlacierMap mapId="home-glacier-map" heightClass="h-[440px]" mode="navigate" />
+          <div class="min-h-0 flex-1 overflow-hidden rounded-xl">
+            <GlacierMap mapId="home-glacier-map" heightClass="h-[420px] lg:h-full lg:min-h-[540px]" mode="navigate" />
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
 <script>
+  import { esc } from '../utils/seguridad';
   import { ApiService } from '../services/api';
   import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { piscinasOlimpicas, formatoMiles } from '../config/recorrido.data';
+  import { fijarContexto } from '../scripts/contexto';
 
-  const selectDept = document.getElementById('select-departamento') as HTMLSelectElement | null;
-  const panelTitulo = document.getElementById('panel-titulo');
-  const panelBadge = document.getElementById('panel-badge');
-  const listaLagunasCont = document.getElementById('lista-lagunas');
-
-  let deptosMemoria = [...DEPARTAMENTOS_RIESGO];
+  const $ = (id: string) => document.getElementById(id);
+  const selectDept = $('select-departamento') as HTMLSelectElement | null;
+  const lista = $('lista-lagunas');
+  const btnInforme = $('btn-informe-depto');
+  let deptosMemoria: any[] = [...DEPARTAMENTOS_RIESGO];
   let lagunasMemoria: any[] = [...LAGUNAS_DESTACADAS];
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const ORDEN: Record<string, number> = { 'Muy alto': 4, Alto: 3, Medio: 2, Bajo: 1 };
+  const claseRiesgo = (r: string) => r === 'Muy alto' ? 'riesgo-muy-alto' : r === 'Alto' ? 'riesgo-alto' : r === 'Medio' ? 'riesgo-medio' : r === 'Bajo' ? 'riesgo-bajo' : 'riesgo-sin';
+  const franjaRiesgo = (r: string) => r === 'Muy alto' ? '#e11d48' : r === 'Alto' ? '#f97316' : r === 'Medio' ? '#eab308' : r === 'Bajo' ? '#16a34a' : '#94a3b8';
 
-  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-  function renderLagunasHtml(lagunas: any[]) {
-    if (!listaLagunasCont) return;
-    if (lagunas.length === 0) {
-      listaLagunasCont.innerHTML = `
-        <div class="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-lg border border-slate-200">
-          No hay lagunas en riesgo crítico registradas en este catálogo para la zona seleccionada.
+  function tarjeta(l: any) {
+    const nombre = String(l.nombre || '').startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`;
+    const vol = Number(l.volumen_hm3);
+    const docs = l.total_documentos ?? l.n_docs;
+    return `
+      <div class="item-laguna group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 pl-4 transition hover:border-laguna-200 hover:shadow-md"
+        data-id="${esc(String(l.id || '').toLowerCase())}" data-dept="${esc(String(l.departamento || '').toLowerCase())}"
+        data-lat="${esc(l.lat ?? '')}" data-lng="${esc(l.lng ?? '')}" tabindex="0" role="button" aria-label="Ver ${esc(nombre)} en el mapa">
+        <span class="absolute inset-y-0 left-0 w-1" style="background:${franjaRiesgo(l.riesgo)}"></span>
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="truncate font-semibold text-noche-900">${esc(nombre)}</p>
+            <p class="truncate text-xs text-slate-500">${esc(l.departamento)} · amenaza a <b class="font-semibold text-slate-700">${esc(l.poblado_amenazado || 'sin dato')}</b></p>
+          </div>
+          <span class="etiqueta ${claseRiesgo(l.riesgo)}">${esc(l.riesgo || 'Sin evaluar')}</span>
         </div>
-      `;
-      return;
-    }
-
-    listaLagunasCont.innerHTML = lagunas.map((l: any) => `
-      <div 
-        class="item-laguna block rounded-lg border border-slate-200 bg-white p-3.5 hover:border-slate-400 hover:shadow-xs transition cursor-pointer"
-        data-id="${(l.id || '').toLowerCase()}"
-        data-dept="${(l.departamento || '').toLowerCase()}"
-        data-lat="${l.lat ?? ''}"
-        data-lng="${l.lng ?? ''}"
-      >
-        <div class="flex items-center justify-between">
-          <span class="font-bold text-slate-900 text-sm">Laguna ${l.nombre}</span>
-          <span class="rounded px-2 py-0.5 text-[10px] font-bold ${l.riesgo === 'Muy alto' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
-            ${l.riesgo}
+        <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
+            ${Number.isFinite(vol) ? `<span>💧 ${esc(vol)} hm³ <span class="text-slate-400">≈ ${formatoMiles(piscinasOlimpicas(vol))} piscinas</span></span>` : ''}
+            ${docs ? `<span class="rounded-full bg-hielo-50 px-2 py-0.5 font-medium text-hielo-700">${esc(docs)} informes</span>` : ''}
           </span>
+          <a href="/buscar?id=${encodeURIComponent(l.id)}" class="btn-ficha font-semibold text-laguna-700 hover:text-laguna-900">Ficha →</a>
         </div>
-        <div class="mt-1.5 flex items-center justify-between text-xs text-slate-500">
-          <span>${l.departamento} · Cordillera ${l.cordillera || 'Andina'}</span>
-          <span>Amenaza a: <strong class="text-slate-700">${l.poblado_amenazado || 'Población local'}</strong></span>
-        </div>
-        <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-          <span class="text-cyan-700 font-medium">Ver en mapa ↗</span>
-          <a href="/buscar?id=${encodeURIComponent(l.id)}" class="text-slate-500 hover:text-slate-900 font-semibold underline" onclick="event.stopPropagation()">Ficha técnica →</a>
-        </div>
-      </div>
-    `).join('');
+      </div>`;
   }
 
-  function filtrarPorDepartamento(dept: string) {
-    const deptNorm = norm(dept);
-    const filtered = (deptNorm === 'todos')
-      ? lagunasMemoria
-      : lagunasMemoria.filter((l: any) => norm(l.departamento) === deptNorm);
-
-    renderLagunasHtml(filtered);
-
-    if (panelTitulo) panelTitulo.textContent = dept === 'todos' ? 'Todo el Perú' : dept.toUpperCase();
-    if (panelBadge) {
-      if (deptNorm === 'todos') {
-        const total = deptosMemoria.reduce((acc: number, d: any) => acc + (d.total || 0), 0);
-        panelBadge.textContent = `${total} lagunas críticas`;
-      } else {
-        const dObj = deptosMemoria.find(d => norm(d.departamento) === deptNorm);
-        if (dObj) {
-          panelBadge.textContent = `${dObj.total} ${dObj.total === 1 ? 'laguna crítica' : 'lagunas críticas'}`;
-        } else {
-          panelBadge.textContent = '0 lagunas críticas';
-        }
-      }
+  function pintar(dept: string) {
+    const d = norm(dept);
+    const filtradas = (d === 'todos' ? lagunasMemoria : lagunasMemoria.filter((l) => norm(l.departamento) === d))
+      .slice().sort((a, b) => (ORDEN[b.riesgo] || 0) - (ORDEN[a.riesgo] || 0) || Number(b.volumen_hm3 || 0) - Number(a.volumen_hm3 || 0));
+    if (lista) {
+      lista.innerHTML = filtradas.length ? filtradas.map(tarjeta).join('')
+        : '<div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">El catálogo no registra lagunas críticas aquí. Eso no significa riesgo cero: puede no estar evaluado.</div>';
     }
-
+    const nombre = d === 'todos' ? 'Todo el Perú' : (deptosMemoria.find((x) => norm(x.departamento) === d)?.departamento || dept);
+    const set = (id: string, t: string) => { const e = $(id); if (e) e.textContent = t; };
+    set('panel-titulo', nombre);
+    set('panel-badge', `${filtradas.length} lagunas`);
+    set('res-muy-alto', String(filtradas.filter((l) => l.riesgo === 'Muy alto').length));
+    set('res-sin-obras', String(filtradas.filter((l) => l.tiene_obras === false).length));
+    set('res-agua', formatoMiles(Math.round(filtradas.reduce((s, l) => s + (Number(l.volumen_hm3) || 0), 0))));
+    const peor = filtradas[0];
+    set('panel-descripcion', peor ? `La más crítica: ${String(peor.nombre).startsWith('Laguna') ? peor.nombre : `Laguna ${peor.nombre}`}, sobre ${peor.poblado_amenazado || 'poblados sin registrar'}.` : '');
+    btnInforme?.classList.toggle('hidden', d === 'todos');
+    if (d !== 'todos') fijarContexto({ seccion: 'Busca tu zona', departamento: nombre }, true);
     document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
   }
 
-  // Interacción al hacer clic en una tarjeta de laguna para enfocar el mapa
-  listaLagunasCont?.addEventListener('click', (e) => {
-    const target = (e.target as HTMLElement).closest('.item-laguna') as HTMLElement | null;
-    if (!target) return;
-    const id = target.dataset.id;
-    const lat = target.dataset.lat ? parseFloat(target.dataset.lat) : undefined;
-    const lng = target.dataset.lng ? parseFloat(target.dataset.lng) : undefined;
-    const dept = target.dataset.dept || 'todos';
-
-    document.querySelectorAll('.item-laguna').forEach(el => {
-      el.classList.remove('border-cyan-500', 'bg-cyan-50/70', 'ring-1', 'ring-cyan-400');
-      el.classList.add('border-slate-200', 'bg-white');
-    });
-    target.classList.remove('border-slate-200', 'bg-white');
-    target.classList.add('border-cyan-500', 'bg-cyan-50/70', 'ring-1', 'ring-cyan-400');
-
-    document.dispatchEvent(new CustomEvent('bg:map-focus', {
-      detail: { id, lat, lng, dept, zoom: 13 }
-    }));
+  function marcar(card: HTMLElement | null) {
+    document.querySelectorAll('.item-laguna').forEach((el) => el.classList.remove('ring-2', 'ring-laguna-500', 'border-laguna-200'));
+    card?.classList.add('ring-2', 'ring-laguna-500', 'border-laguna-200');
+  }
+  function enfocar(card: HTMLElement) {
+    marcar(card);
+    const l = lagunasMemoria.find((x) => String(x.id).toLowerCase() === card.dataset.id);
+    if (l) fijarContexto({ seccion: 'Busca tu zona', laguna: l.nombre, lagunaId: l.id }, true);
+    document.dispatchEvent(new CustomEvent('bg:map-focus', { detail: {
+      id: card.dataset.id, dept: card.dataset.dept || 'todos', zoom: 13,
+      lat: card.dataset.lat ? parseFloat(card.dataset.lat) : undefined, lng: card.dataset.lng ? parseFloat(card.dataset.lng) : undefined,
+    } }));
+  }
+  lista?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('.btn-ficha')) return;
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.item-laguna');
+    if (card) enfocar(card);
   });
-
-  // Escuchar cuando el usuario hace clic en un punto del mapa para resaltar la tarjeta en la lista
+  lista?.addEventListener('keydown', (e) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.item-laguna');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); enfocar(card); }
+  });
   document.addEventListener('bg:map-active-laguna', ((e: CustomEvent) => {
-    const { id } = e.detail || {};
-    if (!id) return;
-    const clean = id.toLowerCase().replace(/^laguna:/i, '').trim();
-    const card = document.querySelector(`.item-laguna[data-id="${clean}"]`) as HTMLElement | null;
-    if (card) {
-      document.querySelectorAll('.item-laguna').forEach(el => {
-        el.classList.remove('border-cyan-500', 'bg-cyan-50/70', 'ring-1', 'ring-cyan-400');
-        el.classList.add('border-slate-200', 'bg-white');
-      });
-      card.classList.remove('border-slate-200', 'bg-white');
-      card.classList.add('border-cyan-500', 'bg-cyan-50/70', 'ring-1', 'ring-cyan-400');
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    const id = String(e.detail?.id || '').toLowerCase().replace(/^laguna:/i, '').trim();
+    const card = document.querySelector<HTMLElement>(`.item-laguna[data-id="${CSS.escape(id)}"]`);
+    if (card) { marcar(card); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
   }) as EventListener);
 
-  // Sincronizar catálogo ampliado desde el backend
+  selectDept?.addEventListener('change', () => pintar(selectDept.value));
+  btnInforme?.addEventListener('click', async () => {
+    const nombre = $('panel-titulo')?.textContent || '';
+    const { generarInformeDepartamento } = await import('../services/informePdf');
+    await generarInformeDepartamento(nombre);
+  });
+
+  pintar('todos');
+
+  // Catálogo ampliado desde el backend (si está disponible)
   ApiService.getCatalogo(120).then((data) => {
-    const catalogo = data?.lagunas;
-    if (Array.isArray(catalogo) && catalogo.length > 0) {
-      lagunasMemoria = catalogo;
-      const deptActual = selectDept ? selectDept.value : 'todos';
-      filtrarPorDepartamento(deptActual);
+    if (Array.isArray(data?.lagunas) && data.lagunas.length) {
+      // Se completan los campos que el catálogo remoto no trae con el catálogo local
+      lagunasMemoria = data.lagunas.map((l: any) => ({ ...LAGUNAS_DESTACADAS.find((x) => x.id === l.id), ...l }));
+      pintar(selectDept?.value || 'todos');
     }
   }).catch(() => {});
-
-  // Sincronizar departamentos y conteos territoriales desde el backend
-  ApiService.getDepartamentosRiesgo().then((deptos) => {
-    if (deptos && deptos.length > 0) {
-      deptosMemoria = deptos;
-      if (selectDept) {
-        const valActual = selectDept.value;
-        const totalPais = deptos.reduce((acc: number, d: any) => acc + (d.total || 0), 0);
-        selectDept.innerHTML = `
-          <option value="todos">Todo el Perú (${totalPais} lagunas en riesgo)</option>
-          ${deptos.map((d: any) => `<option value="${d.departamento.toLowerCase()}">${d.departamento} (${d.total} lagunas)</option>`).join('')}
-        `;
-        if (deptos.some((d: any) => d.departamento.toLowerCase() === valActual)) {
-          selectDept.value = valActual;
-        }
-      }
-      if (panelBadge && (!selectDept || selectDept.value === 'todos')) {
-        const total = deptos.reduce((acc: number, d: any) => acc + (d.total || 0), 0);
-        panelBadge.textContent = `${total} lagunas críticas`;
-      }
-    }
-  }).catch(() => {});
-
-  if (selectDept) {
-    selectDept.addEventListener('change', (e) => {
-      const val = (e.target as HTMLSelectElement).value;
-      filtrarPorDepartamento(val);
-    });
-  }
+  ApiService.getDepartamentosRiesgo().then((deptos) => { if (deptos?.length) deptosMemoria = deptos; }).catch(() => {});
 </script>

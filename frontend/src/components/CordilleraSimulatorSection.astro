@@ -2,32 +2,24 @@
 import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 ---
 
-<section id="simulador-cordillera" class="relative overflow-hidden border-b border-slate-200 bg-slate-900 py-10 lg:py-14 w-full text-white">
-  <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 space-y-6">
+<section id="simulador-cordillera" data-contexto="Así ocurre un aluvión" class="relative overflow-hidden bg-noche-900 py-14 sm:py-16 w-full text-white">
+  <div class="trama-andina pointer-events-none absolute inset-0 !opacity-[.035]" aria-hidden="true"></div>
+  <div class="relative mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12 space-y-6">
     
     <!-- Encabezado de la Sección de Simulación -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-5">
-      <div class="space-y-1.5 max-w-3xl">
-        <div class="inline-flex items-center gap-2 text-xs font-semibold text-sky-400">
-          <span class="h-2 w-2 rounded-full bg-sky-400 animate-pulse"></span>
-          <span class="uppercase tracking-wider">Simulador Morfodinámico de Alta Montaña</span>
-          <span class="text-slate-600">|</span>
-          <span class="text-slate-400 font-normal">Reconstrucción técnica en 5 escenas</span>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
-          La anatomía de un aluvión: del deshielo al dique regulador
-        </h2>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Explora la evolución geológica de las lagunas críticas del Perú a través de las 5 fases documentadas en los informes oficiales del INAIGEM y la ANA.
-        </p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+      <div class="max-w-3xl">
+        <span class="sobretitulo !text-ocre-400">En 5 escenas</span>
+        <h2 class="mt-2 font-display text-[clamp(1.6rem,2.4vw,2.1rem)] font-bold leading-tight tracking-tight text-white">Así ocurre un aluvión</h2>
+        <p class="mt-1.5 text-base text-slate-300">Del deshielo a la obra que protege al valle, con la fuente de cada dato.</p>
       </div>
 
       <!-- Selector de Laguna Rápido -->
-      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      <div class="flex flex-wrap items-center gap-2 py-1 md:justify-end">
         {Object.values(LAGUNAS_ESCENAS).map((l, idx) => (
           <button 
             type="button" 
-            class={`tab-laguna-escena whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all flex items-center gap-2 ${idx === 0 ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/20' : 'bg-slate-800/90 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+            class={`tab-laguna-escena whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all flex items-center gap-2 ${idx === 0 ? 'bg-white text-noche-900 shadow-md ring-2 ring-white/20' : 'bg-white/10 text-slate-300 hover:text-white hover:bg-white/15'}`}
             data-laguna-id={l.id}
           >
             <span class={`h-2 w-2 rounded-full ${l.id === '513' ? 'bg-emerald-400' : l.id === 'upiscocha' ? 'bg-amber-400' : 'bg-rose-500'}`}></span>
@@ -38,7 +30,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
     </div>
 
     <!-- Escenario Widescreen de Simulación (100% ancho con cámara dinámica) -->
-    <div class="w-full rounded-3xl border border-slate-800 bg-[#060c18] shadow-2xl overflow-hidden flex flex-col text-white">
+    <div class="w-full rounded-3xl border border-white/10 bg-[#060c18] shadow-2xl overflow-hidden flex flex-col text-white">
       
       <!-- Lienzo SVG Cinemático: 1400x680 con Profundidad y Cámara -->
       <div id="contenedor-cinematico" class="relative h-[420px] sm:h-[480px] lg:h-[560px] xl:h-[620px] w-full bg-[#060c18] overflow-hidden flex items-center justify-center select-none cursor-crosshair">
@@ -146,7 +138,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
                 <ellipse cx="0" cy="40" rx="220" ry="25" fill="#020617" opacity="0.9" />
                 <path d="M -120,40 L 120,40" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 4" />
                 <rect x="-110" y="8" width="220" height="26" rx="13" fill="#0f172a" stroke="#334155" stroke-width="1" />
-                <text x="0" y="25" fill="#e2e8f0" font-size="11" font-weight="800" text-anchor="middle" font-family="sans-serif">Quebrada hacia Poblado / Valle</text>
+                <text x="0" y="25" fill="#e2e8f0" font-size="11" font-weight="800" text-anchor="middle" >Quebrada hacia Poblado / Valle</text>
               </g>
             </g>
 
@@ -238,7 +230,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
               <g id="fx-obra-seguridad" class="hidden">
                 <rect x="650" y="435" width="100" height="22" rx="6" fill="#10b981" filter="url(#neon-glow-sim)" />
                 <line x1="665" y1="446" x2="735" y2="446" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
-                <text x="700" y="450" fill="#ffffff" font-size="9" font-weight="900" text-anchor="middle" font-family="sans-serif" letter-spacing="1">DIQUE REFORZADO</text>
+                <text x="700" y="450" fill="#ffffff" font-size="9" font-weight="900" text-anchor="middle"  letter-spacing="1">DIQUE REFORZADO</text>
 
                 <line x1="860" y1="400" x2="860" y2="355" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
                 <polygon points="852,360 868,360 860,350" fill="#10b981" />
@@ -261,12 +253,12 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
             <!-- ======================================================== -->
             <g id="badge-pico" transform="translate(850, 75)" class="transition-transform duration-700">
               <rect x="0" y="0" width="160" height="42" rx="21" fill="#ffffff" filter="drop-shadow(0 10px 20px rgba(0,0,0,0.6))" />
-              <text id="lbl-nombre-pico" x="80" y="26" fill="#0f172a" font-size="14" font-weight="900" text-anchor="middle" font-family="sans-serif">Hualcán</text>
+              <text id="lbl-nombre-pico" x="80" y="26" fill="#0f172a" font-size="14" font-weight="900" text-anchor="middle" >Hualcán</text>
             </g>
 
             <g id="badge-laguna" transform="translate(410, 310)" class="transition-transform duration-700">
               <rect x="0" y="0" width="180" height="44" rx="22" fill="#0284c7" fill-opacity="0.95" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))" />
-              <text id="lbl-nombre-laguna" x="90" y="27" fill="#ffffff" font-size="14" font-weight="900" text-anchor="middle" font-family="sans-serif">Laguna 513</text>
+              <text id="lbl-nombre-laguna" x="90" y="27" fill="#ffffff" font-size="14" font-weight="900" text-anchor="middle" >Laguna 513</text>
             </g>
 
           </g>
@@ -275,13 +267,13 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 
         <!-- Callouts flotantes HUD -->
         <div class="absolute bottom-5 left-6 flex items-center gap-3 bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-700/70 text-xs shadow-xl">
-          <span class="h-2.5 w-2.5 rounded-full bg-sky-400 animate-ping"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-sky-400"></span>
           <span id="callout-cota-texto" class="font-bold text-slate-100 font-mono tracking-tight">ENFOQUE: GLACIAR DE CABECERA (6,122 M)</span>
         </div>
 
         <div class="hidden sm:flex absolute top-5 right-6 items-center gap-2 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300 font-mono">
           <span class="text-sky-400">●</span>
-          <span>Modelo Morfodinámico UNMSM</span>
+          <span>Esquema ilustrativo</span>
         </div>
 
       </div>
@@ -301,7 +293,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
           ].map(fase => (
             <button 
               type="button" 
-              class="btn-escena-seg group flex flex-col gap-1.5 focus:outline-none text-left"
+              class="btn-escena-seg group flex flex-col gap-1.5 text-left rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
               data-escena-index={fase.n}
               title={`Ir a Escena ${fase.n}: ${fase.label}`}
             >
@@ -314,12 +306,12 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
         <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-sky-400 pt-1">
           <span id="txt-escena-subtitulo">Laguna 513, Áncash. Escena 1 de 5: el hielo</span>
           <span id="txt-escena-alerta" class="hidden text-amber-400 font-semibold text-xs flex items-center gap-1.5">
-            <span class="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+            <span class="h-2 w-2 rounded-full bg-amber-400"></span>
             <span>Pieza que falta en los documentos oficiales</span>
           </span>
         </div>
 
-        <p id="txt-escena-cuerpo" class="text-base sm:text-xl font-bold text-slate-100 leading-snug min-h-[56px] transition-opacity duration-200">
+        <p id="txt-escena-cuerpo" aria-live="polite" class="text-base sm:text-xl font-bold text-slate-100 leading-snug min-h-[56px] transition-opacity duration-200">
           El deshielo de Hualcán alimenta la laguna 513. En todo el Perú ya se perdió el 52 % del hielo (1962-2016).
         </p>
 
@@ -331,14 +323,14 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-1 bg-slate-900 rounded-xl p-1 border border-slate-700/80 shadow-inner">
-              <button id="ctrl-prev" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena anterior">
+              <button id="ctrl-prev" type="button" aria-label="Escena anterior" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena anterior">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
               </button>
-              <button id="ctrl-playpause" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Pausar / Reproducir">
+              <button id="ctrl-playpause" type="button" aria-label="Pausar o reproducir" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Pausar / Reproducir">
                 <svg id="icon-pause" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
                 <svg id="icon-play" class="h-4 w-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </button>
-              <button id="ctrl-next" type="button" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena siguiente">
+              <button id="ctrl-next" type="button" aria-label="Escena siguiente" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition" title="Escena siguiente">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -346,7 +338,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
             <a 
               id="btn-ver-ficha"
               href="#comparar" 
-              class="whitespace-nowrap rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2.5 font-bold text-xs transition shadow-md flex items-center gap-1.5"
+              class="btn btn-pri btn-sm"
             >
               <span>Ver ficha técnica</span>
               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
@@ -361,28 +353,15 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
   </div>
 </section>
 
-<style>
-  @keyframes temblorAluvionSim {
-    0% { transform: scale(1.48) translate(30px, 15px); }
-    15% { transform: scale(1.49) translate(36px, 10px); }
-    30% { transform: scale(1.47) translate(24px, 20px); }
-    50% { transform: scale(1.49) translate(34px, 12px); }
-    70% { transform: scale(1.48) translate(26px, 18px); }
-    85% { transform: scale(1.49) translate(32px, 14px); }
-    100% { transform: scale(1.48) translate(30px, 15px); }
-  }
-  .anim-sacudida-sim {
-    animation: temblorAluvionSim 0.35s ease-in-out infinite alternate !important;
-  }
-</style>
-
 <script>
   import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 
   let lagunaActivaId = "513";
   let escenaActual = 1;
-  let timerAutoPlay: any = null;
-  let isPlaying = true;
+  let timerAutoPlay: ReturnType<typeof setInterval> | null = null;
+  const prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let isPlaying = !prefiereMenosMovimiento;
+  let seccionVisible = false;
 
   const tabsLaguna = document.querySelectorAll('.tab-laguna-escena');
   const segmentos = document.querySelectorAll('.btn-escena-seg');
@@ -408,7 +387,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
   const iconPause = document.getElementById('icon-pause');
   const iconPlay = document.getElementById('icon-play');
 
-  const POSICIONES_CAMARA: Record<number, { transform: string; cota: string; fase: string; sacudida?: boolean }> = {
+  const POSICIONES_CAMARA: Record<number, { transform: string; cota: string; fase: string }> = {
     1: {
       transform: "scale(1.85) translate(0px, 160px)",
       cota: "ENFOQUE: GLACIAR DE CABECERA · COTA 6,122 M",
@@ -421,9 +400,8 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
     },
     3: {
       transform: "scale(1.48) translate(30px, 15px)",
-      cota: "EVENTO CRÍTICO: RUPTURA Y OLA DE ALURIÓN",
-      fase: "Fase 3: Aluvión",
-      sacudida: true
+      cota: "EVENTO CRÍTICO: RUPTURA Y OLA DE ALUVIÓN",
+      fase: "Fase 3: Aluvión"
     },
     4: {
       transform: "scale(0.82) translate(0px, -115px)",
@@ -461,7 +439,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
     
     if (btnFicha) {
       btnFicha.innerHTML = `<span>Ver ficha de ${nombreLimpio}</span> <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>`;
-      btnFicha.setAttribute('href', `#comparar`);
+      btnFicha.setAttribute('href', `/buscar?id=${encodeURIComponent(dataLaguna.id)}`);
     }
 
     if (txtAlerta) {
@@ -505,14 +483,7 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
     if (lblLaguna) lblLaguna.textContent = nombreLimpio;
 
     if (camara) {
-      camara.classList.remove('anim-sacudida-sim');
       camara.style.transform = camCfg.transform;
-      
-      if (camCfg.sacudida) {
-        setTimeout(() => {
-          camara.classList.add('anim-sacudida-sim');
-        }, 250);
-      }
     }
 
     if (capaValle) {
@@ -552,21 +523,21 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
 
   function reiniciarAutoPlay() {
     if (timerAutoPlay) clearInterval(timerAutoPlay);
-    if (isPlaying) {
+    timerAutoPlay = null;
+    // Solo avanza solo si el usuario lo permite y la sección está en pantalla
+    if (isPlaying && seccionVisible) {
       timerAutoPlay = setInterval(avanzarEscena, 5500);
     }
   }
 
-  if (contenedorCinematico && camara) {
+  if (contenedorCinematico && camara && !prefiereMenosMovimiento) {
     contenedorCinematico.addEventListener('mousemove', (e) => {
       const rect = contenedorCinematico.getBoundingClientRect();
       const xRel = (e.clientX - rect.left) / rect.width - 0.5;
       const yRel = (e.clientY - rect.top) / rect.height - 0.5;
       
       const camCfg = POSICIONES_CAMARA[escenaActual] || POSICIONES_CAMARA[1];
-      if (!camCfg.sacudida) {
-        camara.style.transform = `${camCfg.transform} translate(${xRel * 16}px, ${yRel * 10}px)`;
-      }
+      camara.style.transform = `${camCfg.transform} translate(${xRel * 16}px, ${yRel * 10}px)`;
     });
 
     contenedorCinematico.addEventListener('mouseleave', () => {
@@ -579,11 +550,11 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
     tab.addEventListener('click', (e) => {
       const target = e.currentTarget as HTMLElement;
       tabsLaguna.forEach(t => {
-        t.classList.remove('bg-white', 'text-slate-950', 'shadow-md', 'ring-2', 'ring-white/20');
-        t.classList.add('bg-slate-800/90', 'text-slate-400');
+        t.classList.remove('bg-white', 'text-noche-900', 'shadow-md', 'ring-2', 'ring-white/20');
+        t.classList.add('bg-white/10', 'text-slate-300');
       });
-      target.classList.add('bg-white', 'text-slate-950', 'shadow-md', 'ring-2', 'ring-white/20');
-      target.classList.remove('bg-slate-800/90', 'text-slate-400');
+      target.classList.add('bg-white', 'text-noche-900', 'shadow-md', 'ring-2', 'ring-white/20');
+      target.classList.remove('bg-white/10', 'text-slate-300');
 
       lagunaActivaId = target.getAttribute('data-laguna-id') || "513";
       escenaActual = 1;
@@ -622,6 +593,22 @@ import { LAGUNAS_ESCENAS } from '../config/scenes.data';
       if (timerAutoPlay) clearInterval(timerAutoPlay);
     }
   });
+
+  // Pausa el autoplay cuando la sección sale de pantalla (ahorra CPU y no "salta" escenas sin que se vean)
+  const seccion = document.getElementById('simulador-cordillera');
+  if (seccion && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entrada]) => {
+      seccionVisible = entrada.isIntersecting;
+      reiniciarAutoPlay();
+    }, { threshold: 0.35 }).observe(seccion);
+  } else {
+    seccionVisible = true;
+  }
+
+  if (!isPlaying) {
+    iconPause?.classList.add('hidden');
+    iconPlay?.classList.remove('hidden');
+  }
 
   renderizarEscena();
   reiniciarAutoPlay();

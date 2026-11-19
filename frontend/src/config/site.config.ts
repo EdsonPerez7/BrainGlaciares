@@ -5,25 +5,29 @@
  */
 
 export const SITE_CONFIG = {
-  name: "BRAIN GLACIARES",
-  tagline: "Conocimiento Conectado sobre el Riesgo Glaciar en el Perú",
+  name: "ARQEN",
+  acronym: "Alerta de Riesgo en Quebradas con Evidencia Nacional",
+  tagline: "Alerta de Riesgo en Quebradas con Evidencia Nacional",
+  formerName: "Brain Glaciares",
   institution: "UNMSM · Facultad de Ingeniería de Sistemas e Informática · Grupo G8",
-  description: "Plataforma científica para la exploración y consulta del inventario de glaciares, lagunas de alta montaña y riesgo de desbordes (GLOFs) en el Perú.",
+  description: "ARQEN (Alerta de Riesgo en Quebradas con Evidencia Nacional): Plataforma científica para la exploración y consulta del inventario de glaciares, lagunas de alta montaña y riesgo de desbordes (GLOFs) en el Perú.",
   author: "Grupo G8 · Gestión del Conocimiento 2026",
   
   // URLs de despliegue y API
   domain: "brainglaciares.pages.dev",
   fallbackDomain: "brainglaciaresunmsm.pages.dev",
-  // Si no hay variable de entorno, apunta al túnel de producción de Cloudflare
+  // Define PUBLIC_API_URL en .env (ver .env.example). El túnel "quick" de Cloudflare
+  // cambia de URL en cada reinicio: úsalo solo como respaldo temporal.
   apiBaseUrl: import.meta.env.PUBLIC_API_URL || "https://literacy-enjoyed-basin-priorities.trycloudflare.com",
 
   // Navegación principal (Sobria e institucional)
   navigation: [
     { label: "Inicio", href: "/" },
     { label: "Buscar", href: "/buscar" },
-    { label: "Comparar", href: "/#comparar" },
-    { label: "Panorama", href: "/#panorama" },
-    { label: "Acerca de", href: "/#acerca" }
+    { label: "Aluvión", href: "/aluvion" },
+    { label: "Comparar", href: "/comparar" },
+    { label: "Panorama", href: "/panorama" },
+    { label: "Metodología", href: "/metodologia" }
   ],
 
   // Cifras clave del corpus de investigación

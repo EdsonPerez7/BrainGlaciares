@@ -1,4 +1,5 @@
 import { SITE_CONFIG } from '../config/site.config';
+import { acotar } from '../utils/seguridad';
 import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
 import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse, CatalogoResponse } from '../models/types';
 
@@ -16,7 +17,7 @@ export const ApiService = {
       return _memoriaCatalogo;
     }
     try {
-      const url = `${BASE_URL}/api/catalogo?limite=${limite}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+      const url = `${BASE_URL}/api/catalogo?limite=${acotar(limite, 1, 200)}${q ? `&q=${encodeURIComponent(q.slice(0, 120))}` : ''}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -62,7 +63,7 @@ export const ApiService = {
 
   async buscar(query: string, limite: number = 20): Promise<{ consulta: string; entidades: any[]; documentos: any[]; fromApi: boolean }> {
     try {
-      const res = await fetch(`${BASE_URL}/api/buscar?q=${encodeURIComponent(query)}&limite=${limite}`);
+      const res = await fetch(`${BASE_URL}/api/buscar?q=${encodeURIComponent(query.slice(0, 120))}&limite=${acotar(limite, 1, 50)}`);
       if (res.ok) {
         const data = await res.json();
         return { ...data, fromApi: true };

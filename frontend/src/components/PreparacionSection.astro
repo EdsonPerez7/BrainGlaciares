@@ -1,0 +1,46 @@
+---
+// Aporte directo a la seguridad de las personas: qué hacer, en lenguaje simple.
+const PASOS = [
+  { n: '1', titulo: 'Conoce tu ruta hoy', texto: 'Ubica la zona alta más cercana y el camino para llegar, lejos del cauce del río.', icono: 'M3 20h18M6 20V10l6-6 6 6v10M10 20v-5h4v5' },
+  { n: '2', titulo: 'Si oyes el ruido, sube', texto: 'Un estruendo que baja por la quebrada o la sirena de alerta: sube de inmediato, no esperes a ver el agua.', icono: 'M12 19V5M5 12l7-7 7 7' },
+  { n: '3', titulo: 'Lejos de ríos y puentes', texto: 'No cruces ríos ni quebradas durante la emergencia y no te quedes sobre los puentes.', icono: 'M3 15c3-3 6 3 9 0s6 3 9 0M3 9c3-3 6 3 9 0s6 3 9 0' },
+  { n: '4', titulo: 'Solo avisos oficiales', texto: 'Sigue las indicaciones de INDECI y del COEN. No compartas rumores.', icono: 'M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z' },
+];
+---
+
+<section id="preparate" data-contexto="Prepárate" class="relative w-full pb-14 pt-4">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="grid items-stretch gap-6 lg:grid-cols-[1fr_340px]">
+      <div>
+        <span class="sobretitulo">Prepárate</span>
+        <h2 class="seccion-titulo mt-2">Qué hacer ante un aluvión</h2>
+        <p class="seccion-sub">Cuatro pasos que salvan vidas. Compártelos con tu familia.</p>
+        <ol class="mt-7 grid gap-4 sm:grid-cols-2">
+          {PASOS.map((p) => (
+            <li class="tarjeta tarjeta-marca flex gap-4 p-5">
+              <span class="icono icono-marca h-11 w-11">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={p.icono} /></svg>
+              </span>
+              <div>
+                <p class="font-display text-base font-bold text-noche-900"><span class="text-cochinilla-600">{p.n}.</span> {p.titulo}</p>
+                <p class="mt-1 text-sm leading-relaxed text-slate-600">{p.texto}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <aside class="tarjeta tarjeta-noche tejida flex flex-col justify-between p-6">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wider text-ocre-400">Emergencias</p>
+          <a href="tel:115" class="mt-3 block font-display text-7xl font-bold leading-none text-white hover:text-hielo-300">115</a>
+          <p class="mt-2 text-sm text-slate-300">Línea de Defensa Civil (INDECI). Bomberos: <a href="tel:116" class="font-semibold text-white underline underline-offset-2">116</a>.</p>
+        </div>
+        <div class="mt-6 space-y-2">
+          <a href="tel:115" class="btn btn-marca w-full">Llamar al 115</a>
+          <a href="https://www.gob.pe/indeci" target="_blank" rel="noopener noreferrer" class="btn btn-cristal w-full">Avisos oficiales de INDECI ↗</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

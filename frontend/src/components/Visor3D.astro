@@ -1,0 +1,49 @@
+---
+// Ventana con el relieve 3D real de una laguna (Cesium). Se carga solo al pedirla.
+---
+<dialog id="visor-3d" class="m-auto w-[min(1100px,94vw)] overflow-hidden rounded-3xl bg-noche-950 p-0 text-white shadow-2xl backdrop:bg-noche-950/70 backdrop:backdrop-blur-sm" aria-labelledby="visor-3d-titulo">
+  <div class="flex items-center justify-between gap-3 px-5 py-3">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-hielo-300">Relieve 3D real</p>
+      <h2 id="visor-3d-titulo" class="font-display text-lg font-bold">Laguna</h2>
+    </div>
+    <button id="visor-3d-cerrar" type="button" class="btn btn-sm btn-cristal" aria-label="Cerrar vista 3D">Cerrar</button>
+  </div>
+  <div class="relative h-[min(640px,70vh)] w-full bg-noche-900">
+    <div id="visor-3d-escena" class="absolute inset-0"></div>
+    <div id="visor-3d-marcas" class="pointer-events-none absolute inset-0"></div>
+    <p id="visor-3d-estado" class="absolute inset-0 flex items-center justify-center text-sm text-slate-300">Cargando relieve…</p>
+  </div>
+  <p class="px-5 py-2.5 text-xs text-slate-400">Arrastra para girar · rueda para acercar · la luz corresponde a la hora actual en los Andes.</p>
+</dialog>
+
+<script>
+  import { MARCAS } from '../config/recorrido.data';
+  import type { Escena3D } from '../scripts/hero3d';
+
+  const dlg = document.getElementById('visor-3d') as HTMLDialogElement | null;
+  const escenaEl = document.getElementById('visor-3d-escena');
+  const marcasEl = document.getElementById('visor-3d-marcas');
+  const estado = document.getElementById('visor-3d-estado');
+  let escena: Escena3D | null = null;
+
+  document.getElementById('visor-3d-cerrar')?.addEventListener('click', () => dlg?.close());
+
+  window.addEventListener('arqen:ver3d', async (e) => {
+    const d = (e as CustomEvent).detail || {};
+    if (!dlg || !escenaEl || !marcasEl || !Number.isFinite(d.lat)) return;
+    const t = document.getElementById('visor-3d-titulo');
+    if (t) t.textContent = String(d.nombre).startsWith('Laguna') ? d.nombre : `Laguna ${d.nombre}`;
+    dlg.showModal();
+    const parada = { id: '', titulo: '', mensaje: '', lat: d.lat, lng: d.lng, alt: d.alt || 4500, rumbo: 40, inclinacion: -22, distancia: 9000 };
+    if (!escena) {
+      if (estado) { estado.textContent = 'Cargando relieve…'; estado.hidden = false; }
+      const { iniciarEscena3D } = await import('../scripts/hero3d');
+      escena = await iniciarEscena3D(escenaEl, marcasEl, [...MARCAS, { nombre: String(d.nombre), tipo: 'laguna', lat: d.lat, lng: d.lng, alt: d.alt || 4500 }], () => { if (estado) estado.hidden = true; });
+      if (!escena) { if (estado) estado.textContent = 'No se pudo cargar el 3D (revisa tu conexión o el token de Cesium).'; return; }
+      escena.volarA(parada, 0);
+    } else {
+      escena.volarA(parada, 3);
+    }
+  });
+</script>

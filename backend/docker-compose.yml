@@ -17,7 +17,8 @@ services:
     environment:
       - PORT=8080
       - EMBEDDER=ninguno
-      - CORS_ORIGENES=*
+      # Nunca '*': lista explícita de dominios del frontend
+      - CORS_ORIGENES=https://brainglaciares.pages.dev,https://brainglaciaresunmsm.pages.dev,http://localhost:4321
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/salud')"]
       interval: 30s

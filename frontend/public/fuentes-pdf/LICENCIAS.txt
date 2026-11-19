@@ -1,0 +1,5 @@
+Fuentes incluidas para el informe PDF (todas con SIL Open Font License 1.1):
+- Aldrich · Matt McInerney
+- Space Grotesk · Florian Karsten
+- IBM Plex Sans / IBM Plex Mono · IBM Corp.
+Licencia: https://openfontlicense.org

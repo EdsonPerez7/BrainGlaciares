@@ -1,0 +1,54 @@
+---
+// Mapa con las dos lagunas que se comparan (se actualiza al cambiar la selección)
+---
+<article class="tarjeta tarjeta-hielo flex flex-col p-3">
+  <div class="flex flex-wrap items-center justify-between gap-2 px-2 pb-2.5 pt-1">
+    <h3 class="font-display text-lg font-bold text-noche-900">Dónde están</h3>
+    <span id="mapa-comp-distancia" class="etiqueta bg-white text-hielo-700 ring-1 ring-sky-100">–</span>
+  </div>
+  <div id="mapa-comparacion" class="h-[360px] w-full overflow-hidden rounded-xl"></div>
+</article>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+  import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { distanciaKm } from '../config/camino.data';
+
+  const div = document.getElementById('mapa-comparacion');
+  if (div) {
+    const mapa = L.map(div, { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri — IGN, USGS, OpenStreetMap', maxZoom: 16,
+    }).addTo(mapa);
+    const capa = L.layerGroup().addTo(mapa);
+    const icono = (color: string, n: string) => L.divIcon({
+      className: '', iconSize: [34, 34], iconAnchor: [17, 17],
+      html: `<span style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:${color};color:#fff;font:700 13px var(--font-sans);border:3px solid #fff;box-shadow:0 4px 12px rgb(11 24 56/.35)">${n}</span>`,
+    });
+
+    function pintar() {
+      const a = LAGUNAS_DESTACADAS.find((x) => x.id === (document.getElementById('comp-l1') as HTMLSelectElement | null)?.value);
+      const b = LAGUNAS_DESTACADAS.find((x) => x.id === (document.getElementById('comp-l2') as HTMLSelectElement | null)?.value);
+      capa.clearLayers();
+      const puntos = [a, b].filter(Boolean) as typeof LAGUNAS_DESTACADAS;
+      puntos.forEach((l, i) => {
+        L.marker([l.lat, l.lng], { icon: icono(i === 0 ? '#0ea5e9' : '#d97706', String(i + 1)), title: l.nombre })
+          .bindTooltip(`<b>${l.nombre.replace(/[<>&]/g, '')}</b><br>${l.altitud_msnm} m · ${l.volumen_hm3} hm³`, { direction: 'top', offset: [0, -14] })
+          .addTo(capa);
+      });
+      if (puntos.length === 2) {
+        L.polyline([[a!.lat, a!.lng], [b!.lat, b!.lng]], { color: '#0b1838', weight: 2, dashArray: '6 6', opacity: 0.6 }).addTo(capa);
+        mapa.fitBounds(L.latLngBounds([[a!.lat, a!.lng], [b!.lat, b!.lng]]).pad(0.35), { maxZoom: 12 });
+        const d = distanciaKm(a!, b!);
+        const t = document.getElementById('mapa-comp-distancia');
+        if (t) t.textContent = `${d < 10 ? d.toFixed(1) : Math.round(d)} km en línea recta`;
+      } else if (puntos[0]) {
+        mapa.setView([puntos[0].lat, puntos[0].lng], 11);
+      }
+    }
+    document.getElementById('comp-l1')?.addEventListener('change', pintar);
+    document.getElementById('comp-l2')?.addEventListener('change', pintar);
+    requestAnimationFrame(() => { mapa.invalidateSize(); pintar(); });
+  }
+</script>
