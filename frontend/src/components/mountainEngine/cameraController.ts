@@ -6,7 +6,7 @@ export class DroneCameraController {
   public camera: THREE.PerspectiveCamera;
   private config: MountainConfig;
   private flightZ: number = 0;
-  private currentLookY: number = 100.0;
+  private currentLookY: number = 352.0;
   private totalLength: number;
 
   // Interacción suave con el ratón
@@ -19,6 +19,21 @@ export class DroneCameraController {
     this.config = config;
     this.totalLength = totalLength;
     this.camera = new THREE.PerspectiveCamera(config.cameraFov, aspect, 2.0, 4800.0);
+
+    // Inicializar cota focal al objetivo exacto para evitar el cabeceo o efecto de "caída" al entrar
+    const pitchRad = (this.config.cameraPitch * Math.PI) / 180;
+    this.currentLookY = this.config.maxAltitude * 0.52 + Math.sin(pitchRad) * this.config.lookAheadDist;
+
+    // Inicializar posición y orientación inicial de la cámara de inmediato en lugar de esperar al frame 1
+    const safeAltitude = Math.max(this.config.flightAltitude, this.config.maxAltitude + 30.0);
+    this.camera.position.set(this.config.cameraXOffset, safeAltitude, 0);
+
+    const yawRad = (this.config.cameraYaw * Math.PI) / 180;
+    const dirX = Math.sin(yawRad);
+    const dirZ = -Math.cos(yawRad);
+    const focalX = this.config.cameraXOffset + dirX * this.config.lookAheadDist;
+    const focalZ = dirZ * this.config.lookAheadDist;
+    this.camera.lookAt(focalX, this.currentLookY, focalZ);
   }
 
   public resize(width: number, height: number) {

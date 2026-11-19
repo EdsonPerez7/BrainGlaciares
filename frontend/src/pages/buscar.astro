@@ -26,9 +26,9 @@ import { SITE_CONFIG } from '../config/site.config';
               id="filtro-departamento"
               class="appearance-none rounded-lg border border-slate-300 bg-white py-1.5 pl-3 pr-8 text-xs font-semibold text-slate-900 shadow-2xs focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600 cursor-pointer"
             >
-              <option value="todos">Todo el Perú</option>
+              <option value="todos">Todo el Perú (19 lagunas en riesgo)</option>
               {DEPARTAMENTOS_RIESGO.map(d => (
-                <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total} lagunas críticas)</option>
+                <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total} {d.total === 1 ? 'laguna crítica' : 'lagunas críticas'})</option>
               ))}
             </select>
             <span class="pointer-events-none absolute right-2.5 top-2 text-[10px] text-slate-400">▼</span>
@@ -819,7 +819,7 @@ import { SITE_CONFIG } from '../config/site.config';
     } else {
       const totalReg = listaDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
       document.getElementById('mapa-dept-nombre').textContent = "Todo el Perú";
-      document.getElementById('mapa-dept-num').textContent = String(totalReg || 18);
+      document.getElementById('mapa-dept-num').textContent = String(totalReg || 19);
       document.getElementById('mapa-dept-sub').textContent = `${listaDeptos.length} departamentos con glaciares registrados`;
     }
 

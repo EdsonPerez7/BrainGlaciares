@@ -124,7 +124,7 @@ const {
         const fNorm = norm(deptFilter);
         const filtered = !fNorm || fNorm === 'todos'
           ? [...lagunasCatalogo]
-          : lagunasCatalogo.filter((l) => norm(l.departamento) === fNorm);
+          : lagunasCatalogo.filter((l) => norm(l.departamento) === fNorm || (l.departamentos && norm(l.departamentos).includes(fNorm)));
 
         // Si el filtro por departamento no contiene la laguna objetivo pero se pidió una laguna específica, incluirla
         if (targetId && !filtered.some(l => l.id.toLowerCase() === targetId.toLowerCase())) {
@@ -135,6 +135,10 @@ const {
         const coords: L.LatLngTuple[] = [];
 
         filtered.forEach((laguna) => {
+          if (typeof laguna.lat !== 'number' || typeof laguna.lng !== 'number' || isNaN(laguna.lat) || isNaN(laguna.lng)) {
+            return;
+          }
+
           const color = getRiskColor(laguna.riesgo);
           const pos: L.LatLngTuple = [laguna.lat, laguna.lng];
           coords.push(pos);
@@ -231,8 +235,13 @@ const {
         }
 
         // Si se pasaron coordenadas explícitas de laguna
-        if (options.lat && options.lng) {
+        if (typeof options.lat === 'number' && typeof options.lng === 'number' && !isNaN(options.lat) && !isNaN(options.lng)) {
           map.setView([options.lat, options.lng], options.zoom || 13, { animate: true });
+          if (targetId && markersMap.has(targetId)) {
+            const item = markersMap.get(targetId)!;
+            highlightMarker(item.marker);
+            setTimeout(() => item.marker.openPopup(), 200);
+          }
           return;
         }
 
@@ -240,14 +249,20 @@ const {
         if (targetDept && targetDept !== 'todos') {
           const matchingCoords: L.LatLngTuple[] = [];
           markersMap.forEach(({ laguna }) => {
-            if (norm(laguna.departamento) === targetDept) {
-              matchingCoords.push([laguna.lat, laguna.lng]);
+            if (norm(laguna.departamento) === targetDept || (laguna.departamentos && norm(laguna.departamentos).includes(targetDept))) {
+              if (typeof laguna.lat === 'number' && typeof laguna.lng === 'number') {
+                matchingCoords.push([laguna.lat, laguna.lng]);
+              }
             }
           });
 
           if (matchingCoords.length > 0) {
             const bounds = L.latLngBounds(matchingCoords);
-            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 11 });
+            if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+              map.setView(matchingCoords[0], 12, { animate: true });
+            } else {
+              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 11 });
+            }
           } else if (DEPT_CENTROIDS[targetDept]) {
             map.setView(DEPT_CENTROIDS[targetDept], 8, { animate: true });
           }

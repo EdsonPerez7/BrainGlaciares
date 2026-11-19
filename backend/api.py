@@ -50,6 +50,9 @@ COORDENADAS_LAGUNAS = {
     "513": (-9.2133, -77.5511),
     "upiscocha": (-13.7250, -71.2950),
     "a_10": (-13.7280, -71.2880),
+    "a10": (-13.7280, -71.2880),
+    "a_40": (-13.7310, -71.2910),
+    "a40": (-13.7310, -71.2910),
     "gangrajanca": (-10.2764, -76.8778),
     "quesillococha": (-10.2920, -76.8650),
     "chaclan": (-10.2450, -76.8900),
@@ -258,13 +261,42 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 df = pd.read_csv(ruta_nodos, low_memory=False)
                 df_lag = df[df['tipo'].astype(str).str.lower() == 'laguna'].copy()
                 en_r = df_lag[(df_lag['en_riesgo'] == True) | (df_lag['nivel_max'].astype(str).isin(['Muy alto', 'Alto']))]
+                seen_lagunas = set()
                 for _, r in en_r.iterrows():
-                    depts = str(r['departamentos']) if pd.notna(r['departamentos']) else ''
+                    lag_id = str(r['id']).replace('Laguna:', '').strip()
+                    clean_id = norm(lag_id)
+                    if clean_id in ('a10', 'a_10'):
+                        clean_id = 'a_10'
+                    elif clean_id in ('a40', 'a_40'):
+                        clean_id = 'a_40'
+                    if clean_id in seen_lagunas:
+                        continue
+                    seen_lagunas.add(clean_id)
+
                     riesgo = str(r['nivel_max']) if pd.notna(r['nivel_max']) else ''
-                    for d in depts.split(';'):
-                        d = d.strip()
-                        if not d:
-                            continue
+                    if clean_id in ("a_10", "upiscocha"):
+                        deptos_lag = ["Cusco"]
+                    elif clean_id in ("a_40",):
+                        continue  # Laguna en formación monitoreada, no incluida en el inventario consolidado de 19
+                    elif clean_id in ("taullicocha", "palcacocha", "paron", "llaca", "tullparaju", "cuchillacocha", "artizon", "rajucolta", "yanaraju"):
+                        deptos_lag = ["Áncash"]
+                    elif clean_id in ("gangrajanca", "quesillococha", "chaclan"):
+                        deptos_lag = ["Huánuco"]
+                    elif clean_id in ("ananta", "ananta_cucho"):
+                        deptos_lag = ["Puno"]
+                    elif clean_id == "salkantaycocha":
+                        deptos_lag = ["Apurímac"]
+                    elif clean_id == "lecma":
+                        deptos_lag = ["Pasco"]
+                    elif clean_id == "pacliashcocha":
+                        deptos_lag = ["Lima"]
+                    else:
+                        depts = str(r['departamentos']) if pd.notna(r['departamentos']) else 'Áncash'
+                        deptos_lag = [d.strip() for d in depts.split(';') if d.strip() and d.strip().lower() != 'nan']
+                        if not deptos_lag:
+                            deptos_lag = ["Áncash"]
+
+                    for d in deptos_lag:
                         if d not in conteo:
                             conteo[d] = {"total": 0, "muy_alto": 0, "alto": 0}
                         conteo[d]["total"] += 1
@@ -320,17 +352,41 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 df_lag['n_docs_num'] = pd.to_numeric(df_lag['n_docs'], errors='coerce').fillna(0)
                 top_lag = df_lag.sort_values(by=['prioridad', 'n_docs_num'], ascending=[True, False])
 
+                seen_catalogo_ids = set()
                 for _, r in top_lag.iterrows():
                     lag_id = str(r['id']).replace('Laguna:', '').strip()
                     clean_norm = norm(lag_id)
-                    dept = str(r['departamentos']) if pd.notna(r['departamentos']) else 'Áncash'
-                    if ';' in dept:
-                        dept = dept.split(';')[0].strip()
+                    if clean_norm in seen_catalogo_ids:
+                        continue
+                    seen_catalogo_ids.add(clean_norm)
+
+                    # Asignación departamental precisa y normalizada
+                    if clean_norm in ("a_40", "a40", "a_10", "a10", "upiscocha"):
+                        dept = "Cusco"
+                    elif clean_norm in ("taullicocha", "palcacocha", "paron", "llaca", "tullparaju", "cuchillacocha", "artizon", "rajucolta", "yanaraju"):
+                        dept = "Áncash"
+                    elif clean_norm in ("gangrajanca", "quesillococha", "chaclan"):
+                        dept = "Huánuco"
+                    elif clean_norm in ("ananta", "ananta_cucho"):
+                        dept = "Puno"
+                    elif clean_norm == "salkantaycocha":
+                        dept = "Apurímac"
+                    elif clean_norm == "lecma":
+                        dept = "Pasco"
+                    elif clean_norm == "pacliashcocha":
+                        dept = "Lima"
+                    else:
+                        dept = str(r['departamentos']) if pd.notna(r['departamentos']) else 'Áncash'
+                        if dept.lower() == 'nan':
+                            dept = 'Áncash'
+                        elif ';' in dept:
+                            dept = dept.split(';')[0].strip()
+
                     riesgo = str(r['nivel_max']) if pd.notna(r['nivel_max']) else 'Sin evaluar'
 
                     coords = COORDENADAS_LAGUNAS.get(clean_norm)
-                    if not coords:
-                        coords = CENTROIDES_DEPARTAMENTOS.get(norm(dept), (-9.52, -77.52))
+                    lat = coords[0] if coords else None
+                    lng = coords[1] if coords else None
 
                     cord = "Blanca" if "ancash" in norm(dept) else (
                         "Vilcanota" if "cusco" in norm(dept) else (
@@ -348,8 +404,8 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                         "riesgo": riesgo,
                         "n_docs": int(r['n_docs_num']),
                         "total_documentos": int(r['n_docs_num']),
-                        "lat": coords[0],
-                        "lng": coords[1],
+                        "lat": lat,
+                        "lng": lng,
                         "volumen_hm3": 15.0 if riesgo == "Muy alto" else (5.0 if riesgo == "Alto" else 2.0),
                         "superficie_km2": 0.5 if riesgo == "Muy alto" else 0.25,
                         "altitud_msnm": 4450,
@@ -887,9 +943,24 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             final_riesgo = "Sin evaluar"
 
         clean_norm = norm(id)
+        if clean_norm in ("a_40", "a40", "a_10", "a10", "upiscocha"):
+            dept = "Cusco"
+        elif clean_norm in ("taullicocha", "palcacocha", "paron", "llaca", "tullparaju", "cuchillacocha", "artizon", "rajucolta", "yanaraju"):
+            dept = "Áncash"
+        elif clean_norm in ("gangrajanca", "quesillococha", "chaclan"):
+            dept = "Huánuco"
+        elif clean_norm in ("ananta", "ananta_cucho"):
+            dept = "Puno"
+        elif clean_norm == "salkantaycocha":
+            dept = "Apurímac"
+        elif clean_norm == "lecma":
+            dept = "Pasco"
+        elif clean_norm == "pacliashcocha":
+            dept = "Lima"
+
         coords = COORDENADAS_LAGUNAS.get(clean_norm)
-        if not coords:
-            coords = CENTROIDES_DEPARTAMENTOS.get(norm(str(dept)), (-9.52, -77.52))
+        lat = coords[0] if coords else None
+        lng = coords[1] if coords else None
 
         cord = "Blanca" if "ancash" in norm(str(dept)) else (
             "Vilcanota" if "cusco" in norm(str(dept)) else (
@@ -919,8 +990,8 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             "datos_conectados": 12 + len(obras) + len(poblados),
             "confianza": 0.94 if final_riesgo != "Sin evaluar" else 0.65,
             "fecha_actualizacion": "2026 · al día",
-            "lat": coords[0],
-            "lng": coords[1],
+            "lat": lat,
+            "lng": lng,
             "fragmentos_rag": docs_fragmentos,
             "alerta_especifica": f"Información consolidada de la red de conocimiento oficial para la laguna {nombre}."
         }
