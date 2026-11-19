@@ -1,0 +1,146 @@
+---
+import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
+import { formatoMiles } from '../config/recorrido.data';
+
+const h = METRICAS_PAIS.hielo_perdido;
+const r = METRICAS_PAIS.lagunas_riesgo;
+const a = METRICAS_PAIS.aluviones_historicos;
+
+// Aluviones por época (catálogo histórico)
+const EPOCAS = [
+  { label: '1868–1920', corto: '1900', eventos: 8 },
+  { label: '1920–1940', corto: '1930', eventos: 12 },
+  { label: '1940–1960', corto: '1950', eventos: 24, nota: 'Huaraz 1941' },
+  { label: '1960–1980', corto: '1970', eventos: 27, nota: 'Yungay 1970' },
+  { label: '1980–2000', corto: '1990', eventos: 15 },
+  { label: '2000–2020', corto: '2010', eventos: 11, nota: 'Laguna 513' },
+  { label: '2020–hoy', corto: 'hoy', eventos: 3 },
+];
+const maxEv = Math.max(...EPOCAS.map((e) => e.eventos));
+const deptos = DEPARTAMENTOS_RIESGO.filter((d) => d.total > 0);
+const maxDep = Math.max(...deptos.map((d) => d.total));
+const circ = 2 * Math.PI * 42;
+interface Props { comoPagina?: boolean }
+const { comoPagina = false } = Astro.props;
+---
+
+<section id="panorama" data-contexto="Panorama" class="relative w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="sobretitulo">Panorama nacional</span>
+        {comoPagina ? <h1 class="seccion-titulo mt-2">El país en cuatro datos</h1> : <h2 class="seccion-titulo mt-2">El país en cuatro datos</h2>}
+        <p class="seccion-sub">Toca cualquier gráfico y el asistente te sugiere qué preguntar.</p>
+      </div>
+      <a href="/metodologia" class="btn btn-sec">¿De dónde salen los datos?</a>
+    </div>
+
+    <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <!-- 1. Hielo perdido -->
+      <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-hielo"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 4l3 3 3-3M9 20l3-3 3 3"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Hielo perdido</h3>
+        </div>
+        <button type="button" data-arqen-grafico="hielo" data-arqen-valor={`${h.porcentaje} %`} class="mt-4 flex items-center gap-4 rounded-xl text-left" aria-label={`Se perdió el ${h.porcentaje} % del hielo. Preguntar sobre esto`}>
+          <svg class="h-24 w-24 flex-none -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e0f2fe" stroke-width="12" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#grad-hielo)" stroke-width="12" stroke-linecap="round" stroke-dasharray={`${(h.porcentaje / 100) * circ} ${circ}`} />
+            <defs><linearGradient id="grad-hielo"><stop offset="0" stop-color="#38bdf8" /><stop offset="1" stop-color="#0369a1" /></linearGradient></defs>
+          </svg>
+          <span>
+            <span class="block font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={h.porcentaje} data-sufijo=" %">{h.porcentaje} %</span>
+            <span class="mt-1 block text-sm text-slate-600">de {formatoMiles(h.superficie_1962_km2)} a {formatoMiles(h.superficie_2016_km2)} km²</span>
+          </span>
+        </button>
+        <p class="mt-4 text-sm text-slate-600">El Perú perdió la mitad de su hielo entre {h.periodo}.</p>
+        <p class="fuente">ANA · Inventario Nacional, {h.pagina}</p>
+      </article>
+
+      <!-- 2. Lagunas en riesgo -->
+      <article class="tarjeta tarjeta-riesgo tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-riesgo"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Lagunas en riesgo crítico</h3>
+        </div>
+        <span class="mt-4 font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={r.total}>{r.total}</span>
+        <div class="mt-4 flex h-4 overflow-hidden rounded-full" role="group" aria-label="Lagunas por nivel de riesgo">
+          <button type="button" data-arqen-grafico="riesgo-pais" data-arqen-valor="Muy alto" class="bg-rose-600" style={`flex:${r.muy_alto}`} aria-label={`${r.muy_alto} de riesgo muy alto`}></button>
+          <button type="button" data-arqen-grafico="riesgo-pais" data-arqen-valor="Alto" class="bg-orange-500" style={`flex:${r.alto}`} aria-label={`${r.alto} de riesgo alto`}></button>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700">
+          <span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-full bg-rose-600"></i>{r.muy_alto} muy alto</span>
+          <span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-full bg-orange-500"></i>{r.alto} alto</span>
+        </div>
+        <p class="mt-3 text-sm font-medium text-cochinilla-700">{r.sin_obras_seguridad} todavía sin obras de seguridad.</p>
+        <p class="fuente">INAIGEM · {r.pagina}</p>
+      </article>
+
+      <!-- 3. Aluviones por época -->
+      <article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-historia"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">Aluviones desde {a.primer_registro_ano}</h3>
+        </div>
+        <span class="mt-4 font-display text-5xl font-bold tracking-tight text-noche-900 tabular" data-contador={a.total_registrados}>{a.total_registrados}</span>
+        <div class="mt-4 flex h-24 items-end gap-1.5" role="group" aria-label="Aluviones por época">
+          {EPOCAS.map((e) => (
+            <button type="button" data-arqen-grafico="aluviones" data-arqen-valor={e.label} class="group relative flex h-full flex-1 flex-col justify-end" aria-label={`${e.eventos} aluviones entre ${e.label}`} title={`${e.label}: ${e.eventos}${e.nota ? ` · ${e.nota}` : ''}`}>
+              <span class={`block w-full rounded-t-md ${e.eventos > 20 ? 'bg-ocre-600' : 'bg-ocre-400'} transition group-hover:brightness-110`} style={`height:${Math.max(8, (e.eventos / maxEv) * 100)}%`}></span>
+            </button>
+          ))}
+        </div>
+        <div class="mt-1.5 flex gap-1.5 font-mono text-[10.5px] text-slate-500">
+          {EPOCAS.map((e) => <span class="flex-1 text-center">{e.corto}</span>)}
+        </div>
+        <p class="fuente mt-3">ANA · INAIGEM · SENAMHI</p>
+      </article>
+
+      <!-- 4. Por departamento -->
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5">
+        <div class="flex items-center gap-3">
+          <span class="icono icono-laguna"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <h3 class="text-sm font-semibold text-slate-600">¿Dónde están?</h3>
+        </div>
+        <ul class="mt-4 space-y-2">
+          {deptos.map((d) => (
+            <li>
+              <button type="button" data-arqen-grafico="departamento" data-arqen-valor={d.departamento} data-arqen-departamento={d.departamento} class="flex w-full items-center gap-2 rounded-lg text-left text-sm">
+                <span class="w-20 flex-none truncate text-slate-700">{d.departamento}</span>
+                <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white">
+                  <span class="bg-rose-600" style={`width:${(d.muy_alto / maxDep) * 100}%`}></span>
+                  <span class="bg-orange-500" style={`width:${(d.alto / maxDep) * 100}%`}></span>
+                </span>
+                <span class="w-5 flex-none text-right font-mono text-xs font-medium text-slate-700">{d.total}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p class="fuente mt-3">INAIGEM · lagunas críticas</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Contadores que suben al aparecer (sin animación si se pidió menos movimiento)
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = document.querySelectorAll<HTMLElement>('[data-contador]');
+  if (!reducido && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const el = e.target as HTMLElement, fin = Number(el.dataset.contador), suf = el.dataset.sufijo || '';
+        const t0 = performance.now();
+        const paso = (t: number) => {
+          const p = Math.min(1, (t - t0) / 900);
+          el.textContent = `${Math.round(fin * (1 - Math.pow(1 - p, 3)))}${suf}`;
+          if (p < 1) requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
+      });
+    }, { threshold: 0.6 });
+    els.forEach((el) => io.observe(el));
+  }
+</script>

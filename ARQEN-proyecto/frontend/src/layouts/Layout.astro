@@ -1,0 +1,68 @@
+---
+import '@fontsource/aldrich/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans/600.css';
+import '@fontsource/ibm-plex-sans/700.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import Asistente from '../components/Asistente.astro';
+import { SITE_CONFIG } from '../config/site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${SITE_CONFIG.name} · ${SITE_CONFIG.tagline}`,
+  description = SITE_CONFIG.description
+} = Astro.props;
+
+const urlCanonica = new URL(Astro.url.pathname, `https://${SITE_CONFIG.domain}`).href;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth bg-[#f5f7fb] text-slate-900 antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1838" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={urlCanonica} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Vista previa al compartir el enlace -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_CONFIG.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={urlCanonica} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body class="min-h-screen flex flex-col bg-[#f5f7fb] text-slate-900 font-sans selection:bg-laguna-600 selection:text-white">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:shadow-lg"
+    >
+      Saltar al contenido
+    </a>
+
+    <Navbar />
+
+    <main id="contenido" class="fondo-tejido flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <Asistente />
+  </body>
+</html>

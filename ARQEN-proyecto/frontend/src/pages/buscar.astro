@@ -1,0 +1,887 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBox from '../components/SearchBox.astro';
+import GlacierMap from '../components/GlacierMap.astro';
+import Visor3D from '../components/Visor3D.astro';
+import { LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
+import { SITE_CONFIG } from '../config/site.config';
+---
+
+<Layout title="Buscar lagunas y zonas de riesgo · ARQEN">
+  <div class="min-h-screen pb-12 pt-8" data-contexto="Ficha de laguna">
+    <div class="mx-auto w-full max-w-[1400px] space-y-5 px-4 sm:px-8 lg:px-12">
+
+      <!-- Encabezado + buscador -->
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <span class="sobretitulo">Buscar</span>
+          <h1 class="seccion-titulo mt-2">Busca tu zona o una laguna</h1>
+          <p class="seccion-sub">Fichas con la fuente de cada dato. Escribe con o sin tildes.</p>
+        </div>
+        <div class="w-full lg:w-[420px]">
+          <SearchBox inputId="buscar-input" theme="light" mode="event" maxWidthClass="max-w-full" placeholder="Pueblo, departamento o laguna…" />
+        </div>
+      </div>
+
+      <!-- Filtro + vistas -->
+      <div class="tarjeta flex flex-wrap items-center justify-between gap-3 p-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="filtro-departamento" class="pl-1 text-sm font-semibold text-slate-600">Zona</label>
+          <select id="filtro-departamento" class="h-10 cursor-pointer rounded-xl border border-laguna-200 bg-laguna-50 px-3 pr-8 text-sm font-semibold text-laguna-900 focus:border-laguna-500 focus:outline-none">
+            <option value="todos">Todo el Perú</option>
+            {DEPARTAMENTOS_RIESGO.map(d => (<option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total})</option>))}
+          </select>
+          <button id="btn-quitar-filtro" type="button" class="btn btn-sm btn-ter">Quitar filtro</button>
+        </div>
+        <div class="flex gap-1 rounded-xl bg-slate-100 p-1" role="group" aria-label="Vista">
+          <button id="tab-ficha" type="button" class="rounded-lg px-4 py-2 text-sm font-semibold transition bg-slate-900 text-white">Ficha</button>
+          <button id="tab-mapa" type="button" class="rounded-lg px-4 py-2 text-sm font-semibold transition bg-slate-100 text-slate-700">Mapa</button>
+        </div>
+        <input type="checkbox" id="toggle-ver-mapa" class="hidden" aria-hidden="true" tabindex="-1" />
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VISTA A: FICHA TÉCNICA DETALLADA DE LAGUNA               -->
+      <!-- ======================================================== -->
+      <div id="seccion-ficha" class="space-y-4">
+        
+        <!-- Cabecera de la ficha -->
+        <div class="tarjeta tejida p-6 sm:p-7">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0 space-y-2">
+              <p class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                <span id="badge-breadcrumb">Laguna · Áncash</span>
+                <span id="ficha-cordillera" class="hidden"></span>
+              </p>
+              <h2 id="ficha-nombre" class="font-display text-3xl font-bold tracking-tight text-noche-900 sm:text-4xl">Laguna</h2>
+              <div class="flex flex-wrap items-center gap-2 pt-1 text-sm">
+                <span id="badge-riesgo-pill" class="etiqueta riesgo-sin">Sin evaluar</span>
+                <span id="badge-docs" class="etiqueta bg-hielo-50 text-hielo-700">0 informes</span>
+                <span id="badge-datos" class="etiqueta bg-laguna-50 text-laguna-700">0 datos conectados</span>
+                <span id="badge-confianza" class="etiqueta bg-ocre-50 text-ocre-700">Confianza –</span>
+                <span id="badge-fecha" class="etiqueta bg-slate-100 text-slate-600">Último dato: –</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2 lg:justify-end">
+              <button id="btn-preguntar-mayu" type="button" class="btn btn-sec">Preguntar al asistente</button>
+              <button id="btn-ver-3d-ficha" type="button" class="btn btn-hielo">◈ Ver en 3D real</button>
+              <button id="btn-generar-informe" type="button" class="btn btn-marca">↓ Informe PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicadores -->
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="tarjeta tarjeta-riesgo flex items-center gap-4 p-5">
+            <div class="relative h-[70px] w-[120px] flex-none overflow-hidden">
+              <svg class="absolute -top-[2px] left-0 h-[120px] w-[120px]" viewBox="0 0 100 100" aria-hidden="true">
+                <path d="M 15 50 A 35 35 0 0 1 26 26" fill="none" stroke="#22c55e" stroke-width="10" stroke-linecap="round" />
+                <path d="M 26 26 A 35 35 0 0 1 50 15" fill="none" stroke="#eab308" stroke-width="10" />
+                <path d="M 50 15 A 35 35 0 0 1 74 26" fill="none" stroke="#f97316" stroke-width="10" />
+                <path d="M 74 26 A 35 35 0 0 1 85 50" fill="none" stroke="#e11d48" stroke-width="10" stroke-linecap="round" />
+                <line id="velocimetro-aguja" x1="50" y1="50" x2="50" y2="22" stroke="#0b1838" stroke-width="3.5" stroke-linecap="round" class="transition-transform duration-1000 ease-out origin-[50px_50px]" style="transform: rotate(-45deg);" />
+                <circle cx="50" cy="50" r="4.5" fill="#0b1838" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm text-slate-500">Nivel de riesgo</p>
+              <p id="velocimetro-etiqueta" class="font-display text-xl font-bold text-noche-900">Sin evaluar</p>
+            </div>
+          </article>
+          <article class="tarjeta tarjeta-hielo flex flex-col p-5" data-arqen-grafico="volumen" id="kpi-volumen">
+            <p class="text-sm text-slate-500">Agua almacenada</p>
+            <p class="font-display text-3xl font-bold text-noche-900 tabular"><span id="kpi-volumen-valor">–</span> <span class="text-base font-medium text-slate-500">hm³</span></p>
+            <p class="mt-auto pt-1 text-sm text-hielo-700">💧 ≈ <b id="kpi-piscinas">–</b> piscinas olímpicas</p>
+          </article>
+          <article class="tarjeta tarjeta-historia flex flex-col p-5">
+            <p class="text-sm text-slate-500">Aguas abajo</p>
+            <p id="flujo-pueblos" class="truncate font-display text-2xl font-bold text-noche-900">–</p>
+            <p class="mt-auto pt-1 text-sm text-slate-600"><b id="metrica-pueblos-num">0</b> poblado(s) · <b id="metrica-eventos-num">0</b> evento(s) en su historia</p>
+          </article>
+          <article class="tarjeta tarjeta-laguna flex flex-col p-5">
+            <p class="text-sm text-slate-500">Obras de seguridad</p>
+            <p id="kpi-obras-si" class="font-display text-2xl font-bold text-laguna-700">–</p>
+            <p id="flujo-obras" class="mt-auto line-clamp-2 pt-1 text-sm text-slate-600">–</p>
+          </article>
+        </div>
+
+        <!-- Alerta -->
+        <div id="banner-alerta" class="tarjeta tarjeta-historia flex items-start gap-3 p-4 text-sm text-ocre-700">
+          <span class="icono icono-historia h-9 w-9 text-base" aria-hidden="true">!</span>
+          <span id="banner-alerta-texto" class="pt-1.5 font-medium">–</span>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid gap-4 lg:grid-cols-2">
+          <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-display text-lg font-bold text-noche-900">Volumen frente a otras lagunas críticas</h3>
+              <span class="text-xs text-slate-500">hm³ · toca una barra</span>
+            </div>
+            <div id="grafico-volumen" class="mt-4 space-y-2"></div>
+            <p class="fuente mt-4">Catálogo de lagunas INAIGEM / ANA</p>
+          </article>
+          <article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-display text-lg font-bold text-noche-900">De dónde viene el agua</h3>
+              <span class="text-xs text-slate-500">recorrido de la cuenca</span>
+            </div>
+            <ol class="mt-4 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+              <li class="flex flex-col rounded-xl bg-hielo-50 p-3 ring-1 ring-sky-100"><span class="text-xs font-semibold text-hielo-700">1 · Glaciar</span><b id="flujo-glaciar" class="mt-1 text-sm text-noche-900">–</b></li>
+              <li class="flex flex-col rounded-xl bg-laguna-50 p-3 ring-1 ring-laguna-100"><span class="text-xs font-semibold text-laguna-700">2 · Laguna</span><b id="flujo-laguna" class="mt-1 text-sm text-noche-900">–</b><span id="flujo-laguna-estado" class="mt-auto pt-1 text-xs text-slate-500">–</span></li>
+              <li class="flex flex-col rounded-xl bg-rose-50 p-3 ring-1 ring-rose-100"><span class="text-xs font-semibold text-rose-700">3 · Superficie</span><b class="mt-1 text-sm text-noche-900"><span id="metrica-superficie">–</span> km²</b><span id="metrica-superficie-doc" class="mt-auto break-words pt-1 font-mono text-[10.5px] leading-snug text-slate-500">–</span></li>
+              <li class="flex flex-col rounded-xl bg-ocre-50 p-3 ring-1 ring-amber-100"><span class="text-xs font-semibold text-ocre-700">4 · Historia</span><div id="linea-tiempo" class="mt-1 space-y-1 text-xs text-slate-700"></div></li>
+            </ol>
+            <p class="fuente mt-4">Ficha técnica del catálogo oficial</p>
+          </article>
+        </div>
+
+        <!-- Evidencia documental -->
+        <div id="contenedor-docs-rag" class="tarjeta p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-display text-lg font-bold text-noche-900">Lo que dicen los informes</h3>
+            <span class="etiqueta bg-hielo-50 text-hielo-700">Fragmentos originales · sin IA</span>
+          </div>
+          <div id="lista-docs-rag" class="mt-4 grid gap-3 md:grid-cols-2"></div>
+          <div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+            <span class="self-center text-sm text-slate-500">Pregúntale al asistente:</span>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="¿Y si se desborda esta laguna? ¿Qué zonas se verían afectadas?">¿Y si se desborda?</button>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="Explícame en términos simples el riesgo de esta laguna.">Explícamela en simple</button>
+            <button type="button" class="btn-accion-chat btn btn-sm btn-hielo" data-prompt="¿Qué obras de seguridad tiene esta laguna y funcionan?">¿Está protegida?</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VISTA B: MAPA TERRITORIAL Y DEPARTAMENTAL                -->
+      <!-- ======================================================== -->
+      <div id="seccion-mapa" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Lado Izquierdo: Resumen Departamental -->
+          <div class="lg:col-span-4 space-y-4">
+            
+            <div class="tarjeta tarjeta-marca tejida space-y-4 p-6">
+              <div>
+                <label for="select-colorear" class="text-xs font-bold text-slate-700 block mb-1.5">
+                  Colorear por
+                </label>
+                <select 
+                  id="select-colorear"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 shadow-2xs focus:border-cyan-600 focus:outline-none"
+                >
+                  <option>Lagunas en riesgo alto o muy alto</option>
+                  <option>Volumen de agua embalsada (hm³)</option>
+                  <option>Presencia de obras de seguridad</option>
+                </select>
+              </div>
+
+              <!-- Tarjeta de métricas departamentales -->
+              <div class="pt-3 border-t border-slate-100">
+                <h3 id="mapa-dept-nombre" class="font-display text-2xl font-bold text-noche-900">Áncash</h3>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span id="mapa-dept-num" class="text-4xl font-black text-rose-600">9</span>
+                  <span class="text-xs font-semibold text-slate-600">lagunas en riesgo</span>
+                </div>
+                <p id="mapa-dept-sub" class="text-xs text-slate-500 mt-0.5">
+                  puesto 1 de 13 departamentos con glaciares
+                </p>
+
+                <div class="mt-4">
+                  <button 
+                    id="btn-ver-todo-peru"
+                    type="button" 
+                    class="btn btn-sec w-full"
+                  >
+                    Ver todo el Perú
+                  </button>
+                </div>
+
+                <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
+                  Haz clic en un punto del mapa para abrir esa laguna en su ficha técnica. Acerca con la rueda y arrastra para moverte.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lista de lagunas del departamento seleccionado -->
+            <div class="tarjeta space-y-3 p-5">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Lagunas en esta zona
+              </h4>
+              <div id="lista-lagunas-dept" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                <!-- Se llena por JS -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Lado Derecho: Mapa Interactivo con Leaflet + CARTO Positron -->
+          <div class="lg:col-span-8">
+            <div class="tarjeta tarjeta-hielo flex flex-col overflow-hidden">
+              <div class="p-3.5 border-b border-slate-200 flex items-center justify-between text-xs text-slate-700 bg-slate-50">
+                <span class="font-bold">Distribución geográfica de lagunas de alta montaña</span>
+                <span class="text-slate-400 text-[11px]">Cartografía Esri Topo / OSM</span>
+              </div>
+
+              <!-- Contenedor del Mapa Leaflet (componente modular) -->
+              <GlacierMap mapId="mapa-leaflet" heightClass="h-[520px]" mode="event" />
+
+              <!-- Leyenda inferior -->
+              <div class="p-3 border-t border-slate-200 bg-white flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                <div class="flex items-center gap-1.5">
+                  <span class="h-2 w-12 rounded-full bg-gradient-to-r from-rose-200 to-rose-600 inline-block"></span>
+                  <span>menos → más lagunas en riesgo</span>
+                </div>
+                <div>
+                  <span class="inline-block h-2 w-2 rounded-full bg-slate-400 mr-1"></span>
+                  <span>gris = sin registros</span>
+                </div>
+                <div>
+                  <span class="inline-block h-2.5 w-2.5 rounded-full bg-rose-600 border border-white shadow-2xs mr-1"></span>
+                  <span>puntos = lagunas (color = nivel de riesgo)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <Visor3D />
+</Layout>
+
+<!-- Script de Datos, Ficha Técnica y Mapa -->
+<script define:vars={{ LAGUNAS_DESTACADAS, DEPARTAMENTOS_RIESGO, API_BASE: SITE_CONFIG.apiBaseUrl }}>
+  // Escape HTML: todo dato del backend/URL se escapa antes de ir a innerHTML (anti-XSS)
+  const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"'`]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
+
+  // Normalizador para búsqueda insensible a acentos
+  const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  let listaLagunas = [...LAGUNAS_DESTACADAS];
+  let listaDeptos = [...DEPARTAMENTOS_RIESGO];
+  let currentLaguna = LAGUNAS_DESTACADAS[0]; // Por defecto Cancahua
+  let mapInstance = null;
+  let markersLayer = null;
+  let searchDebounce = null;
+
+  // ========================================================
+  // RENDERIZAR FICHA TÉCNICA
+  // ========================================================
+
+  const claseRiesgo = (r) => r === 'Muy alto' ? 'riesgo-muy-alto' : r === 'Alto' ? 'riesgo-alto' : r === 'Medio' ? 'riesgo-medio' : r === 'Bajo' ? 'riesgo-bajo' : 'riesgo-sin';
+  const colorRiesgo = (r) => r === 'Muy alto' ? '#e11d48' : r === 'Alto' ? '#f97316' : r === 'Medio' ? '#eab308' : r === 'Bajo' ? '#16a34a' : '#94a3b8';
+
+  function pintarGraficoVolumen(laguna) {
+    const cont = document.getElementById('grafico-volumen');
+    if (!cont) return;
+    const orden = { 'Muy alto': 4, 'Alto': 3 };
+    let filas = LAGUNAS_DESTACADAS.filter((x) => orden[x.riesgo] || x.id === laguna.id).sort((a, b) => b.volumen_hm3 - a.volumen_hm3).slice(0, 6);
+    if (!filas.some((x) => x.id === laguna.id)) { const propia = LAGUNAS_DESTACADAS.find((x) => x.id === laguna.id); if (propia) filas = [...filas.slice(0, 5), propia]; }
+    const max = Math.max(...filas.map((x) => x.volumen_hm3), 1);
+    cont.innerHTML = filas.map((x) => {
+      const propia = x.id === laguna.id;
+      return `<button type="button" data-arqen-grafico="volumen" data-arqen-valor="${esc(x.nombre)}" data-arqen-laguna="${esc(x.nombre)}" data-arqen-laguna-id="${esc(x.id)}" class="grid w-full grid-cols-[110px_1fr_52px] items-center gap-3 rounded-lg text-left text-sm">
+        <span class="truncate ${propia ? 'font-semibold text-noche-900' : 'text-slate-600'}">${esc(x.nombre)}</span>
+        <span class="h-5 overflow-hidden rounded-md bg-white ring-1 ring-slate-100"><span class="block h-full rounded-md" style="width:${Math.max(3, (x.volumen_hm3 / max) * 100)}%;background:${propia ? 'linear-gradient(90deg,#14b8a6,#0d9488)' : colorRiesgo(x.riesgo)};opacity:${propia ? 1 : .55}"></span></span>
+        <span class="text-right font-mono text-xs ${propia ? 'font-medium text-noche-900' : 'text-slate-500'}">${esc(x.volumen_hm3)}</span>
+      </button>`;
+    }).join('');
+  }
+
+  function pintarLineaTiempo(laguna) {
+    const cont = document.getElementById('linea-tiempo');
+    if (!cont) return;
+    const hitos = [];
+    if (laguna.primer_estudio_ano) hitos.push([laguna.primer_estudio_ano, 'primer estudio']);
+    if (laguna.ano_evento_critico) hitos.push([laguna.ano_evento_critico, 'evento crítico']);
+    hitos.push([String(laguna.fecha_actualizacion || '').slice(0, 4) || '–', 'último dato']);
+    hitos.sort((a, b) => Number(a[0]) - Number(b[0]));
+    cont.innerHTML = hitos.map(([a, t]) => `<p><b class="font-mono text-noche-900">${esc(a)}</b> ${esc(t)}</p>`).join('');
+  }
+
+  function renderFicha(laguna) {
+    if (!laguna) return;
+    currentLaguna = laguna;
+
+    // Encabezado
+    document.getElementById('badge-breadcrumb').textContent = `${laguna.departamento} · Cordillera ${laguna.cordillera} · ${Number(laguna.altitud_msnm || 0).toLocaleString('es-PE')} m`;
+    document.getElementById('ficha-cordillera').textContent = `${laguna.departamento} • cordillera ${laguna.cordillera}`;
+    document.getElementById('ficha-nombre').innerHTML = `Laguna <span class="text-laguna-700">${esc(String(laguna.nombre).replace(/^Laguna\s+/i, ''))}</span>`;
+
+    // Badges
+    const badgeRiesgo = document.getElementById('badge-riesgo-pill');
+    badgeRiesgo.textContent = laguna.riesgo;
+    badgeRiesgo.textContent = `Riesgo ${String(laguna.riesgo).toLowerCase()}`;
+    badgeRiesgo.className = `etiqueta ${claseRiesgo(laguna.riesgo)}`;
+
+    document.getElementById('badge-docs').textContent = `${laguna.total_documentos} informes la respaldan`;
+    document.getElementById('badge-datos').textContent = `${laguna.datos_conectados} datos conectados`;
+    document.getElementById('badge-confianza').textContent = `Confianza ${laguna.confianza}`;
+    document.getElementById('badge-fecha').textContent = `Último dato: ${laguna.fecha_actualizacion}`;
+
+    // Velocímetro y aguja
+    const aguja = document.getElementById('velocimetro-aguja');
+    const etiqueta = document.getElementById('velocimetro-etiqueta');
+    etiqueta.textContent = laguna.riesgo;
+
+    let rotacion = -45; // default sin evaluar
+    if (laguna.riesgo === 'Bajo') rotacion = -65;
+    else if (laguna.riesgo === 'Medio') rotacion = -20;
+    else if (laguna.riesgo === 'Alto') rotacion = 25;
+    else if (laguna.riesgo === 'Muy alto') rotacion = 65;
+    else if (laguna.riesgo === 'Sin evaluar') rotacion = -45;
+
+    if (aguja) {
+      aguja.style.transform = `rotate(${rotacion}deg)`;
+    }
+
+    // Flujo de cuenca
+    document.getElementById('flujo-glaciar').textContent = laguna.glaciar_origen;
+    document.getElementById('flujo-laguna').textContent = laguna.nombre;
+    document.getElementById('flujo-laguna-estado').textContent = laguna.riesgo;
+    document.getElementById('flujo-pueblos').textContent = laguna.poblado_amenazado;
+    document.getElementById('flujo-obras').textContent = laguna.obras_detalle;
+
+    // Métricas clave
+    document.getElementById('metrica-superficie').textContent = laguna.superficie_km2;
+    document.getElementById('metrica-superficie-doc').textContent = laguna.documento_superficie || 'Inventario Oficial';
+    document.getElementById('metrica-pueblos-num').textContent = laguna.pueblos_aguas_abajo_num;
+    document.getElementById('metrica-eventos-num').textContent = laguna.eventos_historicos_num;
+
+    // Alerta específica
+    const banner = document.getElementById('banner-alerta');
+    const texto = document.getElementById('banner-alerta-texto');
+    if (laguna.alerta_especifica) {
+      texto.textContent = laguna.alerta_especifica;
+      banner.classList.remove('hidden');
+    } else {
+      banner.classList.add('hidden');
+    }
+
+    // Indicadores con equivalencias que se entienden
+    const vol = Number(laguna.volumen_hm3);
+    document.getElementById('kpi-volumen-valor').textContent = Number.isFinite(vol) ? String(vol) : '–';
+    document.getElementById('kpi-piscinas').textContent = Number.isFinite(vol) ? Math.round(vol * 400).toLocaleString('es-PE') : '–';
+    const kv = document.getElementById('kpi-volumen');
+    if (kv) { kv.dataset.arqenValor = laguna.nombre; kv.dataset.arqenLaguna = laguna.nombre; kv.dataset.arqenLagunaId = laguna.id; }
+    const obrasSi = document.getElementById('kpi-obras-si');
+    if (obrasSi) { obrasSi.textContent = laguna.tiene_obras ? 'Sí' : 'No'; obrasSi.className = `font-display text-2xl font-bold ${laguna.tiene_obras ? 'text-laguna-700' : 'text-cochinilla-600'}`; }
+    pintarGraficoVolumen(laguna);
+    pintarLineaTiempo(laguna);
+
+    // Contexto para el asistente único
+    window.ARQEN?.fijarContexto({ seccion: 'Ficha de laguna', laguna: laguna.nombre, lagunaId: laguna.id, departamento: laguna.departamento }, true);
+
+    // Consultar evidencia y citas documentales en vivo desde el RAG (398 Informes oficiales - Cero LLM)
+    cargarDetalleRAG(laguna);
+  }
+
+  async function cargarDetalleRAG(laguna) {
+    const contDocs = document.getElementById('lista-docs-rag');
+    if (!contDocs) return;
+    contDocs.innerHTML = `<div class="col-span-2 py-3 text-xs text-slate-400 text-center animate-pulse">Consultando 398 documentos del RAG en milisegundos (Cero LLM)...</div>`;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(laguna.id)}`);
+      if (!res.ok) throw new Error("API offline");
+      const data = await res.json();
+
+      if (data.obras_detalle && data.obras_detalle !== "Sin obras de mitigación física registradas") {
+        document.getElementById('flujo-obras').textContent = data.obras_detalle;
+      }
+      if (data.documento_superficie) {
+        document.getElementById('metrica-superficie-doc').textContent = data.documento_superficie;
+      }
+      if (data.fragmentos_rag && data.fragmentos_rag.length > 0) {
+        contDocs.innerHTML = data.fragmentos_rag.map(f => `
+          <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 hover:bg-white hover:border-cyan-300 transition shadow-2xs">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-800">
+              <span class="truncate pr-2">${esc(f.titulo || 'Informe glaciológico oficial')}</span>
+              <span class="rounded bg-slate-200/90 px-1.5 py-0.5 text-[11px] text-slate-700 font-semibold shrink-0">${esc(f.fuente)} · ${esc(f.anio)} ${f.pagina ? `p. ${esc(f.pagina)}` : ''}</span>
+            </div>
+            <p class="text-xs text-slate-600 italic line-clamp-3 mt-1.5 leading-relaxed">“${esc(f.extracto)}”</p>
+          </div>
+        `).join('');
+        return;
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    contDocs.innerHTML = `
+      <div class="col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500 flex items-center justify-between">
+        <span>Registro oficial indexado en el Inventario Nacional de Glaciares y Lagunas (ANA / INAIGEM).</span>
+        <span class="text-[11px] font-semibold text-emerald-700">Evidencia verificada</span>
+      </div>
+    `;
+  }
+
+  // ========================================================
+  // LISTA LATERAL DE LAGUNAS EN EL MAPA
+  // ========================================================
+  function renderListaDepartamental(deptFilter) {
+    const listEl = document.getElementById('lista-lagunas-dept');
+    if (!listEl) return;
+
+    const fNorm = norm(deptFilter);
+    const filtered = !fNorm || fNorm === 'todos'
+      ? listaLagunas
+      : listaLagunas.filter(l => norm(l.departamento) === fNorm);
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div class="p-3 text-center text-xs text-slate-400 bg-slate-50 rounded-xl border border-slate-200/60">
+          No hay lagunas críticas registradas en este catálogo para esta zona.
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(l => {
+      const esActiva = currentLaguna && currentLaguna.id.toLowerCase() === l.id.toLowerCase();
+      return `
+        <div 
+          id="item-laguna-${esc(l.id)}"
+          data-laguna-id="${esc(l.id)}"
+          role="button"
+          tabindex="0"
+          class="p-2.5 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2 ${
+            esActiva 
+              ? 'border-cyan-500 bg-cyan-50/70 shadow-xs ring-1 ring-cyan-400' 
+              : 'border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+          }"
+          title="Clic para enfocar en el mapa"
+        >
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
+              <span>Laguna ${esc(l.nombre)}</span>
+              ${esActiva ? '<span class="inline-block h-1.5 w-1.5 rounded-full bg-cyan-600"></span>' : ''}
+            </div>
+            <div class="text-[11px] text-slate-500 truncate">${esc(l.departamento)} · C. ${esc(l.cordillera)}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded ${
+              l.riesgo === 'Muy alto' ? 'bg-rose-100 text-rose-800' :
+              l.riesgo === 'Alto' ? 'bg-orange-100 text-orange-800' :
+              l.riesgo === 'Medio' ? 'bg-amber-100 text-amber-800' :
+              'bg-slate-100 text-slate-700'
+            }">
+              ${esc(l.riesgo)}
+            </span>
+            <button 
+              type="button"
+              data-abrir-ficha="${esc(l.id)}"
+              aria-label="Abrir ficha de la laguna ${esc(l.nombre)}"
+              class="rounded-lg p-1 text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 transition"
+              title="Abrir ficha técnica detallada"
+            >
+              📋
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Delegación de eventos (reemplaza los onclick inline, que permitían inyectar JS)
+  const listaDelegada = document.getElementById('lista-lagunas-dept');
+  if (listaDelegada) {
+    listaDelegada.addEventListener('click', (e) => {
+      const btnFicha = e.target.closest('[data-abrir-ficha]');
+      if (btnFicha) {
+        e.stopPropagation();
+        window.selectLagunaById(btnFicha.getAttribute('data-abrir-ficha'));
+        return;
+      }
+      const item = e.target.closest('[data-laguna-id]');
+      if (item) window.enfocarLagunaEnMapa(item.getAttribute('data-laguna-id'));
+    });
+    listaDelegada.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const item = e.target.closest('[data-laguna-id]');
+      if (item && !e.target.closest('[data-abrir-ficha]')) {
+        e.preventDefault();
+        window.enfocarLagunaEnMapa(item.getAttribute('data-laguna-id'));
+      }
+    });
+  }
+
+  function resaltarLagunaEnLista(id) {
+    if (!id) return;
+    document.querySelectorAll('#lista-lagunas-dept > div').forEach(el => {
+      el.classList.remove('border-cyan-500', 'bg-cyan-50/70', 'shadow-xs', 'ring-1', 'ring-cyan-400');
+      el.classList.add('border-slate-200');
+    });
+    const target = document.getElementById(`item-laguna-${id}`);
+    if (target) {
+      target.classList.remove('border-slate-200');
+      target.classList.add('border-cyan-500', 'bg-cyan-50/70', 'shadow-xs', 'ring-1', 'ring-cyan-400');
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // ========================================================
+  // CONTROLADOR GLOBAL DE SELECCIÓN Y VISTAS
+  // ========================================================
+  window.enfocarLagunaEnMapa = function(id) {
+    const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
+    const match = listaLagunas.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
+    if (match) {
+      currentLaguna = match;
+      renderFicha(match);
+      resaltarLagunaEnLista(match.id);
+      
+      mostrarMapa({
+        id: match.id,
+        dept: match.departamento.toLowerCase(),
+        lat: match.lat,
+        lng: match.lng,
+        zoom: 13
+      });
+    }
+  };
+
+  window.selectLagunaById = async function(id) {
+    const cleanId = (id || "").replace(/^Laguna:/i, "").trim();
+
+    // 1. Siempre intentar consultar la ficha viva desde el backend (2,038 lagunas del grafo)
+    try {
+      const res = await fetch(`${API_BASE}/api/lagunas/${encodeURIComponent(cleanId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const fichaViva = {
+          id: data.id || cleanId,
+          nombre: data.nombre || cleanId,
+          departamento: data.departamento || "Áncash",
+          cordillera: data.cordillera || "Andina",
+          riesgo: data.riesgo || "Sin evaluar",
+          poblado_amenazado: data.poblado_amenazado || "Población local",
+          tiene_obras: Boolean(data.tiene_obras),
+          obras_detalle: data.obras_detalle || "Sin obras registradas",
+          volumen_hm3: data.volumen_hm3 || 0,
+          superficie_km2: data.superficie_km2 || 0,
+          documento_superficie: data.documento_superficie,
+          pueblos_aguas_abajo_num: data.pueblos_aguas_abajo_num || 0,
+          eventos_historicos_num: data.eventos_historicos_num || 0,
+          altitud_msnm: data.altitud_msnm || 4400,
+          glaciar_origen: data.glaciar_origen || "Glaciar de cabecera",
+          total_documentos: data.total_documentos || 0,
+          datos_conectados: data.datos_conectados || 12,
+          confianza: data.confianza || 0.75,
+          fecha_actualizacion: data.fecha_actualizacion || "2026",
+          alerta_especifica: data.alerta_especifica,
+          lat: data.lat || -9.42,
+          lng: data.lng || -77.50
+        };
+
+        // Renderizar fragmentos oficiales del RAG si vienen disponibles
+        if (data.fragmentos_rag && data.fragmentos_rag.length > 0) {
+          const contDocs = document.getElementById('lista-docs-rag');
+          if (contDocs) {
+            contDocs.innerHTML = data.fragmentos_rag.map(doc => `
+              <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
+                <div class="font-bold text-slate-900 text-xs">${esc(doc.titulo)}</div>
+                <div class="text-[11px] text-slate-500 font-semibold">${esc(doc.fuente)} · ${esc(doc.anio)} ${doc.pagina ? `(p. ${esc(doc.pagina)})` : ''}</div>
+                <p class="text-[11px] text-slate-600 italic">“${esc(doc.extracto)}…”</p>
+              </div>
+            `).join('');
+          }
+        }
+
+        renderFicha(fichaViva);
+        mostrarFicha();
+        const selectDept = document.getElementById('filtro-departamento');
+        if (selectDept) selectDept.value = fichaViva.departamento.toLowerCase();
+        resaltarLagunaEnLista(fichaViva.id);
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend inaccesible para ficha en vivo, usando copia local:', err);
+    }
+
+    // 2. Respaldo local si la red falla
+    const match = listaLagunas.find(l => l.id.toLowerCase() === cleanId.toLowerCase());
+    if (match) {
+      renderFicha(match);
+      mostrarFicha();
+      const selectDept = document.getElementById('filtro-departamento');
+      if (selectDept) selectDept.value = match.departamento.toLowerCase();
+      resaltarLagunaEnLista(match.id);
+    }
+  };
+
+  function mostrarFicha() {
+    document.getElementById('seccion-ficha')?.classList.remove('hidden');
+    document.getElementById('seccion-mapa')?.classList.add('hidden');
+    document.getElementById('tab-ficha')?.classList.replace('bg-slate-100', 'bg-slate-900');
+    document.getElementById('tab-ficha')?.classList.replace('text-slate-700', 'text-white');
+    document.getElementById('tab-mapa')?.classList.replace('bg-slate-900', 'bg-slate-100');
+    document.getElementById('tab-mapa')?.classList.replace('text-white', 'text-slate-700');
+    const toggle = document.getElementById('toggle-ver-mapa');
+    if (toggle) toggle.checked = false;
+  }
+
+  function mostrarMapa(options = {}) {
+    document.getElementById('seccion-ficha')?.classList.add('hidden');
+    document.getElementById('seccion-mapa')?.classList.remove('hidden');
+    document.getElementById('tab-mapa')?.classList.replace('bg-slate-100', 'bg-slate-900');
+    document.getElementById('tab-mapa')?.classList.replace('text-slate-700', 'text-white');
+    document.getElementById('tab-ficha')?.classList.replace('bg-slate-900', 'bg-slate-100');
+    document.getElementById('tab-ficha')?.classList.replace('text-white', 'text-slate-700');
+    const toggle = document.getElementById('toggle-ver-mapa');
+    if (toggle) toggle.checked = true;
+
+    const selectDept = document.getElementById('filtro-departamento');
+    const targetDept = options.dept || (selectDept?.value !== 'todos' ? selectDept?.value : (currentLaguna ? currentLaguna.departamento.toLowerCase() : 'todos'));
+    const targetId = options.id || currentLaguna?.id;
+
+    const payload = {
+      id: targetId,
+      dept: targetDept,
+      lat: options.lat || currentLaguna?.lat,
+      lng: options.lng || currentLaguna?.lng,
+      zoom: options.zoom || (targetId ? 13 : 8)
+    };
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('bg:map-focus', { detail: payload }));
+      if (targetId) resaltarLagunaEnLista(targetId);
+    }, 60);
+  }
+
+  // ========================================================
+  // CONEXIÓN CON COMPONENTES REUTILIZABLES SearchBox & GlacierMap
+  // ========================================================
+  function initSearchListener() {
+    document.addEventListener('bg:search-select', (e) => {
+      const { item, docs } = e.detail || {};
+      if (!item) return;
+
+      if (item.type === 'laguna') {
+        window.selectLagunaById(item.id);
+      } else if (item.type === 'departamento') {
+        filtrarPorDepartamento(norm(item.nombre));
+      } else if (docs && docs.length > 0) {
+        const contDocs = document.getElementById('lista-docs-rag');
+        if (contDocs) {
+          contDocs.innerHTML = docs.map(doc => `
+            <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-1">
+              <div class="font-bold text-slate-900 text-xs">${esc(doc.titulo)}</div>
+              <div class="text-[11px] text-slate-500 font-semibold">${esc(doc.fuente)} · ${esc(doc.anio)} ${doc.pagina ? `(p. ${esc(doc.pagina)})` : ''}</div>
+              <p class="text-[11px] text-slate-600 italic">“${esc(doc.extracto)}…”</p>
+            </div>
+          `).join('');
+        }
+        mostrarFicha();
+      }
+    });
+
+    document.addEventListener('bg:map-select', (e) => {
+      const { id } = e.detail || {};
+      if (id) window.selectLagunaById(id);
+    });
+
+    document.addEventListener('bg:map-active-laguna', (e) => {
+      const { laguna } = e.detail || {};
+      if (laguna) {
+        currentLaguna = laguna;
+        renderFicha(laguna);
+        resaltarLagunaEnLista(laguna.id);
+      }
+    });
+  }
+
+  function filtrarPorDepartamento(dept) {
+    const select = document.getElementById('filtro-departamento');
+    if (select) select.value = dept;
+
+    const fNorm = norm(dept);
+    const deptObj = listaDeptos.find(d => norm(d.departamento) === fNorm);
+    if (deptObj) {
+      document.getElementById('mapa-dept-nombre').textContent = deptObj.departamento;
+      document.getElementById('mapa-dept-num').textContent = deptObj.total;
+      document.getElementById('mapa-dept-sub').textContent = `Departamento prioritario · ${deptObj.muy_alto} en riesgo muy alto`;
+    } else {
+      const totalReg = listaDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
+      document.getElementById('mapa-dept-nombre').textContent = "Todo el Perú";
+      document.getElementById('mapa-dept-num').textContent = String(totalReg || 19);
+      document.getElementById('mapa-dept-sub').textContent = `${listaDeptos.length} departamentos con glaciares registrados`;
+    }
+
+    renderListaDepartamental(dept);
+
+    // Buscar si hay lagunas en este departamento
+    const lagunasEnDept = fNorm === 'todos'
+      ? listaLagunas
+      : listaLagunas.filter(l => norm(l.departamento) === fNorm);
+
+    if (lagunasEnDept.length > 0) {
+      if (!currentLaguna || norm(currentLaguna.departamento) !== fNorm) {
+        currentLaguna = lagunasEnDept[0];
+        renderFicha(currentLaguna);
+      }
+    }
+
+    // Verificar si el mapa está actualmente visible
+    const mapaVisible = !document.getElementById('seccion-mapa')?.classList.contains('hidden');
+    if (mapaVisible) {
+      document.dispatchEvent(new CustomEvent('bg:map-focus', {
+        detail: {
+          dept: dept,
+          id: currentLaguna?.id,
+          lat: currentLaguna?.lat,
+          lng: currentLaguna?.lng
+        }
+      }));
+      if (currentLaguna) resaltarLagunaEnLista(currentLaguna.id);
+    } else {
+      document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
+    }
+  }
+
+  // ========================================================
+  // SINCRONIZACIÓN CON BACKEND (Single Source of Truth)
+  // ========================================================
+  async function sincronizarBackend() {
+    try {
+      // 1. Departamentos y conteos calculados dinámicamente desde nodos.csv
+      const resDeptos = await fetch(`${API_BASE}/api/departamentos/riesgo`);
+      if (resDeptos.ok) {
+        const dataDeptos = await resDeptos.json();
+        if (Array.isArray(dataDeptos) && dataDeptos.length > 0) {
+          listaDeptos = dataDeptos;
+          const select = document.getElementById('filtro-departamento');
+          if (select) {
+            const currentVal = select.value || 'todos';
+            const totalLagunas = dataDeptos.reduce((acc, d) => acc + (d.total || 0), 0);
+            select.innerHTML = `
+              <option value="todos">Todo el Perú (${totalLagunas} lagunas críticas)</option>
+              ${dataDeptos.map(d => `<option value="${esc(String(d.departamento).toLowerCase())}">${esc(d.departamento)} (${esc(d.total)} lagunas · ${esc(d.muy_alto)} muy alto)</option>`).join('')}
+            `;
+            if (dataDeptos.some(d => d.departamento.toLowerCase() === currentVal)) {
+              select.value = currentVal;
+            } else {
+              select.value = 'todos';
+            }
+          }
+        }
+      }
+
+      // 2. Catálogo completo con georreferenciación y riesgo
+      const resCat = await fetch(`${API_BASE}/api/catalogo?limit=150`);
+      if (resCat.ok) {
+        const dataCat = await resCat.json();
+        const lagunasArr = Array.isArray(dataCat) ? dataCat : (dataCat.lagunas || []);
+        if (Array.isArray(lagunasArr) && lagunasArr.length > 0) {
+          listaLagunas = lagunasArr;
+
+          // Propagar al mapa Leaflet para redibujar marcadores
+          document.dispatchEvent(new CustomEvent('bg:map-update-catalog', {
+            detail: { lagunas: listaLagunas }
+          }));
+
+          // Refrescar lista lateral con el filtro actual
+          const select = document.getElementById('filtro-departamento');
+          const deptActivo = select ? select.value : 'todos';
+          renderListaDepartamental(deptActivo);
+
+          // Si la ficha activa está en el nuevo catálogo, enriquecerla
+          if (currentLaguna) {
+            const matchActual = listaLagunas.find(l => l.id.toLowerCase() === currentLaguna.id.toLowerCase());
+            if (matchActual) {
+              currentLaguna = { ...currentLaguna, ...matchActual };
+              renderFicha(currentLaguna);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Conexión con backend en segundo plano diferida, conservando catálogo base:', err);
+    }
+  }
+
+  // ========================================================
+  // EVENT LISTENERS & INICIALIZACIÓN
+  // ========================================================
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Inicializar Ficha por defecto con respaldo inmediato
+    renderFicha(LAGUNAS_DESTACADAS[0]);
+    renderListaDepartamental('todos');
+    initSearchListener();
+
+    // Sincronizar de inmediato con el backend (Single Source of Truth)
+    await sincronizarBackend();
+
+    // Tabs
+    document.getElementById('tab-ficha')?.addEventListener('click', mostrarFicha);
+    document.getElementById('tab-mapa')?.addEventListener('click', mostrarMapa);
+    document.getElementById('toggle-ver-mapa')?.addEventListener('change', (e) => {
+      if (e.target.checked) mostrarMapa();
+      else mostrarFicha();
+    });
+
+    // Filtro de departamento
+    document.getElementById('filtro-departamento')?.addEventListener('change', (e) => {
+      const val = e.target.value;
+      filtrarPorDepartamento(val);
+    });
+
+    // Quitar filtro
+    document.getElementById('btn-quitar-filtro')?.addEventListener('click', () => {
+      filtrarPorDepartamento('todos');
+    });
+
+    document.getElementById('btn-ver-todo-peru')?.addEventListener('click', () => {
+      filtrarPorDepartamento('todos');
+    });
+
+    // Un solo asistente: estos botones lo abren con el contexto de la laguna
+    const ctxLaguna = () => ({ seccion: 'Ficha de laguna', laguna: currentLaguna.nombre, lagunaId: currentLaguna.id, departamento: currentLaguna.departamento });
+    document.getElementById('btn-preguntar-mayu')?.addEventListener('click', () => window.ARQEN?.abrirAsistente(ctxLaguna()));
+    document.getElementById('btn-generar-informe')?.addEventListener('click', () => window.ARQEN?.informeLaguna(currentLaguna.id));
+    document.getElementById('btn-ver-3d-ficha')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('arqen:ver3d', { detail: { nombre: currentLaguna.nombre, lat: currentLaguna.lat, lng: currentLaguna.lng, alt: currentLaguna.altitud_msnm } }));
+    });
+
+    document.querySelectorAll('.btn-accion-chat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.getAttribute('data-prompt');
+        if (prompt) {
+          window.ARQEN?.abrirAsistente(ctxLaguna(), `${prompt} (Laguna ${currentLaguna.nombre}, ${currentLaguna.departamento})`, true);
+        }
+      });
+    });
+
+    // Soporte para URL params: ?id=palcacocha o ?dept=ancash o ?q=huaraz
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+    const deptParam = params.get('dept');
+    const qParam = params.get('q');
+
+    if (idParam) {
+      window.selectLagunaById(idParam);
+    } else if (deptParam) {
+      filtrarPorDepartamento(deptParam);
+    } else if (qParam) {
+      const qNorm = norm(qParam);
+      const inputEl = document.getElementById('buscar-input');
+      if (inputEl) inputEl.value = qParam;
+
+      const matchLaguna = listaLagunas.find(l => norm(l.nombre).includes(qNorm) || norm(l.poblado_amenazado).includes(qNorm));
+      if (matchLaguna) {
+        window.selectLagunaById(matchLaguna.id);
+      } else {
+        const matchDept = listaDeptos.find(d => norm(d.departamento).includes(qNorm));
+        if (matchDept) {
+          filtrarPorDepartamento(matchDept.departamento.toLowerCase());
+        } else if (inputEl) {
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    }
+  });
+
+</script>

@@ -1,0 +1,399 @@
+---
+import Logo from './Logo.astro';
+---
+
+<!-- Botón burbuja (siempre visible cuando el asistente está cerrado) -->
+<button
+  id="asistente-burbuja"
+  type="button"
+  aria-controls="asistente"
+  aria-expanded="false"
+  class="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 rounded-full bg-noche-900 py-2 pl-2 pr-4 text-sm font-semibold text-white shadow-[0_12px_32px_-8px_rgb(11_24_56/.6)] ring-1 ring-white/10 transition hover:bg-noche-800"
+>
+  <span class="relative"><Logo class="h-9 w-9" /><span id="asistente-aviso" class="absolute -right-0.5 -top-0.5 hidden h-3 w-3 rounded-full bg-cochinilla-500 ring-2 ring-noche-900"></span></span>
+  <span id="asistente-burbuja-texto" class="transition-all">Pregúntale a ARQEN</span>
+</button>
+
+<!-- Ventana del asistente: movible en computadora, hoja inferior en celular -->
+<section
+  id="asistente"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="asistente-titulo"
+  aria-hidden="true"
+  inert
+  class="asistente-ventana fixed z-50 hidden flex-col overflow-hidden bg-white shadow-[0_30px_80px_-20px_rgb(11_24_56/.55)] ring-1 ring-slate-900/10"
+>
+  <!-- Barra superior: se arrastra desde aquí -->
+  <header id="asistente-barra" class="relative flex cursor-grab select-none items-center gap-3 bg-noche-900 px-4 pb-3 pt-4 text-white active:cursor-grabbing">
+    <div class="franja-tejida absolute inset-x-0 top-0 !h-1.5" aria-hidden="true"></div>
+    <Logo class="h-8 w-8" />
+    <div class="min-w-0 flex-1">
+      <h2 id="asistente-titulo" class="text-base font-bold leading-tight">Asistente ARQEN</h2>
+      <p class="flex items-center gap-1.5 text-xs text-slate-300">
+        <span id="asistente-modo-punto" class="h-2 w-2 rounded-full bg-laguna-500"></span>
+        <span id="asistente-modo">Con IA y citas · respaldo por reglas</span>
+      </p>
+    </div>
+    <span class="hidden text-slate-400 sm:inline" aria-hidden="true" title="Arrastra para mover">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+    </span>
+    <button id="asistente-minimizar" type="button" class="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white" aria-label="Minimizar asistente">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>
+    </button>
+  </header>
+
+  <!-- Contexto: qué está mirando la persona -->
+  <div id="asistente-contexto" class="hidden items-center gap-2 border-b border-slate-100 bg-hielo-50 px-4 py-2 text-xs text-hielo-700">
+    <svg class="h-3.5 w-3.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span class="min-w-0 flex-1 truncate">Viendo: <b id="asistente-contexto-texto" class="font-semibold"></b></span>
+    <button id="asistente-informe" type="button" class="hidden rounded-md bg-white px-2 py-1 font-semibold text-cochinilla-700 ring-1 ring-cochinilla-100 hover:bg-cochinilla-50">↓ Informe PDF</button>
+  </div>
+
+  <!-- Conversación -->
+  <div id="asistente-mensajes" class="flex-1 space-y-3 overflow-y-auto bg-[#f7f9fc] px-4 py-4 text-sm" aria-live="polite">
+    <div class="rounded-2xl border border-laguna-100 bg-gradient-to-br from-laguna-50 to-white p-4">
+      <p class="font-display text-base font-bold text-noche-900">Hola, te ayudo a entender el riesgo glaciar.</p>
+      <p class="mt-1 text-slate-600">Respondo con lo que dicen los informes oficiales y te muestro la fuente. Toca cualquier gráfico y te sugiero preguntas.</p>
+    </div>
+  </div>
+
+  <!-- Sugerencias -->
+  <div class="border-t border-slate-100 bg-white px-4 pt-3">
+    <p class="text-xs font-semibold text-slate-500">Te sugiero preguntar</p>
+    <div id="asistente-sugerencias" class="mt-2 flex flex-col gap-1.5"></div>
+  </div>
+
+  <!-- Entrada -->
+  <form id="asistente-form" class="bg-white p-4 pt-3">
+    <div class="flex items-end gap-2 rounded-2xl border border-slate-300 bg-white p-1.5 pl-3 focus-within:border-laguna-500 focus-within:ring-2 focus-within:ring-laguna-100">
+      <textarea id="asistente-pregunta" rows="1" maxlength="600" aria-label="Tu pregunta" placeholder="Escribe tu pregunta…" class="max-h-28 min-h-[2.25rem] flex-1 resize-none bg-transparent py-1.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"></textarea>
+      <button id="asistente-enviar" type="submit" class="btn btn-pri btn-sm !rounded-xl" aria-label="Enviar pregunta">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </form>
+</section>
+
+<style is:global>
+  /* Computadora: ventana flotante movible */
+  @media (min-width: 640px) {
+    .asistente-ventana { width: 400px; height: min(640px, calc(100vh - 6rem)); border-radius: 1.25rem; right: 20px; bottom: 20px; }
+  }
+  /* Celular: hoja que sube desde abajo */
+  @media (max-width: 639px) {
+    .asistente-ventana { left: 0; right: 0; bottom: 0; height: 86svh; border-radius: 1.25rem 1.25rem 0 0; }
+    #asistente-barra { cursor: default; }
+  }
+  .asistente-ventana.abierto { display: flex; }
+  .asistente-sug { display: flex; align-items: center; gap: .5rem; width: 100%; text-align: left; font: 500 .8125rem/1.35 var(--font-sans); color: #0b1838; background: #f0f9ff; border: 1px solid #d6ecfb; border-radius: .75rem; padding: .55rem .7rem; transition: background-color .15s, border-color .15s; }
+  .asistente-sug:hover { background: #e0f2fe; border-color: #bae6fd; }
+  .asistente-sug::before { content: '→'; color: #0d9488; font-weight: 700; }
+  .burbuja-usuario { margin-left: 2.5rem; border-radius: 1rem 1rem .25rem 1rem; background: #0b1838; color: #fff; padding: .7rem .9rem; line-height: 1.5; }
+  .burbuja-arqen { margin-right: .5rem; border-radius: 1rem 1rem 1rem .25rem; background: #fff; border: 1px solid #e5e9f0; padding: .85rem 1rem; line-height: 1.55; color: #1e293b; box-shadow: 0 1px 2px rgb(15 23 42 / .04); }
+  .burbuja-arqen .modo { display: inline-flex; align-items: center; gap: .35rem; margin-bottom: .4rem; font: 600 .6875rem/1 var(--font-sans); letter-spacing: .04em; text-transform: uppercase; }
+  .burbuja-arqen .citas { margin-top: .6rem; padding-top: .55rem; border-top: 1px solid #eef2f6; font: 400 .72rem/1.45 var(--font-mono); color: #64748b; }
+  .burbuja-arqen .citas li { scroll-margin: 1rem; border-radius: .35rem; padding: .1rem .25rem; }
+  .burbuja-arqen .citas li.resaltada { background: #fef3c7; }
+  .escribiendo span { display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: #0d9488; animation: arqen-punto 1s infinite ease-in-out; }
+  .escribiendo span:nth-child(2) { animation-delay: .15s; } .escribiendo span:nth-child(3) { animation-delay: .3s; }
+  @keyframes arqen-punto { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+</style>
+
+<script>
+  import { SITE_CONFIG } from '../config/site.config';
+  import { esc, markdownSeguro } from '../utils/seguridad';
+  import { obtenerContexto, fijarContexto, abrirAsistente, type Contexto } from '../scripts/contexto';
+  import { responderPorReglas, sugerenciasPara } from '../services/asistenteReglas';
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
+  const ventana = $('asistente')!;
+  const burbuja = $('asistente-burbuja')!;
+  const barra = $('asistente-barra')!;
+  const mensajes = $('asistente-mensajes')!;
+  const sugerencias = $('asistente-sugerencias')!;
+  const form = $<HTMLFormElement>('asistente-form')!;
+  const entrada = $<HTMLTextAreaElement>('asistente-pregunta')!;
+  const btnEnviar = $<HTMLButtonElement>('asistente-enviar')!;
+  const ctxCaja = $('asistente-contexto')!;
+  const ctxTexto = $('asistente-contexto-texto')!;
+  const btnInforme = $<HTMLButtonElement>('asistente-informe')!;
+
+  // Exponer API mínima para scripts en línea (p. ej. /buscar)
+  (window as any).ARQEN = {
+    abrirAsistente, fijarContexto,
+    informeLaguna: async (id: string) => (await import('../services/informePdf')).generarInformeLaguna(id),
+  };
+
+  // ---------------- Abrir / minimizar ----------------
+  const esCelular = () => window.matchMedia('(max-width: 639px)').matches;
+  let abierto = false;
+
+  function abrir() {
+    if (abierto) { entrada.focus(); return; }
+    abierto = true;
+    ventana.classList.add('abierto');
+    ventana.removeAttribute('inert');
+    ventana.setAttribute('aria-hidden', 'false');
+    burbuja.classList.add('hidden');
+    burbuja.setAttribute('aria-expanded', 'true');
+    $('asistente-aviso')?.classList.add('hidden');
+    aplicarPosicion();
+    setTimeout(() => entrada.focus(), 60);
+  }
+  function minimizar() {
+    abierto = false;
+    ventana.classList.remove('abierto');
+    ventana.setAttribute('inert', '');
+    ventana.setAttribute('aria-hidden', 'true');
+    burbuja.classList.remove('hidden');
+    burbuja.setAttribute('aria-expanded', 'false');
+    burbuja.focus();
+  }
+  burbuja.addEventListener('click', abrir);
+  // Al bajar por la página la burbuja se vuelve compacta para no tapar contenido
+  const textoBurbuja = $('asistente-burbuja-texto');
+  const compactar = () => {
+    const c = window.scrollY > 240 || window.innerWidth < 640;
+    textoBurbuja?.classList.toggle('sr-only', c);
+    burbuja.classList.toggle('pr-4', !c); burbuja.classList.toggle('pr-2', c);
+  };
+  window.addEventListener('scroll', compactar, { passive: true }); compactar();
+  $('asistente-minimizar')?.addEventListener('click', minimizar);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && abierto) minimizar(); });
+
+  // ---------------- Ventana movible (solo computadora) ----------------
+  const CLAVE_POS = 'arqen-asistente-pos';
+  let pos: { x: number; y: number } | null = null;
+  try { pos = JSON.parse(localStorage.getItem(CLAVE_POS) || 'null'); } catch { pos = null; }
+
+  function limitar(x: number, y: number) {
+    const w = ventana.offsetWidth || 400, h = ventana.offsetHeight || 600, m = 12;
+    return { x: Math.min(Math.max(m, x), window.innerWidth - w - m), y: Math.min(Math.max(m + 56, y), window.innerHeight - h - m) };
+  }
+  function aplicarPosicion() {
+    if (esCelular()) { ventana.style.left = ''; ventana.style.top = ''; ventana.style.right = ''; ventana.style.bottom = ''; return; }
+    if (!pos) return;
+    const p = limitar(pos.x, pos.y);
+    Object.assign(ventana.style, { left: `${p.x}px`, top: `${p.y}px`, right: 'auto', bottom: 'auto' });
+  }
+  window.addEventListener('resize', aplicarPosicion);
+
+  let arrastre: { dx: number; dy: number } | null = null;
+  barra.addEventListener('pointerdown', (e) => {
+    if (esCelular() || (e.target as HTMLElement).closest('button')) return;
+    const r = ventana.getBoundingClientRect();
+    arrastre = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    barra.setPointerCapture(e.pointerId);
+  });
+  barra.addEventListener('pointermove', (e) => {
+    if (!arrastre) return;
+    const p = limitar(e.clientX - arrastre.dx, e.clientY - arrastre.dy);
+    Object.assign(ventana.style, { left: `${p.x}px`, top: `${p.y}px`, right: 'auto', bottom: 'auto' });
+  });
+  barra.addEventListener('pointerup', () => {
+    if (!arrastre) return;
+    arrastre = null;
+    // Se pega al borde más cercano si se suelta cerca de él
+    const r = ventana.getBoundingClientRect(), iman = 48, m = 20;
+    let x = r.left, y = r.top;
+    if (x < iman) x = m; else if (window.innerWidth - r.right < iman) x = window.innerWidth - r.width - m;
+    if (window.innerHeight - r.bottom < iman) y = window.innerHeight - r.height - m;
+    pos = limitar(x, y);
+    Object.assign(ventana.style, { left: `${pos.x}px`, top: `${pos.y}px` });
+    try { localStorage.setItem(CLAVE_POS, JSON.stringify(pos)); } catch { /* sin almacenamiento */ }
+  });
+  // Doble clic en la barra: vuelve a su lugar
+  barra.addEventListener('dblclick', () => {
+    pos = null; try { localStorage.removeItem(CLAVE_POS); } catch { /* */ }
+    Object.assign(ventana.style, { left: '', top: '', right: '', bottom: '' });
+  });
+
+  // ---------------- Contexto y sugerencias ----------------
+  function describir(c: Contexto): string {
+    if (c.comparacion) return `${c.comparacion[0]} vs ${c.comparacion[1]}`;
+    const partes = [c.laguna && (c.laguna.startsWith('Laguna') ? c.laguna : `Laguna ${c.laguna}`), c.departamento, c.grafico && (c.valor ? `${nombreGrafico(c.grafico)} · ${c.valor}` : nombreGrafico(c.grafico))].filter(Boolean);
+    return partes.length ? partes.join(' › ') : (c.seccion || '');
+  }
+  function nombreGrafico(g: string) {
+    return ({ hielo: 'Hielo perdido', 'riesgo-pais': 'Lagunas en riesgo', aluviones: 'Aluviones por época', volumen: 'Volumen', departamento: 'Departamento', ragas: 'Validación' } as Record<string, string>)[g] || g;
+  }
+  function pintarContexto() {
+    const c = obtenerContexto();
+    const texto = describir(c);
+    ctxCaja.classList.toggle('hidden', !texto);
+    ctxCaja.classList.toggle('flex', !!texto);
+    ctxTexto.textContent = texto;
+    btnInforme.classList.toggle('hidden', !(c.lagunaId || c.comparacion || c.departamento));
+    sugerencias.replaceChildren(...sugerenciasPara(c).map((s) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'asistente-sug'; b.textContent = s;
+      b.addEventListener('click', () => preguntar(s));
+      return b;
+    }));
+  }
+  window.addEventListener('arqen:contexto', () => {
+    pintarContexto();
+    if (!abierto) $('asistente-aviso')?.classList.remove('hidden');
+  });
+  window.addEventListener('arqen:abrir', (e) => {
+    const { pregunta, enviar } = (e as CustomEvent).detail || {};
+    abrir();
+    if (pregunta) { entrada.value = pregunta; if (enviar) preguntar(pregunta); }
+  });
+
+  // Sección visible → contexto base
+  const secciones = document.querySelectorAll<HTMLElement>('[data-contexto]');
+  if ('IntersectionObserver' in window && secciones.length) {
+    let actual = '';
+    const io = new IntersectionObserver((entradas) => {
+      for (const x of entradas) {
+        if (!x.isIntersecting) continue;
+        const nombre = x.target.getAttribute('data-contexto') || '';
+        if (nombre && nombre !== actual) { actual = nombre; fijarContexto({ seccion: nombre }, true); }
+      }
+    }, { threshold: 0.45 });
+    secciones.forEach((s) => io.observe(s));
+  }
+
+  // Toque en un gráfico → contexto + sugerencias
+  document.addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-arqen-grafico]');
+    if (!el) return;
+    document.querySelectorAll('[data-arqen-grafico].activo').forEach((x) => x.classList.remove('activo'));
+    el.classList.add('activo');
+    const d = el.dataset;
+    fijarContexto({
+      seccion: obtenerContexto().seccion,
+      grafico: d.arqenGrafico, valor: d.arqenValor,
+      laguna: d.arqenLaguna, lagunaId: d.arqenLagunaId, departamento: d.arqenDepartamento,
+    }, true);
+    abrir();
+  });
+
+  // Informe PDF desde el asistente
+  btnInforme.addEventListener('click', async () => {
+    const c = obtenerContexto();
+    const { generarInformeLaguna, generarInformeComparacion, generarInformeDepartamento } = await import('../services/informePdf');
+    if (c.comparacion) await generarInformeComparacion(c.comparacion[0], c.comparacion[1]);
+    else if (c.lagunaId) await generarInformeLaguna(c.lagunaId);
+    else if (c.departamento) await generarInformeDepartamento(c.departamento);
+  });
+
+  // ---------------- Conversación ----------------
+  let servidorEnLinea: boolean | null = null;
+  window.addEventListener('arqen:estado', (e) => {
+    servidorEnLinea = (e as CustomEvent).detail?.enLinea ?? null;
+    pintarModo(servidorEnLinea !== false);
+  });
+  function pintarModo(ia: boolean) {
+    $('asistente-modo')!.textContent = ia ? 'Con IA y citas · respaldo por reglas' : 'Modo reglas · datos oficiales sin IA';
+    $('asistente-modo-punto')!.className = `h-2 w-2 rounded-full ${ia ? 'bg-laguna-500' : 'bg-ocre-400'}`;
+  }
+
+  const sesionId = (crypto.randomUUID?.() || `${Date.now()}${Math.random().toString(36).slice(2)}`).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
+  let contadorRespuesta = 0;
+
+  function burbujaUsuario(texto: string) {
+    const d = document.createElement('div');
+    d.className = 'burbuja-usuario'; d.textContent = texto;
+    mensajes.appendChild(d);
+  }
+  function burbujaArqen() {
+    const d = document.createElement('div');
+    d.className = 'burbuja-arqen';
+    d.innerHTML = '<div class="escribiendo" aria-label="Pensando"><span></span><span></span><span></span></div>';
+    mensajes.appendChild(d);
+    mensajes.scrollTop = mensajes.scrollHeight;
+    return d;
+  }
+  type Fuente = { n: number | string; referencia?: string; documento?: string; evidencia?: string; texto?: string };
+  function pintarRespuesta(d: HTMLElement, texto: string, fuentes: Fuente[], modo: 'ia' | 'evidencia' | 'reglas') {
+    const id = ++contadorRespuesta;
+    const etiquetas = {
+      ia: '<span class="modo" style="color:#0f766e">● Respuesta con IA</span>',
+      evidencia: '<span class="modo" style="color:#b45309">● Evidencia de los informes</span>',
+      reglas: '<span class="modo" style="color:#b45309">● Respondido por reglas · sin IA</span>',
+    };
+    const citas = fuentes.length
+      ? `<ol class="citas">${fuentes.map((f) => {
+          const n = String(f.n).replace(/[^0-9]/g, '');
+          const ev = f.evidencia || f.texto;
+          return `<li id="cita-${id}-${n}">[${esc(n)}] ${esc(f.referencia || f.documento || 'Documento oficial')}${ev ? ` · <i>${esc(String(ev).slice(0, 140))}</i>` : ''}</li>`;
+        }).join('')}</ol>`
+      : '';
+    d.innerHTML = etiquetas[modo] + markdownSeguro(texto) + citas;
+    d.querySelectorAll<HTMLElement>('.btn-cita-pill').forEach((b) => b.addEventListener('click', () => {
+      const li = d.querySelector(`#cita-${id}-${b.dataset.cita}`);
+      if (!li) return;
+      li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      li.classList.add('resaltada'); setTimeout(() => li.classList.remove('resaltada'), 1800);
+    }));
+    mensajes.scrollTop = mensajes.scrollHeight;
+  }
+
+  async function preguntarAlServidor(pregunta: string, d: HTMLElement): Promise<boolean> {
+    if (servidorEnLinea === false) return false;
+    const ctrl = new AbortController();
+    const limite = setTimeout(() => ctrl.abort(), 35000);
+    try {
+      const c = obtenerContexto();
+      const pista = c.laguna ? ` (Contexto: laguna ${c.laguna})` : c.comparacion ? ` (Contexto: ${c.comparacion.join(' y ')})` : c.departamento ? ` (Contexto: ${c.departamento})` : '';
+      const res = await fetch(`${SITE_CONFIG.apiBaseUrl}/api/preguntar/stream`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
+        body: JSON.stringify({ pregunta: (pregunta + pista).slice(0, 600), sesion_id: sesionId }),
+      });
+      if (!res.ok || !res.body) return false;
+      const lector = res.body.getReader(), dec = new TextDecoder();
+      let buf = '';
+      for (;;) {
+        const { done, value } = await lector.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const partes = buf.split('\n\n'); buf = partes.pop() || '';
+        for (const p of partes) {
+          if (!p.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(p.slice(6));
+            if (data.tipo === 'final' && data.resultado?.respuesta) {
+              const r = data.resultado;
+              pintarRespuesta(d, String(r.respuesta), r.fuentes || [], r.modo === 'evidencia' ? 'evidencia' : 'ia');
+              return true;
+            }
+          } catch { /* fragmento incompleto */ }
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    } finally {
+      clearTimeout(limite);
+    }
+  }
+
+  async function preguntar(texto: string) {
+    const pregunta = texto.trim();
+    if (!pregunta) return;
+    abrir();
+    burbujaUsuario(pregunta);
+    entrada.value = ''; ajustarAlto();
+    btnEnviar.disabled = true;
+    const d = burbujaArqen();
+    const ok = await preguntarAlServidor(pregunta, d);
+    if (!ok) {
+      // Capa final: reglas con datos oficiales locales. Nunca deja a la persona sin respuesta.
+      const r = responderPorReglas(pregunta, obtenerContexto());
+      pintarRespuesta(d, r.respuesta, r.fuentes, 'reglas');
+      if (servidorEnLinea !== false) pintarModo(false);
+    }
+    btnEnviar.disabled = false;
+    entrada.focus();
+  }
+
+  function ajustarAlto() { entrada.style.height = 'auto'; entrada.style.height = `${Math.min(entrada.scrollHeight, 112)}px`; }
+  entrada.addEventListener('input', ajustarAlto);
+  entrada.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
+  form.addEventListener('submit', (e) => { e.preventDefault(); preguntar(entrada.value); });
+
+  pintarContexto();
+</script>

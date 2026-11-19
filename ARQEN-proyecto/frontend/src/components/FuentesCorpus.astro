@@ -1,0 +1,54 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+const FUENTES = [
+  { n: 'INAIGEM', v: 175, c: '#0d9488' },
+  { n: 'ANA', v: 171, c: '#0ea5e9' },
+  { n: 'SENAMHI', v: 52, c: '#d97706' },
+];
+const total = FUENTES.reduce((s, f) => s + f.v, 0);
+const C = 2 * Math.PI * 40;
+let acum = 0;
+const arcos = FUENTES.map((f) => { const a = { ...f, largo: (f.v / total) * C, inicio: acum }; acum += a.largo; return a; });
+const k = SITE_CONFIG.corpus;
+const CIFRAS = [
+  { v: k.paginas_analizadas, t: 'páginas leídas' },
+  { v: k.nodos_grafo, t: 'datos en el grafo' },
+  { v: k.relaciones_grafo, t: 'conexiones' },
+  { v: k.entidades_unicas, t: 'lugares y entidades' },
+];
+---
+<div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+  <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5">
+    <h3 class="font-display text-lg font-bold text-noche-900">De dónde salen los datos</h3>
+    <div class="mt-4 flex flex-1 items-center gap-6">
+      <svg class="h-40 w-40 flex-none -rotate-90" viewBox="0 0 100 100" role="img" aria-label="Informes por institución">
+        {arcos.map((a) => (
+          <circle cx="50" cy="50" r="40" fill="none" stroke={a.c} stroke-width="16" stroke-dasharray={`${a.largo - 1} ${C}`} stroke-dashoffset={-a.inicio} data-arqen-grafico="fuentes" data-arqen-valor={a.n}><title>{`${a.n}: ${a.v} informes`}</title></circle>
+        ))}
+      </svg>
+      <ul class="space-y-3">
+        {FUENTES.map((f) => (
+          <li class="flex items-center gap-3">
+            <i class="h-3 w-3 rounded-full" style={`background:${f.c}`}></i>
+            <span class="w-20 font-semibold text-noche-900">{f.n}</span>
+            <span class="font-mono text-sm text-slate-600">{f.v} · {Math.round((f.v / total) * 100)} %</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="fuente mt-4">{total} informes técnicos oficiales</p>
+  </article>
+  <article class="tarjeta tarjeta-noche tejida flex flex-col p-6">
+    <h3 class="font-display text-lg font-bold text-white">El grafo de conocimiento</h3>
+    <p class="mt-1 text-sm text-slate-300">Cada informe se leyó completo y se convirtió en datos conectados: lagunas, glaciares, pueblos, obras y estudios.</p>
+    <div class="mt-5 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+      {CIFRAS.map((c) => (
+        <div class="flex flex-col justify-center rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+          <span class="font-display text-3xl font-bold text-white tabular">{c.v.toLocaleString('es-PE')}</span>
+          <span class="mt-1 text-sm text-slate-300">{c.t}</span>
+        </div>
+      ))}
+    </div>
+    <p class="mt-5 text-xs text-slate-400">Grafo construido con Neo4j y Kùzu a partir del corpus oficial.</p>
+  </article>
+</div>

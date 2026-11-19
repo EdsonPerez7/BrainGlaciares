@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="12" viewBox="0 0 48 12">
+  <!-- Franja tejida: ribete inspirado en las guardas de las mantas andinas -->
+  <rect width="48" height="12" fill="#0b1838"/>
+  <path d="M0 12 L6 4 L12 12 Z M24 12 L30 4 L36 12 Z" fill="#be185d"/>
+  <path d="M12 12 L18 4 L24 12 Z M36 12 L42 4 L48 12 Z" fill="#0d9488"/>
+  <path d="M0 0 H48 V2 H0 Z" fill="#d97706"/>
+  <rect x="17" y="8" width="2" height="2" fill="#fde68a"/><rect x="41" y="8" width="2" height="2" fill="#fde68a"/>
+  <rect x="5" y="8" width="2" height="2" fill="#7dd3fc"/><rect x="29" y="8" width="2" height="2" fill="#7dd3fc"/>
+</svg>

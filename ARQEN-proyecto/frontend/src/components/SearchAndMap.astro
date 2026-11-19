@@ -1,0 +1,175 @@
+---
+import { DEPARTAMENTOS_RIESGO } from '../config/metrics.data';
+import GlacierMap from './GlacierMap.astro';
+const totalPais = DEPARTAMENTOS_RIESGO.reduce((s, d) => s + d.total, 0);
+---
+
+<section id="buscar" data-contexto="Busca tu zona" class="relative w-full pb-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="sobretitulo">Tu zona</span>
+        <h2 class="seccion-titulo mt-2">Busca tu zona o una laguna</h2>
+        <p class="seccion-sub">Elige un departamento y te resumimos el riesgo en segundos.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="select-departamento" class="sr-only">Departamento</label>
+        <select id="select-departamento" class="h-11 rounded-xl border border-laguna-200 bg-laguna-50 px-3 pr-8 text-sm font-semibold text-laguna-900 focus:border-laguna-500 focus:outline-none">
+          <option value="todos">Todo el Perú ({totalPais} lagunas críticas)</option>
+          {DEPARTAMENTOS_RIESGO.filter((d) => d.total > 0).map((d) => <option value={d.departamento.toLowerCase()}>{d.departamento} ({d.total})</option>)}
+        </select>
+        <button id="btn-informe-depto" type="button" class="btn btn-marca hidden">↓ Informe del departamento</button>
+      </div>
+    </div>
+
+    <div class="mt-8 grid items-stretch gap-5 lg:grid-cols-12">
+      <!-- Resumen + lista -->
+      <div class="flex min-h-0 flex-col gap-4 lg:col-span-5 lg:h-[600px]">
+        <article class="tarjeta tarjeta-marca tejida flex-none p-5">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-display text-lg font-bold text-noche-900"><span id="panel-titulo">Todo el Perú</span> en 30 segundos</h3>
+            <span id="panel-badge" class="etiqueta riesgo-muy-alto">– lagunas</span>
+          </div>
+          <dl class="mt-4 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-rose-100"><dt class="text-[11px] text-slate-500">Muy alto</dt><dd id="res-muy-alto" class="font-display text-2xl font-bold text-rose-600 tabular">–</dd></div>
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-cochinilla-100"><dt class="text-[11px] text-slate-500">Sin obras</dt><dd id="res-sin-obras" class="font-display text-2xl font-bold text-cochinilla-600 tabular">–</dd></div>
+            <div class="rounded-xl bg-white/80 p-2.5 ring-1 ring-sky-100"><dt class="text-[11px] text-slate-500">Agua total</dt><dd class="font-display text-2xl font-bold text-hielo-700 tabular"><span id="res-agua">–</span><span class="text-sm font-medium"> hm³</span></dd></div>
+          </dl>
+          <p id="panel-descripcion" class="mt-3 text-sm text-slate-700"></p>
+        </article>
+
+        <div class="flex min-h-0 flex-1 flex-col">
+          <p class="mb-2 text-xs font-semibold text-slate-500">Lagunas · toca una para verla en el mapa</p>
+          <div id="lista-lagunas" class="lista-desvanecida max-h-[440px] flex-1 space-y-2 overflow-y-auto pb-6 pr-1 lg:max-h-none lg:min-h-0"></div>
+        </div>
+      </div>
+
+      <!-- Mapa -->
+      <div class="lg:col-span-7">
+        <div class="tarjeta tarjeta-hielo flex h-full flex-col p-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 px-1 pb-2.5 text-xs">
+            <span class="flex items-center gap-2 font-semibold text-noche-900"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>Mapa de lagunas en riesgo</span>
+            <span class="text-slate-500">Toca un punto para ver su ficha</span>
+          </div>
+          <div class="min-h-0 flex-1 overflow-hidden rounded-xl">
+            <GlacierMap mapId="home-glacier-map" heightClass="h-[420px] lg:h-full lg:min-h-[540px]" mode="navigate" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { esc } from '../utils/seguridad';
+  import { ApiService } from '../services/api';
+  import { DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { piscinasOlimpicas, formatoMiles } from '../config/recorrido.data';
+  import { fijarContexto } from '../scripts/contexto';
+
+  const $ = (id: string) => document.getElementById(id);
+  const selectDept = $('select-departamento') as HTMLSelectElement | null;
+  const lista = $('lista-lagunas');
+  const btnInforme = $('btn-informe-depto');
+  let deptosMemoria: any[] = [...DEPARTAMENTOS_RIESGO];
+  let lagunasMemoria: any[] = [...LAGUNAS_DESTACADAS];
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const ORDEN: Record<string, number> = { 'Muy alto': 4, Alto: 3, Medio: 2, Bajo: 1 };
+  const claseRiesgo = (r: string) => r === 'Muy alto' ? 'riesgo-muy-alto' : r === 'Alto' ? 'riesgo-alto' : r === 'Medio' ? 'riesgo-medio' : r === 'Bajo' ? 'riesgo-bajo' : 'riesgo-sin';
+  const franjaRiesgo = (r: string) => r === 'Muy alto' ? '#e11d48' : r === 'Alto' ? '#f97316' : r === 'Medio' ? '#eab308' : r === 'Bajo' ? '#16a34a' : '#94a3b8';
+
+  function tarjeta(l: any) {
+    const nombre = String(l.nombre || '').startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`;
+    const vol = Number(l.volumen_hm3);
+    const docs = l.total_documentos ?? l.n_docs;
+    return `
+      <div class="item-laguna group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 pl-4 transition hover:border-laguna-200 hover:shadow-md"
+        data-id="${esc(String(l.id || '').toLowerCase())}" data-dept="${esc(String(l.departamento || '').toLowerCase())}"
+        data-lat="${esc(l.lat ?? '')}" data-lng="${esc(l.lng ?? '')}" tabindex="0" role="button" aria-label="Ver ${esc(nombre)} en el mapa">
+        <span class="absolute inset-y-0 left-0 w-1" style="background:${franjaRiesgo(l.riesgo)}"></span>
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="truncate font-semibold text-noche-900">${esc(nombre)}</p>
+            <p class="truncate text-xs text-slate-500">${esc(l.departamento)} · amenaza a <b class="font-semibold text-slate-700">${esc(l.poblado_amenazado || 'sin dato')}</b></p>
+          </div>
+          <span class="etiqueta ${claseRiesgo(l.riesgo)}">${esc(l.riesgo || 'Sin evaluar')}</span>
+        </div>
+        <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
+            ${Number.isFinite(vol) ? `<span>💧 ${esc(vol)} hm³ <span class="text-slate-400">≈ ${formatoMiles(piscinasOlimpicas(vol))} piscinas</span></span>` : ''}
+            ${docs ? `<span class="rounded-full bg-hielo-50 px-2 py-0.5 font-medium text-hielo-700">${esc(docs)} informes</span>` : ''}
+          </span>
+          <a href="/buscar?id=${encodeURIComponent(l.id)}" class="btn-ficha font-semibold text-laguna-700 hover:text-laguna-900">Ficha →</a>
+        </div>
+      </div>`;
+  }
+
+  function pintar(dept: string) {
+    const d = norm(dept);
+    const filtradas = (d === 'todos' ? lagunasMemoria : lagunasMemoria.filter((l) => norm(l.departamento) === d))
+      .slice().sort((a, b) => (ORDEN[b.riesgo] || 0) - (ORDEN[a.riesgo] || 0) || Number(b.volumen_hm3 || 0) - Number(a.volumen_hm3 || 0));
+    if (lista) {
+      lista.innerHTML = filtradas.length ? filtradas.map(tarjeta).join('')
+        : '<div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">El catálogo no registra lagunas críticas aquí. Eso no significa riesgo cero: puede no estar evaluado.</div>';
+    }
+    const nombre = d === 'todos' ? 'Todo el Perú' : (deptosMemoria.find((x) => norm(x.departamento) === d)?.departamento || dept);
+    const set = (id: string, t: string) => { const e = $(id); if (e) e.textContent = t; };
+    set('panel-titulo', nombre);
+    set('panel-badge', `${filtradas.length} lagunas`);
+    set('res-muy-alto', String(filtradas.filter((l) => l.riesgo === 'Muy alto').length));
+    set('res-sin-obras', String(filtradas.filter((l) => l.tiene_obras === false).length));
+    set('res-agua', formatoMiles(Math.round(filtradas.reduce((s, l) => s + (Number(l.volumen_hm3) || 0), 0))));
+    const peor = filtradas[0];
+    set('panel-descripcion', peor ? `La más crítica: ${String(peor.nombre).startsWith('Laguna') ? peor.nombre : `Laguna ${peor.nombre}`}, sobre ${peor.poblado_amenazado || 'poblados sin registrar'}.` : '');
+    btnInforme?.classList.toggle('hidden', d === 'todos');
+    if (d !== 'todos') fijarContexto({ seccion: 'Busca tu zona', departamento: nombre }, true);
+    document.dispatchEvent(new CustomEvent('bg:map-filter', { detail: { dept } }));
+  }
+
+  function marcar(card: HTMLElement | null) {
+    document.querySelectorAll('.item-laguna').forEach((el) => el.classList.remove('ring-2', 'ring-laguna-500', 'border-laguna-200'));
+    card?.classList.add('ring-2', 'ring-laguna-500', 'border-laguna-200');
+  }
+  function enfocar(card: HTMLElement) {
+    marcar(card);
+    const l = lagunasMemoria.find((x) => String(x.id).toLowerCase() === card.dataset.id);
+    if (l) fijarContexto({ seccion: 'Busca tu zona', laguna: l.nombre, lagunaId: l.id }, true);
+    document.dispatchEvent(new CustomEvent('bg:map-focus', { detail: {
+      id: card.dataset.id, dept: card.dataset.dept || 'todos', zoom: 13,
+      lat: card.dataset.lat ? parseFloat(card.dataset.lat) : undefined, lng: card.dataset.lng ? parseFloat(card.dataset.lng) : undefined,
+    } }));
+  }
+  lista?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('.btn-ficha')) return;
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.item-laguna');
+    if (card) enfocar(card);
+  });
+  lista?.addEventListener('keydown', (e) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.item-laguna');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); enfocar(card); }
+  });
+  document.addEventListener('bg:map-active-laguna', ((e: CustomEvent) => {
+    const id = String(e.detail?.id || '').toLowerCase().replace(/^laguna:/i, '').trim();
+    const card = document.querySelector<HTMLElement>(`.item-laguna[data-id="${CSS.escape(id)}"]`);
+    if (card) { marcar(card); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  }) as EventListener);
+
+  selectDept?.addEventListener('change', () => pintar(selectDept.value));
+  btnInforme?.addEventListener('click', async () => {
+    const nombre = $('panel-titulo')?.textContent || '';
+    const { generarInformeDepartamento } = await import('../services/informePdf');
+    await generarInformeDepartamento(nombre);
+  });
+
+  pintar('todos');
+
+  // Catálogo ampliado desde el backend (si está disponible)
+  ApiService.getCatalogo(120).then((data) => {
+    if (Array.isArray(data?.lagunas) && data.lagunas.length) {
+      // Se completan los campos que el catálogo remoto no trae con el catálogo local
+      lagunasMemoria = data.lagunas.map((l: any) => ({ ...LAGUNAS_DESTACADAS.find((x) => x.id === l.id), ...l }));
+      pintar(selectDept?.value || 'todos');
+    }
+  }).catch(() => {});
+  ApiService.getDepartamentosRiesgo().then((deptos) => { if (deptos?.length) deptosMemoria = deptos; }).catch(() => {});
+</script>

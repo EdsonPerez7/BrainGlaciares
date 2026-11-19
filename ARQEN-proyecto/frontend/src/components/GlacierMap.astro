@@ -1,0 +1,326 @@
+---
+/**
+ * Componente Mapa Territorial Reutilizable (GlacierMap)
+ * Utiliza Leaflet 1.9.4 empaquetado localmente con Vite (sin depender de CDNs externos para el script).
+ * Soporta filtrado dinámico por departamento mediante el evento `bg:map-filter` y
+ * ajuste automático de tamaño con ResizeObserver cuando se muestra dentro de pestañas.
+ */
+interface Props {
+  mapId?: string;
+  heightClass?: string;
+  mode?: 'navigate' | 'event';
+}
+
+const {
+  mapId = 'glacier-map',
+  heightClass = 'h-[460px]',
+  mode = 'navigate',
+} = Astro.props;
+---
+
+<div
+  class="relative w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+  data-bg-map
+  data-map-id={mapId}
+  data-mode={mode}
+>
+  <div id={mapId} class={`w-full ${heightClass} z-0`}></div>
+
+  <!-- Leyenda flotante de niveles de riesgo -->
+  <div class="pointer-events-none absolute bottom-3 left-3 z-[400] flex flex-wrap items-center gap-3 rounded-lg border border-slate-200/90 bg-white/95 px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur-sm">
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Muy alto</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-orange-600"></span> Alto</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-600"></span> Bajo</span>
+    <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-slate-500"></span> Sin evaluar</span>
+  </div>
+</div>
+
+<script>
+  import { esc } from '../utils/seguridad';
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+  import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { ApiService } from '../services/api';
+
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const DEPT_CENTROIDS: Record<string, L.LatLngTuple> = {
+    'ancash': [-9.52, -77.52],
+    'cusco': [-13.53, -71.96],
+    'junin': [-11.50, -75.50],
+    'puno': [-15.84, -70.02],
+    'apurimac': [-14.05, -73.08],
+    'huanuco': [-9.93, -76.24],
+    'lima': [-11.80, -76.50],
+    'arequipa': [-16.40, -71.50],
+    'pasco': [-10.68, -76.25],
+    'ayacucho': [-13.16, -74.22],
+    'huancavelica': [-12.78, -74.97],
+    'moquegua': [-17.19, -70.93],
+    'tacna': [-18.01, -70.25]
+  };
+
+  function getRiskColor(riesgo: string): string {
+    const r = (riesgo || '').toLowerCase();
+    if (r.includes('muy')) return '#e11d48';
+    if (r.includes('alto')) return '#ea580c';
+    if (r.includes('medio')) return '#ca8a04';
+    if (r.includes('bajo')) return '#16a34a';
+    return '#64748b';
+  }
+
+  function initGlacierMaps() {
+    const containers = document.querySelectorAll<HTMLElement>('[data-bg-map]');
+
+    containers.forEach((wrapper) => {
+      if (wrapper.dataset.initialized === 'true') return;
+      wrapper.dataset.initialized = 'true';
+
+      const mapId = wrapper.dataset.mapId || 'glacier-map';
+      const mode = wrapper.dataset.mode || 'navigate';
+      const mapEl = document.getElementById(mapId);
+      if (!mapEl) return;
+
+      const map = L.map(mapId, {
+        center: [-9.8, -76.5],
+        zoom: 6,
+        zoomControl: true,
+        scrollWheelZoom: true
+      });
+
+      const capaTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; IGN, USGS, OpenStreetMap',
+        maxZoom: 18
+      });
+
+      const capaClara = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 16
+      });
+
+      const capaOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      });
+
+      capaTopo.addTo(map);
+      L.control.layers({
+        'Relieve Topográfico': capaTopo,
+        'Mapa Claro Minimalista': capaClara,
+        'OpenStreetMap': capaOSM
+      }, undefined, { position: 'topright' }).addTo(map);
+
+      const markersLayer = L.layerGroup().addTo(map);
+      const markersMap = new Map<string, { marker: L.CircleMarker; laguna: any }>();
+      let activeMarker: L.CircleMarker | null = null;
+      let currentDept = 'todos';
+      let lagunasCatalogo: any[] = [...LAGUNAS_DESTACADAS];
+
+      function renderMarkers(deptFilter: string, targetId?: string) {
+        markersLayer.clearLayers();
+        markersMap.clear();
+        activeMarker = null;
+        currentDept = deptFilter || 'todos';
+
+        const fNorm = norm(deptFilter);
+        const filtered = !fNorm || fNorm === 'todos'
+          ? [...lagunasCatalogo]
+          : lagunasCatalogo.filter((l) => norm(l.departamento) === fNorm || (l.departamentos && norm(l.departamentos).includes(fNorm)));
+
+        // Si el filtro por departamento no contiene la laguna objetivo pero se pidió una laguna específica, incluirla
+        if (targetId && !filtered.some(l => l.id.toLowerCase() === targetId.toLowerCase())) {
+          const extra = lagunasCatalogo.find(l => l.id.toLowerCase() === targetId.toLowerCase());
+          if (extra) filtered.push(extra);
+        }
+
+        const coords: L.LatLngTuple[] = [];
+
+        filtered.forEach((laguna) => {
+          if (typeof laguna.lat !== 'number' || typeof laguna.lng !== 'number' || isNaN(laguna.lat) || isNaN(laguna.lng)) {
+            return;
+          }
+
+          const color = getRiskColor(laguna.riesgo);
+          const pos: L.LatLngTuple = [laguna.lat, laguna.lng];
+          coords.push(pos);
+
+          const marker = L.circleMarker(pos, {
+            radius: 8,
+            fillColor: color,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.92
+          });
+
+          const popupEl = document.createElement('div');
+          popupEl.style.fontFamily = 'inherit';
+          popupEl.style.fontSize = '12px';
+          popupEl.style.lineHeight = '1.45';
+          popupEl.innerHTML = `
+            <div style="font-weight: 800; font-size: 13px; color: #0f172a; margin-bottom: 2px;">Laguna ${esc(laguna.nombre)}</div>
+            <div style="color: #475569; font-size: 11px;">${esc(laguna.departamento)} · Cordillera ${esc(laguna.cordillera)}</div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
+              <span style="display: inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 10px; background: ${color}20; color: ${color}; border: 1px solid ${color}40;">
+                Riesgo ${esc(laguna.riesgo)}
+              </span>
+              <span style="font-size: 10px; color: #64748b;">${esc(laguna.altitud_msnm)} msnm</span>
+            </div>
+          `;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = 'Ver ficha técnica detallada →';
+          btn.style.cssText = 'display:block; width:100%; text-align:center; margin-top:8px; background:#0f172a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:11px; font-weight:700; transition:background 0.2s;';
+          btn.onmouseover = () => { btn.style.background = '#0284c7'; };
+          btn.onmouseout = () => { btn.style.background = '#0f172a'; };
+
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (mode === 'event') {
+              wrapper.dispatchEvent(new CustomEvent('bg:map-select', {
+                detail: { id: laguna.id, laguna },
+                bubbles: true
+              }));
+            } else {
+              window.location.href = `/buscar?id=${encodeURIComponent(laguna.id)}`;
+            }
+          });
+
+          popupEl.appendChild(btn);
+          marker.bindPopup(popupEl);
+
+          marker.on('click', () => {
+            highlightMarker(marker);
+            wrapper.dispatchEvent(new CustomEvent('bg:map-active-laguna', {
+              detail: { id: laguna.id, laguna },
+              bubbles: true
+            }));
+          });
+
+          markersLayer.addLayer(marker);
+          markersMap.set(laguna.id.toLowerCase(), { marker, laguna });
+        });
+
+        return coords;
+      }
+
+      function highlightMarker(marker: L.CircleMarker) {
+        if (activeMarker && activeMarker !== marker) {
+          activeMarker.setStyle({ radius: 8, weight: 2, color: '#ffffff' });
+        }
+        marker.setStyle({ radius: 12, weight: 3.5, color: '#0284c7' });
+        activeMarker = marker;
+      }
+
+      function focusOn(options: { id?: string; dept?: string; lat?: number; lng?: number; zoom?: number }) {
+        map.invalidateSize();
+        const targetDept = options.dept ? norm(options.dept) : '';
+        const targetId = options.id ? options.id.toLowerCase().replace(/^laguna:/i, '').trim() : '';
+
+        // Si cambió el departamento o no hay marcadores cargados
+        const needsReload = targetDept && targetDept !== norm(currentDept);
+        if (needsReload || markersMap.size === 0) {
+          renderMarkers(options.dept || 'todos', targetId);
+        }
+
+        // 1. Si hay una laguna específica objetivo
+        if (targetId && markersMap.has(targetId)) {
+          const item = markersMap.get(targetId)!;
+          highlightMarker(item.marker);
+          map.setView([item.laguna.lat, item.laguna.lng], options.zoom || 13, { animate: true });
+          setTimeout(() => {
+            item.marker.openPopup();
+          }, 200);
+          return;
+        }
+
+        // Si se pasaron coordenadas explícitas de laguna
+        if (typeof options.lat === 'number' && typeof options.lng === 'number' && !isNaN(options.lat) && !isNaN(options.lng)) {
+          map.setView([options.lat, options.lng], options.zoom || 13, { animate: true });
+          if (targetId && markersMap.has(targetId)) {
+            const item = markersMap.get(targetId)!;
+            highlightMarker(item.marker);
+            setTimeout(() => item.marker.openPopup(), 200);
+          }
+          return;
+        }
+
+        // 2. Si es filtro departamental
+        if (targetDept && targetDept !== 'todos') {
+          const matchingCoords: L.LatLngTuple[] = [];
+          markersMap.forEach(({ laguna }) => {
+            if (norm(laguna.departamento) === targetDept || (laguna.departamentos && norm(laguna.departamentos).includes(targetDept))) {
+              if (typeof laguna.lat === 'number' && typeof laguna.lng === 'number') {
+                matchingCoords.push([laguna.lat, laguna.lng]);
+              }
+            }
+          });
+
+          if (matchingCoords.length > 0) {
+            const bounds = L.latLngBounds(matchingCoords);
+            if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+              map.setView(matchingCoords[0], 12, { animate: true });
+            } else {
+              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 11 });
+            }
+          } else if (DEPT_CENTROIDS[targetDept]) {
+            map.setView(DEPT_CENTROIDS[targetDept], 8, { animate: true });
+          }
+          return;
+        }
+
+        // 3. Todo el Perú por defecto
+        map.setView([-9.8, -76.5], 6, { animate: true });
+      }
+
+      // Inicializar con todos los marcadores
+      renderMarkers('todos');
+
+      // Escuchar actualización dinámica del catálogo desde el backend
+      document.addEventListener('bg:map-update-catalog', ((e: CustomEvent<{ lagunas?: any[] }>) => {
+        if (e.detail?.lagunas && e.detail.lagunas.length > 0) {
+          lagunasCatalogo = e.detail.lagunas;
+          renderMarkers(currentDept);
+        }
+      }) as EventListener);
+
+      // Hidratación en segundo plano para catálogos dinámicos
+      ApiService.getCatalogo(150).then((data) => {
+        const lagunas = data?.lagunas;
+        if (Array.isArray(lagunas) && lagunas.length > 0) {
+          lagunasCatalogo = lagunas;
+          renderMarkers(currentDept);
+        }
+      }).catch(() => {});
+
+      // Escuchar evento de enfoque completo (laguna y/o departamento)
+      document.addEventListener('bg:map-focus', ((e: CustomEvent) => {
+        const detail = e.detail || {};
+        setTimeout(() => focusOn(detail), 40);
+      }) as EventListener);
+
+      // Escuchar filtros externos por departamento
+      document.addEventListener('bg:map-filter', ((e: CustomEvent<{ dept: string }>) => {
+        const dept = e.detail?.dept || 'todos';
+        setTimeout(() => focusOn({ dept }), 40);
+      }) as EventListener);
+
+      // Reajustar tiles automáticamente cuando el contenedor pase de hidden a visible
+      const ro = new ResizeObserver(() => {
+        if (mapEl.offsetParent !== null) {
+          map.invalidateSize();
+        }
+      });
+      ro.observe(mapEl);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGlacierMaps);
+  } else {
+    initGlacierMaps();
+  }
+  document.addEventListener('astro:page-load', initGlacierMaps);
+</script>
+

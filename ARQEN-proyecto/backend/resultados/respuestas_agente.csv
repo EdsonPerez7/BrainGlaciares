@@ -1,0 +1,65 @@
+id,tipo,pregunta,responde,modo,modelo,autocorregida,herramientas,n_citas,citas_grafo,citas_texto,docs_citados,instituciones_citadas,avisos,segundos,respuesta
+P2,competencia,¿Qué lagunas glaciares de Áncash tienen riesgo muy alto de desborde?,True,agente,groq · openai/gpt-oss-120b,False,consulta_verificada,5,5,0,3,"ANA, INAIGEM",,2.93,"- Laguna **Cuchillacocha** – nivel muy alto [1]  
+- Laguna **Llaca** – nivel muy alto [2]  
+- Laguna **Palcacocha** – nivel muy alto [3]  
+- Laguna **Parón** – nivel muy alto [4]  
+- Laguna **Tullparaju** – nivel muy alto [5]"
+P4,competencia,"¿Qué lagunas tuvieron eventos de desborde, de qué glaciar provienen y qué poblados afectaron?",True,agente,groq · openai/gpt-oss-20b,False,consulta_verificada,19,19,0,12,"ANA, INAIGEM",,5.1,"- Se registraron **82** eventos de desborde en lagunas glaciares; se muestran 20 de ellos.  
+- **Laguna Tambillo** – Deslizamiento Tambillo 1870 – poblados afectados: Ancash, Rampac Chico, Macashca, Carhuaz, Huaraz. [1]  
+- **Laguna Tambillo** – Aluvión Tambillo 1883 – poblados afectados: Ancash, Rampac Chico, Macashca, Carhuaz, Huaraz. [2]  
+- **Laguna Solterococha** – Avalancha Solterococha 1917 – poblados afectados: Ranrahirca, Huari, Carhuaz, Yungay, Huaraz. [3]  
+- **Laguna Palcacocha** – Avalancha Palcacocha 1932 – glaciares origen: Randolph, Ranrapalca, Pucaranra, Palcaraju – poblado afectado: Huaraz. [4]  
+- **Laguna Artesa** – Aluvión Artesa 1938 – (poblados no registrados). [5]  
+- **Laguna Pakliashcocha** – Aluvión Pakliashcocha 1938 – (poblados no registrados). [6]  
+- **Laguna Arteza** – Aluvión Arteza 1938 – poblado afectado: Carhuaz. [7]  
+- **Laguna UH Quilcay** – Aluvión UH Quilcay 1941 – (poblados no registrados). [8]  
+- **Laguna Paleolake Jircacocha** – Aluvión Paleolake Jircacocha 1941 – (poblados no registrados). [9]  
+- **Laguna Jircacocha** – Aluvión Jircacocha 1941 – (poblados no registrados). [10]  
+- **Laguna Artesoncocha** – Aluvión Artesoncocha 1941 – (poblados no registrados). [11]  
+- **Laguna Palcacocha** – Avalancha Palcacocha 1941 – glaciares origen: Randolph, Ranrapalca, Pucaranra, Palcaraju – poblado afectado: Huaraz. [12]  
+- **Laguna Palcacocha** – Aluvión Palcacocha 1941 – glaciares origen: Randolph, Ranrapalca, Pucaranra, Palcaraju – poblado afectado: Huaraz. [13]  
+- **Laguna Palcacocha** – Aluvión Palcacocha 1947 – glaciares origen: Randolph, Ranrapalca, Pucaranra, Palcaraju – (poblados no registrados). [14]  
+- **Laguna Jancarurish** – Aluvión Jancarurish 1950 – poblado afectado: Huaraz. [15]  
+- **Laguna Artesoncocha** – Aluvión Artesoncocha 1951 – poblados afectados: Ranrahirca, Huari, Carhuaz, Yungay, Huaraz. [16]  
+- **Laguna Parón** – Aluvión Parón 1953 – glaciares origen: Jatunraju, Hatunraju, Aguja, Parón – poblados afectados: Ranrahirca, Huari, Carhuaz, Yungay, Huaraz. [17]  
+- **Laguna Tullparaju** – Deslizamiento Tullparaju 1962 – glacial origen: Tullparaju – poblados afectados: Ranrahirca, Huari, Carhuaz, Yungay, Huaraz. [18]  
+- **Laguna Chuspicocha** – Aluvión Chuspicocha 1969 – glaciares origen: Talves, Huaytapallana, Chuspicocha – (poblados no registrados). [19]  
+- **Laguna Safuna Alta** – Aluvión Safuna Alta 1970 – glaciares origen: Pisco,"
+P10,competencia,"¿Qué lagunas en riesgo cuentan con obras de seguridad, en qué estado están y qué poblados protegen?",False,evidencia,,False,P10,24,20,4,10,"ANA, INAIGEM",El LLM no respondió (groq · openai/gpt-oss-20b: RateLimitError): se muestra la evidencia.,6.21,"**Hechos del grafo** (66 filas):
+- laguna: Artizón · nivel: Alto · obra: Canal de desagüe · estado: Colapsada [1]
+- laguna: Artizón · nivel: Alto · obra: Dique · estado: Colapsada [2]
+- laguna: Artizón · nivel: Alto · obra: Obras de seguridad · estado: Deteriorada, Colapsada [3]
+- laguna: Artizón · nivel: Alto · obra: Presa · estado: Colapsada [4]
+- laguna: Chaclan · nivel: Muy alto · obra: Dique [5]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Dique · estado: Deteriorada · poblados_protegidos: Huaraz [6]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Obras de seguridad · estado: Deteriorada · poblados_protegidos: Huaraz [7]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Presa · poblados_protegidos: Huaraz [8]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Sistema de alerta temprana · estado: Operativa · poblados_protegidos: Huaraz [9]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Dique · estado: Deteriorada, Colapsada · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [10]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Presa · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [11]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Sistema de alerta temprana · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [12]
+- laguna: Lecma · nivel: Alto · obra: Dique [13]
+- laguna: Llaca · nivel: Muy alto · obra: Dique · estado: Requiere mantenimiento · poblados_protegidos: Huaraz [14]
+- laguna: Llaca · nivel: Muy alto · obra: Obras de seguridad · estado: Deteriorada · poblados_protegidos: Huaraz [15]
+- laguna: Llaca · nivel: Muy alto · obra: Presa · poblados_protegidos: Huaraz [16]
+- laguna: Llaca · nivel: Muy alto · obra: Sistema de alerta temprana · poblados_protegidos: Huaraz [17]
+- laguna: Llaca · nivel: Muy alto · obra: dique artificial de 9 mts de alto · poblados_protegidos: Huaraz [18]
+- laguna: Pacliashcocha · nivel: Alto · obra: Canal de desagüe · poblados_protegidos: Marcará, Carhuaz [19]
+- laguna: Pacliashcocha · nivel: Alto · obra: Dique · poblados_protegidos: Marcará, Carhuaz [20]
+
+**Fragmentos relacionados:**
+- Riesgos asociados a glaciares En 2018, se han efectuado estudios de evaluación de riesgo por aluvión de tres subcuencas de origen glaciar para tomar medidas de prevención en el marco del Sistema Nacional de la Gestión de… [21]
+- El Informe Anual 2018 de la situación de los glaciares y ecosistemas de montaña en el Perú aborda la evaluación de las obras de seguridad en 21 lagunas de alta peligrosidad, ubicadas principalmente en la Cordillera Blanc… [22]
+- 6.1 Las obras de seguridad de la laguna Pacliascocha, están comprendidas por un canal de mampostería de piedra, el cual se encuentra en condiciones regulares, siendo que posee el deterioro de su tarrajeo y requiere la li… [23]
+- Luego, en la década de 1970, se continuó con la ejecución de nuevas obras de seguridad y la refacción de algunas existentes. Un caso en particular es el de la laguna Parón. A partir de la década de 1960, la empresa estat… [24]"
+D1,descriptiva,¿Por qué la laguna Palcacocha es peligrosa?,True,graphrag,groq · openai/gpt-oss-120b,False,buscar_entidad > texto,4,0,4,4,"ANA, INAIGEM",,16.65,"- Posee un volumen de agua de aproximadamente **16 Mm³** y la morfología de su microcuenca la conecta directamente con la ciudad de Huaraz, lo que incrementa el potencial de inundación. [4]  
+- Se sitúa a **4 562 m s.n.m.** y está catalogada como “peligrosa” por la amenaza inminente que representa para la población cercana. [1][2]  
+- Ya en **1940** el glaciólogo Hans Kinzl la señaló como una laguna peligrosa; al año siguiente, el **13 de diciembre de 1941** se produjo la ruptura violenta del dique frontal, generando una ola que provocó el aluvión de 1941. [3]  
+
+Estas características (gran volumen, ubicación alta, vulnerabilidad geomorfológica y antecedentes históricos de desborde) explican por qué la laguna Palcacocha es considerada peligrosa."
+D3,histórica,¿Qué ocurrió en el aluvión de Huaraz de 1941?,True,agente,groq · openai/gpt-oss-20b,False,buscar_documentos,3,0,3,3,"ANA, INAIGEM",,2.29,"El aluvión que devastó Huaraz en 1941 fue provocado por una gran masa de hielo y rocas que se desprendió del nevado Palcaraju y cayó violentamente en la laguna Palcacocha, a más de 4 500 m.s.n.m. El impacto generó una ola de gran altura que rompió la morrena frontal de la laguna y transformó el agua, sedimentos y hielo en un aluvión de alta energía que descendió por la quebrada Cojup a 30‑40 km/h, arrasando todo a su paso hasta la ciudad de Huaraz [1].  
+
+El desastre destruyó gran parte de la ciudad y se estima que murieron alrededor de 5 000 personas [2].  
+
+La fecha más citada es el 13 de diciembre 1941, aunque algunos registros lo ubican el 20 de abril 1941; la mayoría de las fuentes contemporáneas coinciden en la fecha de diciembre [1][4]."
+D5,fuera del corpus,¿Quién ganó el Mundial de fútbol 2022?,False,graphrag,groq · openai/gpt-oss-120b,False,texto,0,0,0,0,,,14.24,No encontré esa información en el grafo ni en los documentos del corpus.

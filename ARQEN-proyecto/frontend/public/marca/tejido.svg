@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <!-- Patrón propio de ARQEN, inspirado en la geometría del pallay andino: rombo escalonado (montaña), zigzag (río) y puntos (lagunas) -->
+  <g fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="miter">
+    <path d="M48 14 L54 20 L54 26 L60 26 L60 32 L66 32 L66 38 L72 38 L72 44 L78 48 L72 52 L72 58 L66 58 L66 64 L60 64 L60 70 L54 70 L54 76 L48 82 L42 76 L42 70 L36 70 L36 64 L30 64 L30 58 L24 58 L24 52 L18 48 L24 44 L24 38 L30 38 L30 32 L36 32 L36 26 L42 26 L42 20 Z"/>
+    <path d="M48 34 L54 40 L54 44 L58 48 L54 52 L54 56 L48 62 L42 56 L42 52 L38 48 L42 44 L42 40 Z"/>
+    <path d="M0 4 L8 0 L16 4 L24 0 L32 4 L40 0 L48 4 L56 0 L64 4 L72 0 L80 4 L88 0 L96 4" />
+    <path d="M0 92 L8 96 L16 92 L24 96 L32 92 L40 96 L48 92 L56 96 L64 92 L72 96 L80 92 L88 96 L96 92" />
+  </g>
+  <g fill="#ffffff"><rect x="46" y="46" width="4" height="4"/><rect x="4" y="46" width="4" height="4"/><rect x="88" y="46" width="4" height="4"/><rect x="46" y="4" width="4" height="4" opacity=".0"/></g>
+</svg>

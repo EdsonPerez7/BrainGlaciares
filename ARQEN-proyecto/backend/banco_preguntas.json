@@ -1,0 +1,152 @@
+[
+ {
+  "id": "P1",
+  "tipo": "competencia",
+  "pregunta": "¿Cuántas lagunas de origen glaciar se formaron en la Cordillera Blanca según el inventario de 2023?"
+ },
+ {
+  "id": "P2",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas glaciares de Áncash tienen riesgo muy alto de desborde?"
+ },
+ {
+  "id": "P3",
+  "tipo": "competencia",
+  "pregunta": "¿Qué centros poblados están aguas abajo de lagunas con riesgo alto y qué estudios los evaluaron?"
+ },
+ {
+  "id": "P4",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas tuvieron eventos de desborde, de qué glaciar provienen y qué poblados afectaron?"
+ },
+ {
+  "id": "P5",
+  "tipo": "competencia",
+  "pregunta": "¿Qué glaciares con retroceso medido (balance de masa) alimentan lagunas que hoy están en riesgo?"
+ },
+ {
+  "id": "P6",
+  "tipo": "competencia",
+  "pregunta": "¿Qué métodos de monitoreo se aplicaron a lagunas en riesgo y qué institución realizó cada estudio?"
+ },
+ {
+  "id": "P7",
+  "tipo": "competencia",
+  "pregunta": "¿En qué subcuencas coinciden lagunas en riesgo y contaminación por drenaje ácido de roca?"
+ },
+ {
+  "id": "P8",
+  "tipo": "competencia",
+  "pregunta": "¿Qué bofedales están en subcuencas con glaciares en retroceso y qué servicios ecosistémicos brindan?"
+ },
+ {
+  "id": "P9",
+  "tipo": "competencia",
+  "pregunta": "¿Cómo cambió la superficie glaciar de una cordillera entre los inventarios de 2018 y 2023?"
+ },
+ {
+  "id": "P10",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas en riesgo cuentan con obras de seguridad, en qué estado están y qué poblados protegen?"
+ },
+ {
+  "id": "D1",
+  "tipo": "descriptiva",
+  "pregunta": "¿Por qué la laguna Palcacocha es peligrosa?"
+ },
+ {
+  "id": "D2",
+  "tipo": "multilingüe",
+  "pregunta": "¿Qué factores explican el balance de masa y energía de los glaciares peruanos?"
+ },
+ {
+  "id": "D3",
+  "tipo": "histórica",
+  "pregunta": "¿Qué ocurrió en el aluvión de Huaraz de 1941?"
+ },
+ {
+  "id": "D4",
+  "tipo": "conteo",
+  "pregunta": "¿Cuántas lagunas con riesgo muy alto de desborde hay en cada departamento?"
+ },
+ {
+  "id": "D5",
+  "tipo": "fuera del corpus",
+  "pregunta": "¿Quién ganó el Mundial de fútbol 2022?"
+ },
+ {
+  "id": "G1",
+  "tipo": "negación",
+  "pregunta": "¿Qué lagunas en riesgo alto o muy alto no tienen obras de seguridad registradas?"
+ },
+ {
+  "id": "G2",
+  "tipo": "conteo varios saltos",
+  "pregunta": "¿Qué cordillera tiene más lagunas en riesgo?"
+ },
+ {
+  "id": "G3",
+  "tipo": "camino",
+  "pregunta": "¿Cómo se relaciona el nevado Huascarán con Yungay?"
+ },
+ {
+  "id": "P11",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas glaciares en riesgo existen en el departamento de Huánuco y qué poblados amenazan?"
+ },
+ {
+  "id": "P12",
+  "tipo": "competencia",
+  "pregunta": "¿Qué lagunas glaciares de Cusco o la Cordillera Vilcanota presentan riesgo alto de desborde?"
+ },
+ {
+  "id": "P13",
+  "tipo": "competencia",
+  "pregunta": "¿Qué estudios de batimetría o volumen almacenado se han realizado en la laguna Palcacocha?"
+ },
+ {
+  "id": "P14",
+  "tipo": "competencia",
+  "pregunta": "¿Cuál es la superficie y el volumen registrado de la laguna Parón y qué sistema de descarga posee?"
+ },
+ {
+  "id": "P15",
+  "tipo": "competencia",
+  "pregunta": "¿Qué ocurrió en la laguna 513 en el año 2010 y qué obras de seguridad protegieron a Carhuaz?"
+ },
+ {
+  "id": "D6",
+  "tipo": "descriptiva",
+  "pregunta": "¿Qué es un GLOF (desborde violento de laguna glaciar) y qué factores lo desencadenan en los Andes?"
+ },
+ {
+  "id": "D7",
+  "tipo": "histórica",
+  "pregunta": "¿Qué sucedió en el aluvión de Chavín de Huántar de 1945 y qué laguna lo originó?"
+ },
+ {
+  "id": "D8",
+  "tipo": "institucional",
+  "pregunta": "¿Qué rol cumplen el INAIGEM, la ANA y el SENAMHI en el monitoreo de glaciares del Perú?"
+ },
+ {
+  "id": "D9",
+  "tipo": "descriptiva",
+  "pregunta": "¿Qué riesgos presenta la laguna Gangrajanca en la Cordillera Huayhuash?"
+ },
+ {
+  "id": "G4",
+  "tipo": "camino",
+  "pregunta": "¿Cómo se conecta la laguna Llaca con el glaciar Ranrapalca y la ciudad de Huaraz?"
+ },
+ {
+  "id": "G5",
+  "tipo": "conteo",
+  "pregunta": "¿Qué departamentos del Perú concentran la mayor cantidad de lagunas con peligro de aluvión?"
+ },
+ {
+  "id": "G6",
+  "tipo": "recomendación",
+  "pregunta": "¿Qué recomendaciones técnicas proponen los informes ante el retroceso acelerado en la Cordillera Blanca?"
+ }
+]

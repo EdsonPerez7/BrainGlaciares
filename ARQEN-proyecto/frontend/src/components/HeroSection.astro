@@ -1,0 +1,261 @@
+---
+import SearchBox from './SearchBox.astro';
+import { PARADAS, piscinasOlimpicas, formatoMiles } from '../config/recorrido.data';
+import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+import { SITE_CONFIG } from '../config/site.config';
+
+// Datos de cada parada del recorrido, tomados del catálogo oficial
+const paradas = PARADAS.map((p) => {
+  const l = LAGUNAS_DESTACADAS.find((x) => x.id === p.id)!;
+  return {
+    ...p,
+    nombre: l.nombre.startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`,
+    departamento: l.departamento,
+    cordillera: l.cordillera,
+    altitud: l.altitud_msnm,
+    riesgo: l.riesgo,
+    volumen: l.volumen_hm3,
+    poblado: l.poblado_amenazado,
+    piscinas: formatoMiles(piscinasOlimpicas(l.volumen_hm3)),
+    docs: l.total_documentos,
+  };
+});
+const p0 = paradas[0];
+const claseRiesgo = (r: string) =>
+  r === 'Muy alto' ? 'text-rose-200 bg-rose-500/25' : r === 'Alto' ? 'text-orange-200 bg-orange-500/25' : 'text-slate-200 bg-white/15';
+---
+
+<section id="inicio" class="relative isolate overflow-hidden bg-noche-950 text-white" data-contexto="portada">
+  <!-- Capa 1: póster ilustrado (aparece al instante y es el respaldo si el 3D no carga) -->
+  <img src="/marca/cordillera-noche.svg" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high" />
+
+  <!-- Capa 2: relieve 3D real (Cesium), aparece con un fundido cuando terminó de cargar -->
+  <div id="escena-3d" class="absolute inset-0 opacity-0 transition-opacity duration-[1500ms]" aria-label="Vista 3D de la Cordillera Blanca" role="img"></div>
+  <div id="marcas-3d" class="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-700" aria-hidden="true"></div>
+
+  <!-- Capa 3: trama tejida andina + degradado para que el texto siempre se lea -->
+  <div class="trama-andina pointer-events-none absolute inset-0 z-10" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-noche-950/85 via-noche-950/35 to-transparent" aria-hidden="true"></div>
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-t from-noche-950/80 to-transparent" aria-hidden="true"></div>
+
+  <div class="relative z-20 mx-auto flex min-h-[calc(100svh-4rem)] max-h-[900px] w-full flex-col px-4 pb-24 pt-6 sm:px-8 lg:min-h-[720px] lg:px-12 xl:px-16">
+    <!-- Hora local: la luz de la escena corresponde a este momento -->
+    <div class="flex justify-end">
+      <div class="cristal !rounded-2xl flex items-center gap-2.5 px-3.5 py-2 text-xs sm:text-sm">
+        <span id="hora-local" class="font-mono font-medium text-hielo-300 tabular">--:--</span>
+        <span class="text-slate-200">Cordillera Blanca</span>
+        <span id="fase-luz" class="hidden sm:inline text-slate-400">· luz de ahora</span>
+      </div>
+    </div>
+
+    <div class="mt-4 grid flex-1 items-center gap-6 lg:grid-cols-[minmax(0,560px)_1fr_340px]">
+      <!-- Tarjeta principal de cristal -->
+      <div class="cristal p-6 sm:p-8">
+        <span class="etiqueta border border-white/20 bg-white/10 text-slate-100">
+          <span class="h-2 w-2 rounded-full bg-hielo-300"></span>
+          {SITE_CONFIG.corpus.documentos_totales} informes oficiales · cada dato con su fuente
+        </span>
+        <h1 class="mt-5 text-4xl font-bold leading-[1.02] sm:text-5xl xl:text-6xl">¿Hay riesgo<br />donde vives?</h1>
+        <p class="mt-4 max-w-md text-base leading-relaxed text-slate-200 sm:text-lg">
+          Escribe tu pueblo o una laguna. Te mostramos qué hay aguas arriba y qué dicen los informes.
+        </p>
+        <div class="mt-6">
+          <SearchBox inputId="hero-search-input" theme="dark" mode="navigate" maxWidthClass="max-w-full" placeholder="Tu pueblo o una laguna…" />
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+          <span class="text-slate-400">Prueba:</span>
+          {[['Huaraz', '/buscar?q=Huaraz'], ['Laguna 513', '/buscar?id=513'], ['Parón', '/buscar?id=paron'], ['Cusco', '/buscar?dept=cusco']].map(([t, h]) => (
+            <a href={h} class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-slate-100 transition hover:bg-white/20">{t}</a>
+          ))}
+        </div>
+      </div>
+
+      <div class="hidden lg:block"></div>
+
+      <!-- Tarjeta de la parada actual -->
+      <article id="tarjeta-parada" class="cristal !bg-noche-950/60 p-5" aria-live="polite">
+        <div class="flex items-center justify-between text-xs">
+          <span id="parada-num" class="font-semibold uppercase tracking-wider text-hielo-300">Parada 1 de 3</span>
+          <span id="parada-docs" class="font-mono text-slate-300">{p0.docs} informes</span>
+        </div>
+        <h2 id="parada-nombre" class="mt-2 text-2xl font-bold">{p0.nombre}</h2>
+        <p id="parada-lugar" class="text-sm text-slate-300">{p0.departamento} · Cordillera {p0.cordillera} · {formatoMiles(p0.altitud)} m</p>
+        <p id="parada-mensaje" class="mt-3 text-sm leading-relaxed text-slate-100">{p0.mensaje}</p>
+        <dl class="mt-4 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-xl border border-white/15 bg-noche-900/70 p-2.5">
+            <dt class="text-[11px] text-slate-300">Riesgo</dt>
+            <dd id="parada-riesgo" class={`mt-1 rounded-md px-1 py-0.5 text-sm font-semibold ${claseRiesgo(p0.riesgo)}`}>{p0.riesgo}</dd>
+          </div>
+          <div class="rounded-xl border border-white/15 bg-noche-900/70 p-2.5">
+            <dt class="text-[11px] text-slate-300">Volumen</dt>
+            <dd id="parada-volumen" class="mt-1 font-mono text-sm font-medium">{p0.volumen} hm³</dd>
+          </div>
+          <div class="rounded-xl border border-white/15 bg-noche-900/70 p-2.5">
+            <dt class="text-[11px] text-slate-300">Amenaza a</dt>
+            <dd id="parada-poblado" class="mt-1 truncate text-sm font-semibold">{p0.poblado}</dd>
+          </div>
+        </dl>
+        <p class="mt-3 text-xs text-slate-300">💧 Equivale a <b id="parada-piscinas" class="text-white">{p0.piscinas}</b> piscinas olímpicas.</p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <a id="parada-ficha" href={`/buscar?id=${p0.id}`} class="btn btn-sm bg-white text-noche-900 hover:bg-hielo-50">Ver ficha</a>
+          <button id="parada-preguntar" type="button" class="btn btn-sm btn-cristal">Preguntar</button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Barra del recorrido -->
+    <div class="cristal !rounded-2xl mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3">
+      <span class="hidden text-sm font-medium text-slate-200 md:inline">Recorrido</span>
+      <ol class="grid flex-1 grid-cols-3 gap-3" aria-label="Paradas del recorrido">
+        {paradas.map((p, i) => (
+          <li>
+            <button type="button" class="btn-parada group flex w-full flex-col gap-2 text-left" data-indice={i} aria-current={i === 0 ? 'step' : undefined}>
+              <span class="barra-parada h-1 w-full rounded-full bg-white/20 transition-colors group-aria-[current=step]:bg-hielo-300"></span>
+              <span class="truncate text-xs text-slate-300 group-aria-[current=step]:font-semibold group-aria-[current=step]:text-white sm:text-sm">{i + 1} · {p.titulo}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div class="flex items-center gap-2">
+        <button id="btn-recorrido-pausa" type="button" class="btn btn-sm btn-cristal" aria-label="Pausar recorrido">
+          <svg id="ico-pausa" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>
+          <svg id="ico-play" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button id="btn-ver-3d" type="button" class="btn btn-sm btn-cristal">Ver en 3D</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="franja-tejida relative z-20" aria-hidden="true"></div>
+</section>
+
+<style is:global>
+  #escena-3d .cesium-widget, #escena-3d .cesium-viewer { width: 100%; height: 100%; }
+  #escena-3d[data-activo='true'] { opacity: 1; }
+  .arqen-creditos-3d { position: absolute; right: 12px; bottom: 6px; z-index: 30; font: 10px/1.3 var(--font-sans); color: rgb(226 232 240 / .7); max-width: 60%; text-align: right; }
+  .arqen-creditos-3d img { display: inline; height: 12px; vertical-align: middle; opacity: .8; }
+  .arqen-creditos-3d a { color: inherit; }
+  .arqen-marca {
+    position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    padding: 5px 10px; border-radius: 12px; font: 500 12px/1.2 var(--font-sans); color: #fff;
+    background: rgb(11 24 56 / .55); border: 1px solid rgb(255 255 255 / .28); backdrop-filter: blur(10px);
+    transition: opacity .3s; will-change: transform;
+  }
+  .arqen-marca::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 18px; background: linear-gradient(rgb(255 255 255 / .7), transparent); }
+  .arqen-marca i { width: 7px; height: 7px; border-radius: 50%; background: #e0f2fe; }
+  .arqen-marca-laguna i { background: #2dd4bf; }
+  .arqen-marca-ciudad i { background: #fbbf24; }
+  .arqen-marca b { font-weight: 600; }
+  .arqen-marca span { font: 500 11px var(--font-mono); color: #bae6fd; }
+  .arqen-marca-laguna span { color: #fecdd3; }
+</style>
+
+<script>
+  import { PARADAS, MARCAS, piscinasOlimpicas, formatoMiles } from '../config/recorrido.data';
+  import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+  import { faseDeLuz, type Escena3D } from '../scripts/hero3d';
+  import { abrirAsistente } from '../scripts/contexto';
+
+  const $ = (id: string) => document.getElementById(id);
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let indice = 0;
+  let enPausa = reducido;
+  let temporizador: ReturnType<typeof setInterval> | null = null;
+  let escena: Escena3D | null = null;
+
+  // ---------- Hora local de Huaraz ----------
+  const fase = faseDeLuz();
+  const textoFase = { dia: '· luz de día', 'hora-azul': '· hora azul', noche: '· de noche' }[fase];
+  function pintarHora() {
+    const hora = new Intl.DateTimeFormat('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Lima' }).format(new Date());
+    const el = $('hora-local'); if (el) el.textContent = hora;
+  }
+  pintarHora(); setInterval(pintarHora, 30000);
+  const fl = $('fase-luz'); if (fl) fl.textContent = textoFase;
+
+  // ---------- Tarjeta de parada ----------
+  const claseRiesgo = (r: string) => r === 'Muy alto' ? 'text-rose-200 bg-rose-500/25' : r === 'Alto' ? 'text-orange-200 bg-orange-500/25' : 'text-slate-200 bg-white/15';
+  function pintarParada() {
+    const p = PARADAS[indice];
+    const l = LAGUNAS_DESTACADAS.find((x) => x.id === p.id)!;
+    const nombre = l.nombre.startsWith('Laguna') ? l.nombre : `Laguna ${l.nombre}`;
+    const set = (id: string, t: string) => { const e = $(id); if (e) e.textContent = t; };
+    set('parada-num', `Parada ${indice + 1} de ${PARADAS.length}`);
+    set('parada-docs', `${l.total_documentos} informes`);
+    set('parada-nombre', nombre);
+    set('parada-lugar', `${l.departamento} · Cordillera ${l.cordillera} · ${formatoMiles(l.altitud_msnm)} m`);
+    set('parada-mensaje', p.mensaje);
+    set('parada-volumen', `${l.volumen_hm3} hm³`);
+    set('parada-poblado', l.poblado_amenazado);
+    set('parada-piscinas', formatoMiles(piscinasOlimpicas(l.volumen_hm3)));
+    const r = $('parada-riesgo');
+    if (r) { r.textContent = l.riesgo; r.className = `mt-1 rounded-md px-1 py-0.5 text-sm font-semibold ${claseRiesgo(l.riesgo)}`; }
+    $('parada-ficha')?.setAttribute('href', `/buscar?id=${encodeURIComponent(l.id)}`);
+    document.querySelectorAll<HTMLButtonElement>('.btn-parada').forEach((b, i) => {
+      if (i === indice) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    escena?.volarA(p, reducido ? 0 : 5);
+  }
+
+  function irA(i: number) { indice = (i + PARADAS.length) % PARADAS.length; pintarParada(); }
+  function reiniciarTemporizador() {
+    if (temporizador) clearInterval(temporizador);
+    temporizador = enPausa ? null : setInterval(() => irA(indice + 1), 13000);
+  }
+  function pausar(valor: boolean) {
+    enPausa = valor;
+    $('ico-pausa')?.classList.toggle('hidden', valor);
+    $('ico-play')?.classList.toggle('hidden', !valor);
+    $('btn-recorrido-pausa')?.setAttribute('aria-label', valor ? 'Reanudar recorrido' : 'Pausar recorrido');
+    reiniciarTemporizador();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.btn-parada').forEach((b) =>
+    b.addEventListener('click', () => { irA(Number(b.dataset.indice)); reiniciarTemporizador(); }));
+  $('btn-recorrido-pausa')?.addEventListener('click', () => pausar(!enPausa));
+  $('parada-preguntar')?.addEventListener('click', () => {
+    const l = LAGUNAS_DESTACADAS.find((x) => x.id === PARADAS[indice].id)!;
+    abrirAsistente({ seccion: 'Portada', laguna: l.nombre, lagunaId: l.id });
+  });
+
+  // ---------- Carga del 3D real ----------
+  const contenedor = $('escena-3d');
+  const capaMarcas = $('marcas-3d');
+  const btn3d = $('btn-ver-3d') as HTMLButtonElement | null;
+
+  async function cargar3D() {
+    if (escena || !contenedor || !capaMarcas) return;
+    if (btn3d) { btn3d.disabled = true; btn3d.textContent = 'Cargando 3D…'; }
+    try {
+      const { iniciarEscena3D } = await import('../scripts/hero3d');
+      escena = await iniciarEscena3D(contenedor, capaMarcas, MARCAS, () => {
+        contenedor.dataset.activo = 'true';
+        capaMarcas.classList.remove('opacity-0');
+        if (btn3d) btn3d.classList.add('hidden');
+      });
+      if (!escena) throw new Error('sin 3D');
+      // Si en 25 s el relieve no terminó de cargar (red lenta o token inválido), se libera y queda el póster
+      setTimeout(() => {
+        if (contenedor.dataset.activo === 'true' || !escena) return;
+        escena.destruir(); escena = null;
+        if (btn3d) { btn3d.disabled = false; btn3d.textContent = 'Reintentar 3D'; }
+      }, 25000);
+      escena.volarA(PARADAS[indice], 0);
+      escena.alInteractuar(() => pausar(true));   // si la persona explora, el recorrido se detiene
+    } catch {
+      if (btn3d) { btn3d.disabled = false; btn3d.textContent = 'Ver en 3D'; }
+    }
+  }
+  btn3d?.addEventListener('click', cargar3D);
+
+  // En computadora se carga solo, cuando la página ya está lista; en celular, a pedido.
+  const conexion = (navigator as any).connection;
+  const esEscritorio = window.matchMedia('(min-width: 1024px)').matches;
+  if (esEscritorio && !conexion?.saveData) {
+    const cuandoLibre = (window as any).requestIdleCallback || ((f: () => void) => setTimeout(f, 1200));
+    cuandoLibre(() => cargar3D());
+  }
+
+  pintarParada();
+  reiniciarTemporizador();
+</script>

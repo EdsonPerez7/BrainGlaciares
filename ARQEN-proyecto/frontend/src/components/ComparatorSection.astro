@@ -1,0 +1,578 @@
+---
+import { LAGUNAS_DESTACADAS } from '../config/metrics.data';
+---
+
+<section id="comparar" data-contexto="Comparar" class="relative w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="sobretitulo">Comparar</span>
+        <h1 class="seccion-titulo mt-2">Compara dos lagunas</h1>
+        <p class="seccion-sub">Riesgo, agua, historia y lo que las conecta, cara a cara.</p>
+      </div>
+    </div>
+
+    <!-- Selección -->
+    <div class="tarjeta mt-8 flex flex-wrap items-center justify-between gap-4 p-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <label class="flex items-center gap-2 rounded-xl border-2 border-hielo-300 bg-hielo-50 py-1.5 pl-3 pr-2">
+          <span class="h-3 w-3 rounded-full bg-hielo-500"></span>
+          <span class="sr-only">Primera laguna</span>
+          <select id="comp-l1" class="cursor-pointer bg-transparent text-sm font-semibold text-noche-900 focus:outline-none">{LAGUNAS_DESTACADAS.map(l => (<option value={l.id} selected={l.id === 'palcacocha'}>{l.nombre} ({l.departamento})</option>))}</select>
+        </label>
+        <span class="font-display text-sm font-bold text-slate-400">vs</span>
+        <label class="flex items-center gap-2 rounded-xl border-2 border-ocre-400 bg-ocre-50 py-1.5 pl-3 pr-2">
+          <span class="h-3 w-3 rounded-full bg-ocre-600"></span>
+          <span class="sr-only">Segunda laguna</span>
+          <select id="comp-l2" class="cursor-pointer bg-transparent text-sm font-semibold text-noche-900 focus:outline-none">{LAGUNAS_DESTACADAS.map(l => (<option value={l.id} selected={l.id === 'paron'}>{l.nombre} ({l.departamento})</option>))}</select>
+        </label>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="btn-explicar-diferencia" type="button" class="btn btn-sec">Preguntar al asistente</button>
+        <button id="btn-informe-comparacion" type="button" class="btn btn-marca">↓ Informe comparativo</button>
+      </div>
+    </div>
+
+    <!-- Veredicto -->
+    <div class="tarjeta tarjeta-hielo mt-4 flex items-start gap-3 p-4">
+      <span class="icono icono-hielo"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7z"/></svg></span>
+      <div class="min-w-0">
+        <p class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-hielo-700">En pocas palabras <span id="txt-comp-entidades-count" class="etiqueta bg-white text-hielo-700 normal-case tracking-normal">3 datos clave</span></p>
+        <p id="txt-veredicto-comparativo" class="mt-1 text-sm leading-relaxed text-slate-800">Comparando Palcacocha y Parón…</p>
+      </div>
+    </div>
+
+    <!-- Pestañas -->
+    <div class="mt-6 flex gap-1 rounded-2xl bg-white p-1 ring-1 ring-slate-200 sm:inline-flex" role="tablist" aria-label="Vistas de la comparación">
+      <button type="button" role="tab" class="tab-comp flex-1 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold" aria-selected="true" aria-controls="panel-riesgo" id="tab-riesgo">Riesgo y agua</button>
+      <button type="button" role="tab" class="tab-comp flex-1 rounded-xl px-4 py-2 text-sm font-semibold" aria-selected="false" aria-controls="panel-historia" id="tab-historia">Historia</button>
+      <button type="button" role="tab" class="tab-comp flex-1 rounded-xl px-4 py-2 text-sm font-semibold" aria-selected="false" aria-controls="panel-relaciones" id="tab-relaciones">Relaciones</button>
+    </div>
+
+    <div class="mt-4">
+      <!-- Panel: riesgo y agua -->
+      <div id="panel-riesgo" role="tabpanel" aria-labelledby="tab-riesgo" class="panel-comp tarjeta tarjeta-riesgo tejida grid gap-x-10 gap-y-5 p-6 lg:grid-cols-2">
+        <div class="flex items-center justify-between border-b border-rose-100 pb-3 lg:col-span-2">
+          <h3 class="font-display text-lg font-bold text-noche-900">Riesgo, agua y personas expuestas</h3>
+          <span class="text-sm font-medium text-slate-500">Escala oficial INAIGEM</span>
+        </div>
+
+        <!-- Métrica 1: Nivel de Riesgo Oficial INAIGEM -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-semibold text-slate-700">Nivel de Riesgo de Desborde</span>
+            <span id="txt-comp-riesgo-resumen" class="font-bold text-sm px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Ambas en riesgo Muy Alto</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span id="name-riesgo-l1" class="text-sky-800 font-bold truncate">Palcacocha</span>
+                <span id="badge-riesgo-l1" class="font-bold text-sm px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">Muy alto</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-riesgo-l1" class="bg-rose-600 h-full w-full transition-all duration-300"></div>
+              </div>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span id="name-riesgo-l2" class="text-amber-800 font-bold truncate">Parón</span>
+                <span id="badge-riesgo-l2" class="font-bold text-sm px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">Muy alto</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-riesgo-l2" class="bg-rose-600 h-full w-full transition-all duration-300"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métrica 2: Volumen de Agua Almacenada -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-semibold text-slate-700">Volumen de Agua Almacenada (hm³)</span>
+            <span id="txt-comp-vol-diff" class="text-sm font-bold text-slate-600">Parón almacena 3.2x más volumen</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span class="nombre-l1 text-slate-600">Laguna 1</span>
+                <span id="val-vol-l1" class="font-bold text-slate-900">17.3 hm³</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-vol-l1" class="bg-sky-600 h-full w-[31%] transition-all duration-300"></div>
+              </div>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1.5">
+              <div class="flex justify-between font-medium">
+                <span class="nombre-l2 text-slate-600">Laguna 2</span>
+                <span id="val-vol-l2" class="font-bold text-slate-900">55.0 hm³</span>
+              </div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="bar-vol-l2" class="bg-amber-600 h-full w-[100%] transition-all duration-300"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métrica 3: Centros Poblados Amenazados Aguas Abajo -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-sm">
+            <span class="font-semibold text-slate-700">Población Expuesta Aguas Abajo</span>
+            <span class="text-sm text-slate-400">Trayectoria de aluvión</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1">
+              <div class="flex justify-between items-center font-medium">
+                <span id="txt-pob-cant-l1" class="font-bold text-sky-900">1 pueblo</span>
+                <span class="text-sm text-slate-400">Aguas abajo</span>
+              </div>
+              <p id="txt-pob-nombres-l1" class="text-slate-600 text-sm leading-tight font-medium">Huaraz</p>
+            </div>
+            <div class="p-2.5 rounded-lg border border-slate-100 bg-slate-50/80 space-y-1">
+              <div class="flex justify-between items-center font-medium">
+                <span id="txt-pob-cant-l2" class="font-bold text-amber-900">3 pueblos</span>
+                <span class="text-sm text-slate-400">Aguas abajo</span>
+              </div>
+              <p id="txt-pob-nombres-l2" class="text-slate-600 text-sm leading-tight font-medium">Caraz, Pueblo Libre, Huaylas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métrica 4: Altitud y Masa Glaciar -->
+        <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-3 text-sm">
+          <div class="space-y-0.5">
+            <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Altitud & Glaciar</span>
+            <p id="txt-alt-glac-l1" class="font-semibold text-slate-800 text-sm">4,566 m s.n.m. · Palcaraju</p>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Altitud & Glaciar</span>
+            <p id="txt-alt-glac-l2" class="font-semibold text-slate-800 text-sm">4,185 m s.n.m. · Huandoy</p>
+          </div>
+        </div>
+
+        <!-- Métrica 5: Obras de Seguridad Física -->
+        <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-3 text-sm lg:col-span-2">
+          <div>
+            <span id="label-l1" class="font-bold text-sky-800 block text-sm">Palcacocha:</span>
+            <p id="obras-l1" class="text-slate-600 text-sm mt-0.5 leading-snug">Sifones flotantes y dique de contención (seguridad temporal)</p>
+          </div>
+          <div>
+            <span id="label-l2" class="font-bold text-amber-800 block text-sm">Parón:</span>
+            <p id="obras-l2" class="text-slate-600 text-sm mt-0.5 leading-snug">Túnel de descarga regulada (seguridad hidráulica permanente)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: historia -->
+      <div id="panel-historia" role="tabpanel" aria-labelledby="tab-historia" hidden class="panel-comp tarjeta tarjeta-historia tejida flex flex-col justify-between p-6">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-display text-lg font-bold text-noche-900">¿Cuál se ha estudiado más, y desde cuándo?</h3>
+            <span class="text-[11px] font-semibold text-slate-400">1965 – 2026</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600">Estudios oficiales acumulados de cada laguna.</p>
+
+          <!-- Gráfico de curvas de estudios en SVG -->
+          <div class="relative mt-6 h-60 w-full">
+            <svg class="h-full w-full overflow-visible" viewBox="0 0 400 120" preserveAspectRatio="none">
+              <!-- Rejilla horizontal -->
+              <line x1="0" y1="20" x2="400" y2="20" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="55" x2="400" y2="55" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="90" x2="400" y2="90" stroke="#f1f5f9" stroke-width="1" />
+              <line x1="0" y1="115" x2="400" y2="115" stroke="#e2e8f0" stroke-width="1.5" />
+
+              <!-- Curva Laguna 1 (Azul / Sky) -->
+              <path 
+                id="path-curva-l1"
+                d="M 0,115 L 45.9,115 C 169.8,91.3 293.8,48.5 400,20" 
+                fill="none" 
+                stroke="#0284c7" 
+                stroke-width="3" 
+                stroke-linecap="round"
+                class="transition-all duration-500"
+              />
+
+              <!-- Curva Laguna 2 (Ámbar / Naranja) -->
+              <path 
+                id="path-curva-l2"
+                d="M 0,115 L 6.6,115 C 144.3,103.5 282.0,82.7 400,68.9" 
+                fill="none" 
+                stroke="#d97706" 
+                stroke-width="3" 
+                stroke-linecap="round"
+                stroke-dasharray="5 3"
+                class="transition-all duration-500"
+              />
+            </svg>
+
+            <!-- Leyenda de años en el eje X -->
+            <div class="flex justify-between text-[11px] text-slate-400 mt-2 font-medium">
+              <span>1965</span>
+              <span>1980</span>
+              <span>1995</span>
+              <span>2010</span>
+              <span>2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-2.5 w-2.5 rounded-full bg-sky-600"></span>
+            <span id="curva-txt-l1" class="text-slate-800 font-semibold">Palcacocha: 68 docs (desde 1972)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block h-2.5 w-2.5 rounded-full bg-amber-600"></span>
+            <span id="curva-txt-l2" class="text-slate-800 font-semibold">Parón: 33 docs (desde 1966)</span>
+          </div>
+        </div>
+      </div>
+
+
+    <!-- Panel: relaciones -->
+    <div id="panel-relaciones" role="tabpanel" aria-labelledby="tab-relaciones" hidden class="panel-comp tarjeta tarjeta-noche p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+        <div>
+          <h3 class="font-display text-lg font-bold text-white">Lo que las une y lo que las separa</h3>
+          <p class="text-sm text-slate-400">Datos que comparten y datos propios de cada una, según el grafo.</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Compartido</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-sky-400"></span> Solo <span class="nombre-l1">Laguna 1</span></span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-400"></span> Solo <span class="nombre-l2">Laguna 2</span></span>
+        </div>
+      </div>
+
+      <!-- Red dinámica: arrastra los nodos; al tocar uno, el asistente sugiere preguntas -->
+      <div id="contenedor-red-relaciones" class="relative my-5 h-[440px] w-full overflow-hidden rounded-2xl bg-[radial-gradient(ellipse_at_center,rgba(29,53,103,.55),transparent_70%)]">
+        <svg id="svg-red-relaciones" class="h-full w-full" role="img" aria-label="Red de relaciones entre las dos lagunas"></svg>
+        <p class="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/10 px-3 py-1 text-xs text-slate-300">Arrastra los nodos · pasa el mouse para ver conexiones · toca para preguntar</p>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+        <span id="txt-comparten-resumen">Comparten 3 entidades: Departamento (Áncash), Cordillera (Blanca) y Nivel de Riesgo (Muy alto).</span>
+        <span class="text-slate-500">Conexiones verificadas en el grafo Kùzu</span>
+      </div>
+    </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  import { esc } from '../utils/seguridad';
+  import { fijarContexto, abrirAsistente } from '../scripts/contexto';
+  import { dibujarRed } from '../scripts/redDinamica';
+  import { ApiService } from '../services/api';
+
+  const compL1 = document.getElementById('comp-l1') as HTMLSelectElement | null;
+  const compL2 = document.getElementById('comp-l2') as HTMLSelectElement | null;
+  
+  // Elementos de la Síntesis
+  const txtVeredicto = document.getElementById('txt-veredicto-comparativo');
+  const txtEntidadesCount = document.getElementById('txt-comp-entidades-count');
+
+  // Elementos de Atributos
+  const txtRiesgoResumen = document.getElementById('txt-comp-riesgo-resumen');
+  const nameRiesgoL1 = document.getElementById('name-riesgo-l1');
+  const nameRiesgoL2 = document.getElementById('name-riesgo-l2');
+  const badgeRiesgoL1 = document.getElementById('badge-riesgo-l1');
+  const badgeRiesgoL2 = document.getElementById('badge-riesgo-l2');
+  const barRiesgoL1 = document.getElementById('bar-riesgo-l1');
+  const barRiesgoL2 = document.getElementById('bar-riesgo-l2');
+
+  const txtVolDiff = document.getElementById('txt-comp-vol-diff');
+  const valVolL1 = document.getElementById('val-vol-l1');
+  const valVolL2 = document.getElementById('val-vol-l2');
+  const barVolL1 = document.getElementById('bar-vol-l1');
+  const barVolL2 = document.getElementById('bar-vol-l2');
+
+  const txtPobCantL1 = document.getElementById('txt-pob-cant-l1');
+  const txtPobCantL2 = document.getElementById('txt-pob-cant-l2');
+  const txtPobNombresL1 = document.getElementById('txt-pob-nombres-l1');
+  const txtPobNombresL2 = document.getElementById('txt-pob-nombres-l2');
+
+  const txtAltGlacL1 = document.getElementById('txt-alt-glac-l1');
+  const txtAltGlacL2 = document.getElementById('txt-alt-glac-l2');
+
+  const labelL1 = document.getElementById('label-l1');
+  const labelL2 = document.getElementById('label-l2');
+  const obrasL1 = document.getElementById('obras-l1');
+  const obrasL2 = document.getElementById('obras-l2');
+
+  // Curvas de Estudios (SVG)
+  const pathCurvaL1 = document.getElementById('path-curva-l1');
+  const pathCurvaL2 = document.getElementById('path-curva-l2');
+  const curvaTxtL1 = document.getElementById('curva-txt-l1');
+  const curvaTxtL2 = document.getElementById('curva-txt-l2');
+
+  // Red de Relaciones (SVG)
+  const svgRed = document.getElementById('svg-red-relaciones');
+  const txtCompartenResumen = document.getElementById('txt-comparten-resumen');
+
+  const btnExplicar = document.getElementById('btn-explicar-diferencia');
+
+  let ultimaRed: { nombres: [string, string]; nodos: any[] } | null = null;
+  function pintarRed() {
+    const panel = document.getElementById('panel-relaciones');
+    if (!ultimaRed || !svgRed || !panel || panel.hidden) return;
+    dibujarRed(svgRed as unknown as SVGSVGElement, ultimaRed.nombres, ultimaRed.nodos
+      .filter((n: any) => !ultimaRed!.nombres.some((x) => String(n.label ?? '').trim().toLowerCase() === x.trim().toLowerCase()))
+      .map((n: any) => ({ id: String(n.id ?? n.label), label: String(n.label ?? ''), grupo: n.grupo })), (n) => {
+      const [a, b] = ultimaRed!.nombres;
+      fijarContexto({ seccion: 'Comparar', comparacion: [a, b], grafico: 'red', valor: n.label }, true);
+      abrirAsistente();
+    });
+  }
+  let esperaResize: ReturnType<typeof setTimeout> | null = null;
+  window.addEventListener('resize', () => { if (esperaResize) clearTimeout(esperaResize); esperaResize = setTimeout(pintarRed, 250); });
+
+  function getRiesgoInfo(riesgo: string) {
+    const r = (riesgo || '').toLowerCase();
+    if (r.includes('muy')) return { pct: '100%', bg: 'bg-rose-600', badgeClass: 'bg-rose-100 text-rose-800', label: 'Muy alto' };
+    if (r.includes('alto')) return { pct: '75%', bg: 'bg-amber-600', badgeClass: 'bg-amber-100 text-amber-800', label: 'Alto' };
+    if (r.includes('medio')) return { pct: '50%', bg: 'bg-yellow-500', badgeClass: 'bg-yellow-100 text-yellow-800', label: 'Medio' };
+    if (r.includes('bajo')) return { pct: '25%', bg: 'bg-emerald-600', badgeClass: 'bg-emerald-100 text-emerald-800', label: 'Bajo' };
+    return { pct: '15%', bg: 'bg-slate-400', badgeClass: 'bg-slate-100 text-slate-700', label: 'Sin evaluar' };
+  }
+
+  function generarPathCurva(primerAno: number, totalEstudios: number, maxEstudios: number): string {
+    const pAno = Math.max(1965, Math.min(2026, primerAno || 1990));
+    const clampX = (ano: number) => Math.max(0, Math.min(400, ((ano - 1965) / (2026 - 1965)) * 400));
+    const clampY = (val: number) => Math.max(15, Math.min(115, 115 - (val / Math.max(maxEstudios, 1)) * 95));
+
+    const startX = clampX(pAno);
+    const endX = 400;
+    const endY = clampY(totalEstudios);
+
+    if (startX >= 390) return `M 0,115 L ${startX.toFixed(1)},115 L 400,${endY.toFixed(1)}`;
+
+    const midX1 = startX + (endX - startX) * 0.35;
+    const midY1 = clampY(totalEstudios * 0.25);
+    const midX2 = startX + (endX - startX) * 0.70;
+    const midY2 = clampY(totalEstudios * 0.70);
+
+    return `M 0,115 L ${startX.toFixed(1)},115 C ${midX1.toFixed(1)},${midY1.toFixed(1)} ${midX2.toFixed(1)},${midY2.toFixed(1)} ${endX.toFixed(1)},${endY.toFixed(1)}`;
+  }
+
+  function generarSintesis(l1: any, l2: any): string {
+    const riesgoPart = (l1.riesgo === l2.riesgo)
+      ? `Ambas lagunas registran nivel de amenaza ${l1.riesgo} en los inventarios oficiales.`
+      : `${l1.nombre} presenta nivel de riesgo ${l1.riesgo}, mientras que ${l2.nombre} se sitúa en riesgo ${l2.riesgo}.`;
+
+    const vol1 = Number(l1.volumen_hm3 || 0);
+    const vol2 = Number(l2.volumen_hm3 || 0);
+    let volPart = '';
+    if (vol1 > vol2 && vol2 > 0) {
+      volPart = `${l1.nombre} almacena ${(vol1 / vol2).toFixed(1)}x más volumen de agua (${vol1} hm³ frente a ${vol2} hm³).`;
+    } else if (vol2 > vol1 && vol1 > 0) {
+      volPart = `${l2.nombre} almacena ${(vol2 / vol1).toFixed(1)}x más volumen de agua (${vol2} hm³ frente a ${vol1} hm³).`;
+    } else {
+      volPart = `Capacidades hídricas registradas: ${l1.nombre} (${vol1} hm³) y ${l2.nombre} (${vol2} hm³).`;
+    }
+
+    const pob1 = l1.pueblos_lista?.filter(Boolean).join(', ') || 'Población de quebrada';
+    const pob2 = l2.pueblos_lista?.filter(Boolean).join(', ') || 'Población de quebrada';
+    const pobPart = `En afectación directa, el cono de deyección de ${l1.nombre} compromete a ${pob1}, mientras que ${l2.nombre} amenaza a ${pob2}.`;
+
+    return `${riesgoPart} ${volPart} ${pobPart}`;
+  }
+
+  async function actualizarComparacion() {
+    const id1 = compL1 ? compL1.value : 'palcacocha';
+    const id2 = compL2 ? compL2.value : 'paron';
+
+    try {
+      const data = await ApiService.getComparacion(id1, id2);
+      if (!data) return;
+
+      const l1 = data.laguna1;
+      const l2 = data.laguna2;
+
+      // 1. Nombres en encabezados
+      if (nameRiesgoL1) nameRiesgoL1.textContent = l1.nombre;
+      if (nameRiesgoL2) nameRiesgoL2.textContent = l2.nombre;
+      if (labelL1) labelL1.textContent = `${l1.nombre}:`;
+      if (labelL2) labelL2.textContent = `${l2.nombre}:`;
+      document.querySelectorAll('.nombre-l1').forEach((e) => (e.textContent = l1.nombre));
+      document.querySelectorAll('.nombre-l2').forEach((e) => (e.textContent = l2.nombre));
+
+      // 2. Nivel de Riesgo Oficial
+      const infoR1 = getRiesgoInfo(l1.riesgo);
+      const infoR2 = getRiesgoInfo(l2.riesgo);
+      if (badgeRiesgoL1) {
+        badgeRiesgoL1.className = `font-bold text-[11px] px-1.5 py-0.5 rounded ${infoR1.badgeClass}`;
+        badgeRiesgoL1.textContent = infoR1.label;
+      }
+      if (badgeRiesgoL2) {
+        badgeRiesgoL2.className = `font-bold text-[11px] px-1.5 py-0.5 rounded ${infoR2.badgeClass}`;
+        badgeRiesgoL2.textContent = infoR2.label;
+      }
+      if (barRiesgoL1) {
+        barRiesgoL1.style.width = infoR1.pct;
+        barRiesgoL1.className = `h-full transition-all duration-300 ${infoR1.bg}`;
+      }
+      if (barRiesgoL2) {
+        barRiesgoL2.style.width = infoR2.pct;
+        barRiesgoL2.className = `h-full transition-all duration-300 ${infoR2.bg}`;
+      }
+      if (txtRiesgoResumen) {
+        txtRiesgoResumen.textContent = (l1.riesgo === l2.riesgo)
+          ? `Ambas en riesgo ${l1.riesgo}`
+          : `${l1.riesgo} vs ${l2.riesgo}`;
+        txtRiesgoResumen.className = (l1.riesgo === 'Muy alto' || l2.riesgo === 'Muy alto')
+          ? 'font-bold text-[11px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200'
+          : 'font-bold text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
+      }
+
+      // 3. Volumen Almacenado
+      const v1 = Number(l1.volumen_hm3 || 0);
+      const v2 = Number(l2.volumen_hm3 || 0);
+      const maxVol = Math.max(v1, v2, 0.1);
+      if (valVolL1) valVolL1.textContent = `${v1.toFixed(1)} hm³`;
+      if (valVolL2) valVolL2.textContent = `${v2.toFixed(1)} hm³`;
+      if (barVolL1) barVolL1.style.width = `${Math.max(12, Math.round((v1 / maxVol) * 100))}%`;
+      if (barVolL2) barVolL2.style.width = `${Math.max(12, Math.round((v2 / maxVol) * 100))}%`;
+      if (txtVolDiff) {
+        if (v1 > v2 && v2 > 0) {
+          txtVolDiff.textContent = `${l1.nombre} almacena ${(v1 / v2).toFixed(1)}x más volumen`;
+        } else if (v2 > v1 && v1 > 0) {
+          txtVolDiff.textContent = `${l2.nombre} almacena ${(v2 / v1).toFixed(1)}x más volumen`;
+        } else {
+          txtVolDiff.textContent = 'Volúmenes de agua comparables';
+        }
+      }
+
+      // 4. Centros Poblados Amenazados
+      const c1 = Number(l1.pueblos_abajo_total || 0);
+      const c2 = Number(l2.pueblos_abajo_total || 0);
+      if (txtPobCantL1) txtPobCantL1.textContent = `${c1} ${c1 === 1 ? 'centro poblado' : 'centros poblados'}`;
+      if (txtPobCantL2) txtPobCantL2.textContent = `${c2} ${c2 === 1 ? 'centro poblado' : 'centros poblados'}`;
+      if (txtPobNombresL1) txtPobNombresL1.textContent = l1.pueblos_lista?.filter(Boolean).join(', ') || 'Sin población directa registrada';
+      if (txtPobNombresL2) txtPobNombresL2.textContent = l2.pueblos_lista?.filter(Boolean).join(', ') || 'Sin población directa registrada';
+
+      // 5. Altitud y Masa Glaciar
+      if (txtAltGlacL1) txtAltGlacL1.textContent = `${l1.altitud_msnm || 4400} m s.n.m. · ${l1.glaciar_origen || 'Glaciar de cabecera'}`;
+      if (txtAltGlacL2) txtAltGlacL2.textContent = `${l2.altitud_msnm || 4400} m s.n.m. · ${l2.glaciar_origen || 'Glaciar de cabecera'}`;
+
+      // 6. Obras de Mitigación
+      if (obrasL1) obrasL1.textContent = l1.obras || 'Sin obras físicas registradas en inventario';
+      if (obrasL2) obrasL2.textContent = l2.obras || 'Sin obras físicas registradas en inventario';
+
+      // 7. Veredicto y Síntesis Comparativa
+      if (txtVeredicto) {
+        txtVeredicto.textContent = generarSintesis(l1, l2);
+      }
+      if (txtEntidadesCount) {
+        const count = data.elementos_compartidos || 2;
+        txtEntidadesCount.textContent = `${count} coincidencias en el grafo`;
+      }
+
+      // 8. Curvas SVG Dinámicas de Estudios
+      const maxEstudios = Math.max(l1.total_estudios || 1, l2.total_estudios || 1, 25);
+      const path1 = generarPathCurva(l1.primer_estudio_ano, l1.total_estudios, maxEstudios);
+      const path2 = generarPathCurva(l2.primer_estudio_ano, l2.total_estudios, maxEstudios);
+
+      if (pathCurvaL1) pathCurvaL1.setAttribute('d', path1);
+      if (pathCurvaL2) pathCurvaL2.setAttribute('d', path2);
+
+      if (curvaTxtL1) curvaTxtL1.textContent = `${l1.nombre}: ${l1.total_estudios} estudios (primer registro en ${l1.primer_estudio_ano})`;
+      if (curvaTxtL2) curvaTxtL2.textContent = `${l2.nombre}: ${l2.total_estudios} estudios (primer registro en ${l2.primer_estudio_ano})`;
+
+      // 9. Red de relaciones dinámica
+      if (data.red_relaciones) {
+        ultimaRed = { nombres: [l1.nombre, l2.nombre], nodos: data.red_relaciones.nodos || [] };
+        pintarRed();
+      }
+
+      // 10. Resumen de texto de pie
+      if (txtCompartenResumen) {
+        const compartidos = (data.red_relaciones?.nodos || []).filter((n: any) => n.grupo === 'compartido');
+        if (compartidos.length > 0) {
+          const nombres = compartidos.map((c: any) => c.label).join(', ');
+          txtCompartenResumen.textContent = `Coincidencias en el grafo (${compartidos.length}): ${nombres}. Difieren en glaciar de origen y poblaciones expuestas.`;
+        } else {
+          txtCompartenResumen.textContent = `Sistemas hidrológicos independientes: pertenecen a distintas cuencas y cordilleras glaciares.`;
+        }
+      }
+
+    } catch (err) {
+      console.warn('Error al actualizar comparador:', err);
+    }
+  }
+
+  if (compL1) compL1.addEventListener('change', actualizarComparacion);
+  if (compL2) compL2.addEventListener('change', actualizarComparacion);
+
+  // Inicializar al cargar la página
+  actualizarComparacion();
+
+  // Poblar selectores de forma dinámica desde el catálogo del backend
+  ApiService.getCatalogo(120).then((data) => {
+    const catalogo = data?.lagunas;
+    if (Array.isArray(catalogo) && catalogo.length > 0 && compL1 && compL2) {
+      const val1 = compL1.value;
+      const val2 = compL2.value;
+
+      const optsHtml = catalogo.map((l: any) =>
+        `<option value="${esc(l.id)}">${esc(l.nombre)} (${esc(l.departamento)})</option>`
+      ).join('');
+
+      compL1.innerHTML = optsHtml;
+      compL2.innerHTML = optsHtml;
+
+      if (catalogo.some((l: any) => l.id.toLowerCase() === val1.toLowerCase())) {
+        compL1.value = val1;
+      } else {
+        compL1.value = catalogo[0].id;
+      }
+
+      if (catalogo.some((l: any) => l.id.toLowerCase() === val2.toLowerCase())) {
+        compL2.value = val2;
+      } else {
+        compL2.value = catalogo[1]?.id || catalogo[0].id;
+      }
+
+      actualizarComparacion();
+    }
+  }).catch(() => {});
+
+  const nombreDe = (sel: HTMLSelectElement | null, porDefecto: string) => sel ? sel.options[sel.selectedIndex].text.split('(')[0].trim() : porDefecto;
+  function contextoComparacion() {
+    fijarContexto({ seccion: 'Comparar', comparacion: [nombreDe(compL1, 'Palcacocha'), nombreDe(compL2, 'Parón')] }, true);
+  }
+  compL1?.addEventListener('change', contextoComparacion);
+  compL2?.addEventListener('change', contextoComparacion);
+  document.getElementById('comparar')?.addEventListener('pointerenter', contextoComparacion, { once: true });
+
+  btnExplicar?.addEventListener('click', () => {
+    const a = nombreDe(compL1, 'Palcacocha'), b = nombreDe(compL2, 'Parón');
+    abrirAsistente({ seccion: 'Comparar', comparacion: [a, b] }, `¿Cuál es más peligrosa, ${a} o ${b}, y por qué?`, true);
+  });
+  document.getElementById('btn-informe-comparacion')?.addEventListener('click', async () => {
+    const { generarInformeComparacion } = await import('../services/informePdf');
+    await generarInformeComparacion(compL1?.value || 'palcacocha', compL2?.value || 'paron');
+  });
+
+  // Pestañas accesibles (flechas izquierda/derecha)
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab-comp'));
+  function activar(t: HTMLButtonElement) {
+    tabs.forEach((x) => {
+      const sel = x === t;
+      x.setAttribute('aria-selected', String(sel));
+      x.tabIndex = sel ? 0 : -1;
+      x.className = `tab-comp flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition ${sel ? 'bg-noche-900 text-white shadow' : 'text-slate-600 hover:bg-slate-100'}`;
+      const panel = document.getElementById(x.getAttribute('aria-controls') || '');
+      if (panel) panel.hidden = !sel;
+    });
+    if (t.id === 'tab-relaciones') requestAnimationFrame(pintarRed);
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => activar(t));
+    t.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const sig = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      activar(sig); sig.focus();
+    });
+  });
+  if (tabs[0]) activar(tabs[0]);
+</script>

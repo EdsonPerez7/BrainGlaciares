@@ -1,0 +1,120 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+import Logo from './Logo.astro';
+
+const rutaActual = Astro.url.pathname;
+const ruta = rutaActual.replace(/\/$/, '') || '/';
+const esActivo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(href));
+---
+
+<header class="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+  <div class="w-full flex h-16 items-center justify-between gap-4 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+    <!-- Marca -->
+    <a href="/" class="flex items-center gap-2.5 rounded-lg" aria-label={`${SITE_CONFIG.name}, ir al inicio`}>
+      <Logo />
+      <span class="flex flex-col leading-tight">
+        <span class="font-marca text-xl tracking-[0.2em] text-noche-900">{SITE_CONFIG.name}</span>
+        <span class="text-[11px] text-slate-500 font-medium">{SITE_CONFIG.tagline}</span>
+      </span>
+    </a>
+
+    <!-- Navegación de escritorio -->
+    <nav aria-label="Principal" class="hidden lg:flex items-center gap-1 text-sm font-medium text-slate-600">
+      {SITE_CONFIG.navigation.map(item => (
+        <a
+          href={item.href}
+          aria-current={esActivo(item.href) ? 'page' : undefined}
+          class="rounded-lg px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:text-laguna-700 aria-[current=page]:bg-laguna-50"
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <!-- Estado del servidor: discreto, solo informa -->
+      <span
+        id="backend-status-pill"
+        role="status"
+        class="hidden md:inline-flex items-center gap-2 rounded-full border border-laguna-200 bg-laguna-50 px-3 py-1.5 text-xs font-medium text-laguna-900"
+      >
+        <span id="backend-status-dot" class="inline-block h-2 w-2 rounded-full bg-slate-300" aria-hidden="true"></span>
+        <span id="backend-status-subtext">Comprobando…</span>
+      </span>
+
+      <!-- Menú móvil -->
+      <button
+        id="btn-menu-movil"
+        type="button"
+        class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+        aria-controls="menu-movil"
+        aria-expanded="false"
+        aria-label="Abrir menú"
+      >
+        <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <nav id="menu-movil" aria-label="Principal (móvil)" class="lg:hidden hidden border-t border-slate-200 bg-white px-4 py-3">
+    <ul class="grid gap-1 text-sm font-medium text-slate-700">
+      {SITE_CONFIG.navigation.map(item => (
+        <li>
+          <a href={item.href} aria-current={esActivo(item.href) ? 'page' : undefined} class="block rounded-lg px-3 py-2.5 hover:bg-slate-100 aria-[current=page]:bg-laguna-50 aria-[current=page]:font-semibold aria-[current=page]:text-laguna-700">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<script>
+  import { ApiService } from '../services/api';
+
+  // Menú móvil
+  const btnMenu = document.getElementById('btn-menu-movil');
+  const menu = document.getElementById('menu-movil');
+  btnMenu?.addEventListener('click', () => {
+    const abierto = btnMenu.getAttribute('aria-expanded') === 'true';
+    btnMenu.setAttribute('aria-expanded', String(!abierto));
+    btnMenu.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+    menu?.classList.toggle('hidden', abierto);
+  });
+  menu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menu.classList.add('hidden');
+    btnMenu?.setAttribute('aria-expanded', 'false');
+  }));
+
+  // Estado del backend
+  async function verificarSaludBackend() {
+    const pill = document.getElementById('backend-status-pill');
+    const dot = document.getElementById('backend-status-dot');
+    const subtext = document.getElementById('backend-status-subtext');
+    if (!pill || !dot || !subtext) return;
+
+    const marcar = (enLinea: boolean, texto: string, detalle: string) => {
+      dot.className = `inline-block h-2 w-2 rounded-full ${enLinea ? 'bg-laguna-500' : 'bg-ocre-400'}`;
+      window.dispatchEvent(new CustomEvent('arqen:estado', { detail: { enLinea } }));
+      subtext.textContent = texto;
+      pill.title = detalle;
+    };
+
+    try {
+      const salud = await ApiService.getSalud();
+      if (salud && salud.estado === 'vivo') {
+        marcar(true, 'Asistente con IA', 'Servidor en línea: respuestas con IA y citas');
+      } else {
+        marcar(false, 'Asistente por reglas', 'Sin conexión al servidor: el asistente responde con reglas y datos oficiales locales');
+      }
+    } catch {
+      marcar(false, 'Asistente por reglas', 'Sin conexión al servidor: el asistente responde con reglas y datos oficiales locales');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', verificarSaludBackend);
+  } else {
+    verificarSaludBackend();
+  }
+</script>

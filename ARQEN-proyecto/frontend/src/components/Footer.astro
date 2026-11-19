@@ -1,0 +1,37 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+import Logo from './Logo.astro';
+---
+
+<footer class="w-full bg-noche-900 text-slate-300">
+  <div class="franja-tejida" aria-hidden="true"></div>
+  <div class="mx-auto grid w-full max-w-[1400px] gap-10 px-4 py-12 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr] lg:px-12">
+    <div>
+      <div class="flex items-center gap-3">
+        <Logo class="h-10 w-10" />
+        <span class="font-marca text-2xl tracking-[0.2em] text-white">{SITE_CONFIG.name}</span>
+      </div>
+      <p class="mt-4 max-w-md text-sm leading-relaxed text-slate-400">{SITE_CONFIG.description}</p>
+      <p class="mt-3 text-xs text-slate-500">{SITE_CONFIG.institution}</p>
+    </div>
+    <div>
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-ocre-400">Fuentes oficiales</h2>
+      <ul class="mt-3 space-y-2 text-sm">
+        <li>INAIGEM · 175 informes</li>
+        <li>ANA · 171 informes</li>
+        <li>SENAMHI · 52 informes</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-ocre-400">Ante una emergencia</h2>
+      <p class="mt-3 text-sm leading-relaxed text-slate-400">ARQEN es para investigar y prevenir; no emite alertas. Sigue siempre a INDECI y al COEN.</p>
+      <a href="tel:115" class="btn btn-marca btn-sm mt-4">Llamar al 115</a>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="mx-auto flex w-full max-w-[1400px] flex-col gap-2 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+      <p>© 2026 {SITE_CONFIG.name} · UNMSM · Grupo G8</p>
+      <p>Relieve 3D: Cesium ion · Mapas: Esri, OpenStreetMap · Tipografías bajo licencia OFL</p>
+    </div>
+  </div>
+</footer>

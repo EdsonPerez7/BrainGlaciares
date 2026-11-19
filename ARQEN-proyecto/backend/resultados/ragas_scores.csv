@@ -1,0 +1,363 @@
+id,user_input,response,faithfulness,answer_relevancy,llm_context_precision_without_reference
+P1,¿Cuántas lagunas de origen glaciar se formaron en la Cordillera Blanca según el inventario de 2023?,"**Hechos del grafo** (5 filas):
+- inventario: Inventario Blanca 2023 · dato: registraGlaciares · valor: 511 glaciares [1]
+- inventario: Inventario Blanca 2023 · dato: registraLagunas · valor: 850 lagunas [2]
+- inventario: Inventario Blanca 2023 · dato: registraLagunasNuevas · valor: 25 lagunas [3]
+- inventario: Inventario Blanca 2023 · dato: registraLagunasProglaciares · valor: 23 lagunas [4]
+- inventario: Inventario Blanca 2023 · dato: registraSuperficieGlaciar · valor: 424.86 km2 [5]
+
+**Fragmentos relacionados:**
+- Resultados del inventario de glaciares para el departamento de Pasco Resultados del inventario de lagunas de origen glaciar para el departamento de Pasco por detritos del departamento de Pasco, según cordillera en el dep… [6]
+- En el presente inventario se han registran do 8466 lagunas de origen glaciar, cuya superficie total corresponde a 1081.31 km2. Estas lagunas están distribuidas en las 20 cordilleras glaciares y 14 departa mentos del país… [7]
+- SANTA HUARI HUARMEY CASMA HUARAZ RECUAY BOLOGNESI OCROS HUAYLAS SIHUAS AIJA YUNGAY PALLASCA CORONGO CARHUAZ POMABAMBA ASUNCIÓN MARISCAL LUZURIAGA ANTONIO RAYMONDI CARLOS FERMIN FITZCARRALD CORDILLERA HUALLANCA CORDILLERA…",1.0,0.857,0.963
+P2,¿Qué lagunas glaciares de Áncash tienen riesgo muy alto de desborde?,"**Hechos del grafo** (5 filas):
+- laguna: Llaca · nivel: Muy alto · n_docs: 2 [1]
+- laguna: Cuchillacocha · nivel: Muy alto · n_docs: 1 [2]
+- laguna: Palcacocha · nivel: Muy alto · n_docs: 1 [3]
+- laguna: Parón · nivel: Muy alto · n_docs: 1 [4]
+- laguna: Tullparaju · nivel: Muy alto · n_docs: 1 [5]
+
+**Fragmentos relacionados:**
+- A nivel departamental se identificó que, de 14 departamentos con presencia de lagunas glaciares, 8 tienen lagunas con riesgo de desborde. Áncash cuenta con la mayor cantidad de estas lagunas, sumando 169, que equivalen a… [6]
+- Áncash concentra el mayor número de lagunas glaciares con riesgo de desborde, con un total de 169 lagunas. Estas se concentran en un 93 % a lo largo de la Cordillera Blanca, además, el 75 % se ubica en la vertiente del P… [7]
+- Se han identificado 528 lagunas glaciares con riesgo de desborde a nivel nacional. El departamento de Áncash concentra la mayor cantidad con 169, seguido de Lima con 96 y Cusco con 76. 58 lagunas de origen glaciar tienen… [8]
+- 53 Lagunas de origen glaciar con riesgo de desborde Lagunas de origen glaciar con riesgo de desborde 31 24 Lagunas de origen glaciar con riesgo de desborde 6 Lagunas de origen glaciar ",1.0,0.6021148751498974,0.94999999997625
+P3,¿Qué centros poblados están aguas abajo de lagunas con riesgo alto y qué estudios los evaluaron?,"**Hechos del grafo** (72 filas):
+- laguna: Gangrajanca · nivel: Muy alto · poblado: Queropalca · via: el texto lo dice · estudios: 20.500.12748/608 [1]
+- laguna: Cuchillacocha · nivel: Muy alto · poblado: Huaraz · via: el texto lo dice · estudios: 20.500.12543/2093, 20.500.12748/140, 20.500.12543/1687, 20.500.12748/137, 20.500.12543/2005, 20.500.12543/3906, 20.500.12543/4601, 20.500.12748/672, 20.500.125… [2]
+- laguna: Palcacocha · nivel: Muy alto · poblado: Huaraz · via: el texto lo dice · estudios: 20.500.12543/2432, 20.500.12748/247, 20.500.12748/266, 20.500.12543/2093, 20.500.12748/612, 20.500.12543/3230, 20.500.12748/619, 20.500.12543/2081, 20.500.1274… [3]
+- laguna: Palcacocha · nivel: Muy alto · poblado: Huaraz · via: misma subcuenca · subcuenca: Quillcay · estudios: 20.500.12543/2432, 20.500.12748/247, 20.500.12748/266, 20.500.12543/2093, 20.500.12748/612, 20.500.12543/3230, 20.500.12748/619, 20.500.12543/2081, 20.500.1274… [4]
+- laguna: Parón · nivel: Muy alto · poblado: Musho · via: misma subcuenca · subcuenca: Ulta · estudios: 20.500.12748/551 [5]
+- laguna: Salkantaycocha · nivel: Alto · poblado: Santa Teresa · via: misma subcuenca · subcuenca: Salkantay · estudios: 20.5",0.889,0.721,0.853
+P4,"¿Qué lagunas tuvieron eventos de desborde, de qué glaciar provienen y qué poblados afectaron?","**Hechos del grafo** (82 filas):
+- evento: Deslizamiento Tambillo 1870 · anio: 1870 · laguna: Tambillo · poblados_afectados: Ancash, Rampac Chico, Macashca, Carhuaz, Huaraz [1]
+- evento: Aluvión Tambillo 1883 · anio: 1883 · laguna: Tambillo · poblados_afectados: Ancash, Rampac Chico, Macashca, Carhuaz, Huaraz [2]
+- evento: Avalancha Solterococha 1917 · anio: 1917 · laguna: Solterococha · poblados_afectados: Ranrahirca, Huari, Carhuaz, Yungay, Huaraz [3]
+- evento: Avalancha Palcacocha 1932 · anio: 1932 · laguna: Palcacocha · glaciar_origen: Randolph, Ranrapalca, Pucaranra, Palcaraju · poblados_afectados: Huaraz · victimas: 4,000 [4]
+- evento: Aluvión Artesa 1938 · anio: 1938 · laguna: Artesa [5]
+- evento: Aluvión Pakliashcocha 1938 · anio: 1938 · laguna: Pakliashcocha [6]
+- evento: Aluvión Arteza 1938 · anio: 1938 · laguna: Arteza · poblados_afectados: Carhuaz [7]
+- evento: Aluvión Paleolake Jircacocha 1941 · anio: 1941 · laguna: Paleolake Jircacocha [8]
+- evento: Aluvión Jircacocha 1941 · anio: 1941 · laguna: Jircacocha [9]
+- evento: Aluvión Artesoncocha 1941 · anio: 1941 · laguna: Artesoncocha [10]
+- evento: Aluvión Palcacocha 1941 · anio: 1941 · laguna: Palcacocha · glaciar_orige",0.938,0.8199223304213308,0.99999999995
+P5,¿Qué glaciares con retroceso medido (balance de masa) alimentan lagunas que hoy están en riesgo?,"**Hechos del grafo** (16 filas):
+- glaciar: Ausangate · retroceso: retroceso reportado · laguna: Upiscocha · nivel: Alto [1]
+- glaciar: Llaca · retroceso: retroceso reportado · laguna: Llaca · nivel: Muy alto [2]
+- glaciar: Palcaraju · retroceso: retroceso reportado · laguna: Pacliashcocha · nivel: Alto [3]
+- glaciar: Pucaranra · retroceso: retroceso reportado · laguna: Palcacocha · nivel: Muy alto [4]
+- glaciar: Ranrapalca · retroceso: retroceso reportado · laguna: Palcacocha · nivel: Muy alto [5]
+- glaciar: Sarapo · retroceso: retroceso reportado · laguna: Quesillococha · nivel: Muy alto [6]
+- glaciar: Vallunaraju · retroceso: retroceso reportado · laguna: Artizón · nivel: Alto [7]
+- glaciar: Palcaraju · retroceso: medido (balance de masa) · laguna: Palcacocha · nivel: Muy alto [8]
+- glaciar: Huantsan · retroceso: en documento con balance de masa · laguna: Rajucolta · nivel: Alto [9]
+- glaciar: Llaca 1 · retroceso: en documento con balance de masa · laguna: Llaca · nivel: Muy alto [10]
+- glaciar: Pucajirca · retroceso: en documento con balance de masa · laguna: Taullicocha · nivel: Muy alto [11]
+- glaciar: Pucaranra · retroceso: en documento con balance de masa · laguna: Pacliash",0.941,0.79,0.86
+P6,¿Qué métodos de monitoreo se aplicaron a lagunas en riesgo y qué institución realizó cada estudio?,"**Hechos del grafo** (37 filas):
+- laguna: Artizón · metodo: Batimetría · instituciones_en_texto: Unidad de Glaciología · institucion_del_documento: INAIGEM [1]
+- laguna: Artizón · metodo: Fotogrametría · instituciones_en_texto: Unidad de Glaciología · institucion_del_documento: INAIGEM [2]
+- laguna: Cuchillacocha · metodo: Batimetría · instituciones_en_texto: Autoridad Administrativa del Agua, ANA · institucion_del_documento: ANA [3]
+- laguna: Cuchillacocha · metodo: Limnígrafo / limnímetro · instituciones_en_texto: Autoridad Administrativa del Agua, ANA · institucion_del_documento: ANA [4]
+- laguna: Gangrajanca · metodo: Batimetría · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [5]
+- laguna: Gangrajanca · metodo: Dron (UAV) · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [6]
+- laguna: Gangrajanca · metodo: Fotogrametría · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [7]
+- laguna: Gangrajanca · metodo: Modelamiento d",0.9,0.68,0.75
+P7,¿En qué subcuencas coinciden lagunas en riesgo y contaminación por drenaje ácido de roca?,"**Hechos del grafo** (18 filas):
+- subcuenca: Accrigua · lagunas_en_riesgo: Palcacocha · con_drenaje_acido: Palcacocha · documentos: 20.500.12748/140 · evidencias: Para ello, bajo la lógica de una cadena de procesos, se simula una avalancha que cae sobre la laguna de Palcacocha y que da origen a una ola cuyas característi… [1]
+- subcuenca: Casca · lagunas_en_riesgo: Llaca · con_drenaje_acido: Llaca, Subdirección · documentos: 20.500.12748/664, 20.500.12748/667 · evidencias: El único punto con pH dentro del ECA para agua, categoría 4-E2 fue LLAC-04, es el correspondiente a la descarga natural de la laguna Llaca, lo que indica que e… [2]
+- subcuenca: Cojup · lagunas_en_riesgo: Palcacocha, Tullparaju, Cuchillacocha · con_drenaje_acido: Palcacocha · documentos: 20.500.12748/663 · evidencias: Esta situación contrasta con otros sectores de la subcuenca del río Quillcay, donde operan piscigranjas que utilizan aguas del río Paria, provenientes de la mi… [3]
+- subcuenca: Cojup valley · lagunas_en_riesgo: Palcacocha · con_drenaje_acido: Palcacocha · documentos: 20.500.12748/140 · evidencias: Para ello, bajo la lógica de una cadena de procesos, se simula una avalancha que cae sobre la laguna ",0.833,0.731,0.941
+P8,¿Qué bofedales están en subcuencas con glaciares en retroceso y qué servicios ecosistémicos brindan?,"**Hechos del grafo** (5 filas):
+- bofedal: Cara · subcuenca: Negrohuaycco · en_retroceso: Coropuna · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [1]
+- bofedal: Cara Cara · subcuenca: Negrohuaycco · en_retroceso: Coropuna · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [2]
+- bofedal: Muysiniga · subcuenca: Negrohuaycco · en_retroceso: Coropuna · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [3]
+- bofedal: Cátac · subcuenca: Pachacoto · en_retroceso: Pastoruri, Pachacoto · servicios_de_los_bofedales: Regulación hídrica, Almacenamiento de carbono, Forraje y pastoreo, Hábitat y biodiversidad, Provisión de agua [4]
+- bofedal: Cochapampa · subcuenca: Quillcayhuanca · en_retroceso: Quillcayhuanca · servicios_del_bofedal: Regulación hídrica · servicios_de_los_bofedales: Regulación hídric",0.58,0.62,0.50
+P9,¿Cómo cambió la superficie glaciar de una cordillera entre los inventarios de 2018 y 2023?,"**Hechos del grafo** (19 filas):
+- anio: 1955 · km2: 726.26 · confianza: 0.85 [1]
+- anio: 1970 · km2: 723.37 · confianza: 0.8 [2]
+- anio: 1975 · km2: 726.26 · confianza: 0.8 [3]
+- anio: 1989 · anio_imagenes: 1962 · km2: 723.37 · confianza: 1 [4]
+- anio: 1997 · km2: 611.48 · confianza: 0.8 [5]
+- anio: 2006 · km2: 25 · confianza: 0.75 [6]
+- anio: 2012 · km2: 527.62 · confianza: 0.75 [7]
+- anio: 2012 · km2: 195.75 · confianza: 0.75 [8]
+- anio: 2014 · km2: 527.62 · confianza: 0.8 [9]
+- anio: 2014 · km2: 57.63 · confianza: 0.8 [10]
+- anio: 2014 · km2: 527.62 · confianza: 0.8 [11]
+- anio: 2014 · km2: 723.37 · confianza: 0.8 [12]
+- anio: 2016 · km2: 448.81 · confianza: 0.99 [13]
+- anio: 2016 · km2: 425.84 · confianza: 0.8 [14]
+- anio: 2016 · km2: 22.97 · confianza: 0.8 [15]
+- anio: 2018 · anio_imagenes: 2016 · km2: 449.75 · confianza: 1 [16]
+- anio: 2019 · km2: 38.72 · confianza: 0.8 [17]
+- anio: 2019 · km2: 1523 · confianza: 0.8 [18]
+- anio: 2023 · anio_imagenes: 2020 · km2: 424.86 · confianza: 1 [19]
+
+**Fragmentos relacionados:**
+- Libre de detritos y escombros Cubierto Cordillera Vilcanota. 495.05 375.75 279.40 255.44 119.30 215.65 239.61 0 100 200 300 400 500 600 1962 1997 2009 2016 A",0.957,0.68,0.793
+P10,"¿Qué lagunas en riesgo cuentan con obras de seguridad, en qué estado están y qué poblados protegen?","**Hechos del grafo** (66 filas):
+- laguna: Artizón · nivel: Alto · obra: Canal de desagüe · estado: Colapsada [1]
+- laguna: Artizón · nivel: Alto · obra: Dique · estado: Colapsada [2]
+- laguna: Artizón · nivel: Alto · obra: Obras de seguridad · estado: Deteriorada, Colapsada [3]
+- laguna: Artizón · nivel: Alto · obra: Presa · estado: Colapsada [4]
+- laguna: Chaclan · nivel: Muy alto · obra: Dique [5]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Dique · estado: Deteriorada · poblados_protegidos: Huaraz [6]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Obras de seguridad · estado: Deteriorada · poblados_protegidos: Huaraz [7]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Presa · poblados_protegidos: Huaraz [8]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Sistema de alerta temprana · estado: Operativa · poblados_protegidos: Huaraz [9]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Dique · estado: Deteriorada, Colapsada · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [10]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Presa · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [11]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Sis",0.944,0.5449343063304987,0.792
+D1,¿Por qué la laguna Palcacocha es peligrosa?,"**Hechos del grafo** (60 filas):
+- Palcacocha —ubicadaEn→ Blanca (Cordillera) · en 31 documento(s) [1]
+- Aluvión Palcacocha 1941 —ocurrioEn→ Palcacocha (Evento) · en 21 documento(s) [2]
+- Palcacocha —tieneObraSeguridad→ Dique (ObraSeguridad) · en 19 documento(s) [3]
+- INAIGEM —intervieneEn→ Palcacocha (Institucion) · en 17 documento(s) [4]
+- Palcacocha —ubicadaEn→ Áncash (Departamento) · en 15 documento(s) [5]
+- Palcacocha —tieneObraSeguridad→ Obras de seguridad (ObraSeguridad) · en 13 documento(s) [6]
+- Palcacocha —amenazaA→ Huaraz (CentroPoblado) · en 13 documento(s) [7]
+- Palcacocha —ubicadaEn→ Quillcay (Cuenca) · en 13 documento(s) [8]
+- Palcacocha —ubicadaEn→ Cojup (Cuenca) · en 12 documento(s) [9]
+- Palcacocha —monitoreadoCon→ Estación meteorológica (MetodoMonitoreo) · en 11 documento(s) [10]
+- Palcacocha —monitoreadoCon→ Batimetría (MetodoMonitoreo) · en 8 documento(s) [11]
+- Palcacocha —ubicadaEn→ Huaraz (Provincia) · en 8 documento(s) [12]
+- Palcacocha —presentaFenomeno→ Retroceso glaciar (Fenomeno) · en 7 documento(s) [13]
+- Palcacocha —alimentadaPor→ Palcaraju (Glaciar) · en 6 documento(s) [14]
+- Palcacocha —tieneObraSeguridad→ Sistema de alerta temprana (ObraSeguridad) ",1.0,0.9401880697368414,0.999999999975
+D2,¿Qué factores explican el balance de masa y energía de los glaciares peruanos?,"
+**Fragmentos relacionados:**
+- Los glaciares tropicales, altamente sensibles a las variaciones climáticas, son indicadores clave del calentamiento global. La Cordillera Blanca, con la mayor concentración de glaciares tropicales del mundo, enfrenta un … [1]
+- Los glaciares en los Andes peruanos juegan un papel importante para la hidrología local. Para explicar el retroceso acelerado de los glaciares peruanos, es importante primero conocer las principales variables atmosférica… [2]
+- Palabras clave: Paleoglaciares, morrenas, PEH, ELA M ODELAMIENTO 1 * , Jorge Arigony 2 3 4 , Wolfgang 5 6 7 1 2 3 - - - 4 - 5 6 7Área de Evolución de Glaciares y Lagunas, Autoridad Nacional del Agua, Lima, Perú Los glaci… [3]
+- Investigaciones recientes llevadas a cabo en diferentes glaciares tropicales del mundo, han evidenciado un significativo incremento en las concentraciones de carbono negro (CN), llegando a alcanzar hasta un 270 % en comp… [4]",1.0,0.895,0.773
+D3,¿Qué ocurrió en el aluvión de Huaraz de 1941?,"**Hechos del grafo** (60 filas):
+- Huaraz —ubicadaEn→ Independencia (Distrito) · en 18 documento(s) [1]
+- Aluvión Palcacocha 1941 —afectoA→ Huaraz (Evento) · en 14 documento(s) [2]
+- Aluvión 1941 —afectoA→ Huaraz (Evento) · en 14 documento(s) [3]
+- Huaraz —ubicadaEn→ Quillcay (Cuenca) · en 13 documento(s) [4]
+- Palcacocha —amenazaA→ Huaraz (Laguna) · en 13 documento(s) [5]
+- Huaraz —ubicadaEn→ Cojup (Quebrada) · en 11 documento(s) [6]
+- Huaraz —ubicadaEn→ Santa (Quebrada) · en 11 documento(s) [7]
+- Huaraz —ubicadaEn→ Quillcayhuanca (Quebrada) · en 8 documento(s) [8]
+- Huaraz —ubicadaEn→ Llaca (Quebrada) · en 7 documento(s) [9]
+- Huaraz —ubicadaEn→ Olleros (Distrito) · en 6 documento(s) [10]
+- INAIGEM —relacionadoCon→ Huaraz (Institucion) · en 6 documento(s) [11]
+- Huaraz —ubicadaEn→ Cátac (Distrito) · en 4 documento(s) [12]
+- Huaraz —ubicadaEn→ Casca (Cuenca) · en 3 documento(s) [13]
+- Huaraz —ubicadaEn→ Ishinca (Quebrada) · en 2 documento(s) [14]
+- Huaraz —ubicadaEn→ Taricá (Distrito) · en 2 documento(s) [15]
+- Huaraz —ubicadaEn→ Pachacoto (Cuenca) · en 2 documento(s) [16]
+- Huaraz —ubicadaEn→ Huanchay (Cuenca) · en 2 documento(s) [17]
+- Huaraz —ubicadaEn→ Libertad (Distrito) · en",0.8461538461538461,0.9055369866983205,0.999999999975
+D4,¿Cuántas lagunas con riesgo muy alto de desborde hay en cada departamento?,"**Hechos del grafo** (2 filas):
+- departamento: Áncash · lagunas_en_riesgo: 5 · lagunas: Palcacocha, Parón, Tullparaju, Llaca, Cuchillacocha [1]
+- departamento: Huánuco · lagunas_en_riesgo: 3 · lagunas: Gangrajanca, Quesillococha, Chaclan [2]
+
+**Fragmentos relacionados:**
+- Pasco tiene 24 lagunas glaciares con riesgo de desborde, las cuales se concentran en tres sectores. Dos tercios se encuentran en la cordillera Huagoruncho, al norte de la provincia de Pasco; en este sector se ubica la la… [3]
+- El departamento de Junín registra 53 lagunas glaciares con riesgo de desborde, ubicadas en 4 cordilleras en el límite oeste y la zona central del departamento (ver Figura 53). Casi la mitad se concentra en la cordillera … [4]
+- El riesgo aceptable es el riesgo bajo y el riesgo no aceptable es el riesgo alto. A medida que los glaciares sufren modificaciones con el cambio global, también hay un cambio en las condiciones de desborde de las lagunas… [5]
+- Se han identificado 528 lagunas glaciares con riesgo de desborde a nivel nacional. El departamento de Áncash concentra la mayor cantidad con 169, seguido de Lima con 96 y Cusco con 76. 58 lagunas de origen glaciar tienen… [6]",1.0,0.789,0.875
+D5,¿Quién ganó el Mundial de fútbol 2022?,No encontré esa información en el grafo ni en los documentos del corpus.,0.0,0.23228243784508915,0.0
+G1,¿Qué lagunas en riesgo alto o muy alto no tienen obras de seguridad registradas?,"**Hechos del grafo** (6 filas):
+- laguna: A-10 · nivel: Alto · departamentos: Cusco [1]
+- laguna: A-40 · nivel: Alto [2]
+- laguna: A10 · nivel: Alto [3]
+- laguna: A40 · nivel: Alto [4]
+- laguna: Ananta · nivel: Alto · departamentos: Puno [5]
+- laguna: Ananta Cucho · nivel: Alto · departamentos: Puno [6]
+
+**Fragmentos relacionados:**
+- Las ciudades de Huaraz y Huancayo se encuentran expuestas a un riesgo muy alto ante posibles aluviones por el desborde de lagunas glaciares. La metodología aplicada ha permitido realizar, por primera vez, una evaluación … [7]
+- Riesgos asociados a glaciares En 2018, se han efectuado estudios de evaluación de riesgo por aluvión de tres subcuencas de origen glaciar para tomar medidas de prevención en el marco del Sistema Nacional de la Gestión de… [8]
+- Se han identificado 32 lagunas glaciares con riesgo de desborde en el departamento de Huánuco, una de las cuales se encuentra compartida con Lima. Todas se concentran en el extremo suroeste del departamento, en la provin… [9]
+- El retroceso acelerado de glaciares debido al cambio climático ha originado la formación de lagunas nuevas con alto nivel de amenaza física. Las nuevas lagunas, de acuerdo con su ",0.64,0.55,0.52
+G2,¿Qué cordillera tiene más lagunas en riesgo?,"**Hechos del grafo** (13 filas):
+- cordillera: Oriental · lagunas_en_riesgo: 13 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, A-10, Yanaraju, Ananta, Lecma [1]
+- cordillera: Huagoruncho · lagunas_en_riesgo: 11 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, Yanaraju, Lecma [2]
+- cordillera: Blanca · lagunas_en_riesgo: 10 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, Yanaraju [3]
+- cordillera: Occidental · lagunas_en_riesgo: 10 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, Yanaraju [4]
+- cordillera: Ampato · lagunas_en_riesgo: 10 · lagunas: Palcacocha, Upiscocha, Parón, Artizón, Tullparaju, Llaca, Rajucolta, Cuchillacocha, Pacliashcocha, Yanaraju [5]
+- cordillera: Huayhuash · lagunas_en_riesgo: 4 · lagunas: Parón, Tullparaju, Gangrajanca, Quesillococha [6]
+- cordillera: Vilcanota · lagunas_en_riesgo: 3 · lagunas: Upiscocha, A-10, Ananta [7]
+- cordillera: Shacsha · lagunas_en_riesgo: 2 · lagunas: Palcacocha, Artizón [8]
+- cordillera: ",0.929,0.68,0.951
+G3,¿Cómo se relaciona el nevado Huascarán con Yungay?,"**Hechos del grafo** (2 filas):
+- Paso 1: Huascarán —ubicadaEn→ Ranrahirca [1]
+- Paso 2: Ranrahirca —ubicadaEn→ Yungay [2]
+
+**Fragmentos relacionados:**
+- Ante el fenómeno natural (avalancha de hielo y nieve) ocurrido el día martes 20 de junio de 2023 en el pico norte del sistema de montañas Huascarán (comúnmente denominado Nevado Huascarán), se ha visto por conveniente an… [3]
+- La altitud registrada en la cumbre sur del Nevado Huascarán fue de 6756.697 m., las coordenadas y elevaciones se muestran en la tabla siguiente: PUNTO COORD. NORTE (UTM) COORS. ESTE (UTM) ELEVACIÓN (M) BASE YUNGAY 898858… [4]
+- Nev. Huascarán Ubicación dentro un Área Natural Protegida (ANP) La Nevado Huascarán, se encuentran dentro del Área Natural Protegida (ANP) denominado “Parque Nacional Huascarán”. Rutas de Acceso: Para llegar a la Nevado … [5]
+- DEPARTAMENTO PROVJNCJA DISTRUO LUGAR EJECUTOR : ANCASH : YUNGAY : YUNGAY : LLANGANUCO HUARAZ, OCTU·BRE DEL 2001 ¡21 --- • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •… [6]",1.0,0.788,0.807
+P11,¿Qué lagunas glaciares en riesgo existen en el departamento de Huánuco y qué poblados amenazan?,"**Hechos del grafo** (3 filas):
+- laguna: Chaclan · nivel: Muy alto · n_docs: 1 [1]
+- laguna: Gangrajanca · nivel: Muy alto · n_docs: 1 [2]
+- laguna: Quesillococha · nivel: Muy alto · n_docs: 1 [3]
+
+**Fragmentos relacionados:**
+- Se han identificado 32 lagunas glaciares con riesgo de desborde en el departamento de Huánuco, una de las cuales se encuentra compartida con Lima. Todas se concentran en el extremo suroeste del departamento, en la provin… [4]
+- A nivel departamental se identificó que, de 14 departamentos con presencia de lagunas glaciares, 8 tienen lagunas con riesgo de desborde. Áncash cuenta con la mayor cantidad de estas lagunas, sumando 169, que equivalen a… [5]
+- 53 Lagunas de origen glaciar con riesgo de desborde Lagunas de origen glaciar con riesgo de desborde 31 24 Lagunas de origen glaciar con riesgo de desborde 6 Lagunas de origen glaciar con riesgo de desborde DEPARTAMENTO … [6]
+- 111 8. Los niveles del riesgo por aluvión determinados tanto para viviendas como para estructuras, corresponden a que, el 84.10% (1502) viviendas poseen riesgo muy alto, 14.11% (252) viviendas poseen riesgo alto, 1.29% (… [7]",1.0,0.874,1.0
+P12,¿Qué lagunas glaciares de Cusco o la Cordillera Vilcanota presentan riesgo alto de desborde?,"**Hechos del grafo** (60 filas):
+- Quelccaya —ubicadaEn→ Vilcanota (Glaciar) · en 7 documento(s) [1]
+- Upiscocha —ubicadaEn→ Cusco (Laguna) · en 7 documento(s) [2]
+- Canchis —ubicadaEn→ Cusco (Provincia) · en 7 documento(s) [3]
+- Convención —ubicadaEn→ Cusco (Provincia) · en 7 documento(s) [4]
+- Urubamba —ubicadaEn→ Cusco (Provincia) · en 6 documento(s) [5]
+- Vilcanota —presentaFenomeno→ Retroceso glaciar (Fenomeno) · en 5 documento(s) [6]
+- Quisoquipina —ubicadaEn→ Vilcanota (Glaciar) · en 5 documento(s) [7]
+- Vilcanota —presentaFenomeno→ Cambio climático (Fenomeno) · en 5 documento(s) [8]
+- Santa Teresa —ubicadaEn→ Cusco (Distrito) · en 5 documento(s) [9]
+- Suyuparina —ubicadaEn→ Vilcanota (Glaciar) · en 4 documento(s) [10]
+- Cusco —presentaFenomeno→ Cambio climático (Fenomeno) · en 4 documento(s) [11]
+- Pitumarca —ubicadaEn→ Cusco (Distrito) · en 4 documento(s) [12]
+- Ananta —ubicadaEn→ Vilcanota (Glaciar) · en 4 documento(s) [13]
+- Urubamba —ubicadaEn→ Cusco (Cuenca) · en 4 documento(s) [14]
+- Vilcanota —ubicadaEn→ Vilcanota (Glaciar) · en 4 documento(s) [15]
+- Ausangate —ubicadaEn→ Vilcanota (Nevado) · en 4 documento(s) [16]
+- Cusco —ubicadaEn→ Cusco (Provincia) · en 4 documen",0.955,0.68,0.867
+P13,¿Qué estudios de batimetría o volumen almacenado se han realizado en la laguna Palcacocha?,"**Hechos del grafo** (60 filas):
+- Palcacocha —ubicadaEn→ Blanca (Cordillera) · en 31 documento(s) [1]
+- Aluvión Palcacocha 1941 —ocurrioEn→ Palcacocha (Evento) · en 21 documento(s) [2]
+- Palcacocha —tieneObraSeguridad→ Dique (ObraSeguridad) · en 19 documento(s) [3]
+- INAIGEM —intervieneEn→ Palcacocha (Institucion) · en 17 documento(s) [4]
+- Palcacocha —ubicadaEn→ Áncash (Departamento) · en 15 documento(s) [5]
+- Palcacocha —tieneObraSeguridad→ Obras de seguridad (ObraSeguridad) · en 13 documento(s) [6]
+- Palcacocha —amenazaA→ Huaraz (CentroPoblado) · en 13 documento(s) [7]
+- Palcacocha —ubicadaEn→ Quillcay (Cuenca) · en 13 documento(s) [8]
+- Palcacocha —ubicadaEn→ Cojup (Cuenca) · en 12 documento(s) [9]
+- Palcacocha —monitoreadoCon→ Estación meteorológica (MetodoMonitoreo) · en 11 documento(s) [10]
+- Palcacocha —monitoreadoCon→ Batimetría (MetodoMonitoreo) · en 8 documento(s) [11]
+- Palcacocha —ubicadaEn→ Huaraz (Provincia) · en 8 documento(s) [12]
+- Palcacocha —presentaFenomeno→ Retroceso glaciar (Fenomeno) · en 7 documento(s) [13]
+- Palcacocha —alimentadaPor→ Palcaraju (Glaciar) · en 6 documento(s) [14]
+- Palcacocha —tieneObraSeguridad→ Sistema de alerta temprana (ObraSeguridad) ",0.952,0.781,0.833
+P14,¿Cuál es la superficie y el volumen registrado de la laguna Parón y qué sistema de descarga posee?,"**Hechos del grafo** (60 filas):
+- Parón —tieneObraSeguridad→ Dique (ObraSeguridad) · en 8 documento(s) [1]
+- Parón —ubicadaEn→ Blanca (Cordillera) · en 8 documento(s) [2]
+- Parón —ubicadaEn→ Áncash (Departamento) · en 7 documento(s) [3]
+- Parón —tieneObraSeguridad→ Túnel de desagüe (ObraSeguridad) · en 5 documento(s) [4]
+- Parón —tieneAltitud→ tieneAltitud 4 185 m s.n.m. (Medicion) · en 4 documento(s) [5]
+- Parón —ubicadaEn→ Huaylas (Provincia) · en 4 documento(s) [6]
+- ANA —intervieneEn→ Parón (Institucion) · en 4 documento(s) [7]
+- Unidad de Glaciología —intervieneEn→ Parón (Institucion) · en 4 documento(s) [8]
+- Parón —amenazaA→ Caraz (CentroPoblado) · en 3 documento(s) [9]
+- Parón —ubicadaEn→ Parón (Cuenca) · en 3 documento(s) [10]
+- Parón —relacionadoCon→ Túnel de desagüe (ObraSeguridad) · en 3 documento(s) [11]
+- Parón —relacionadoCon→ Dique (ObraSeguridad) · en 3 documento(s) [12]
+- Parón —ubicadaEn→ Llullán (Quebrada) · en 3 documento(s) [13]
+- Parón —tieneAltitud→ tieneAltitud 4 190 m s.n.m. (Medicion) · en 3 documento(s) [14]
+- Parón —tieneAltitud→ tieneAltitud 4 200 m s.n.m. (Medicion) · en 2 documento(s) [15]
+- Parón —ubicadaEn→ Caraz (Distrito) · en 2 documento(s) [16",0.955,0.68,0.812
+P15,¿Qué ocurrió en la laguna 513 en el año 2010 y qué obras de seguridad protegieron a Carhuaz?,"**Hechos del grafo** (66 filas):
+- laguna: Artizón · nivel: Alto · obra: Canal de desagüe · estado: Colapsada [1]
+- laguna: Artizón · nivel: Alto · obra: Dique · estado: Colapsada [2]
+- laguna: Artizón · nivel: Alto · obra: Obras de seguridad · estado: Deteriorada, Colapsada [3]
+- laguna: Artizón · nivel: Alto · obra: Presa · estado: Colapsada [4]
+- laguna: Chaclan · nivel: Muy alto · obra: Dique [5]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Dique · estado: Deteriorada · poblados_protegidos: Huaraz [6]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Obras de seguridad · estado: Deteriorada · poblados_protegidos: Huaraz [7]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Presa · poblados_protegidos: Huaraz [8]
+- laguna: Cuchillacocha · nivel: Muy alto · obra: Sistema de alerta temprana · estado: Operativa · poblados_protegidos: Huaraz [9]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Dique · estado: Deteriorada, Colapsada · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [10]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Presa · poblados_protegidos: Concepción, Jesús y Baños, Baños, Queropalca [11]
+- laguna: Gangrajanca · nivel: Muy alto · obra: Sis",0.944,0.689,0.804
+D6,¿Qué es un GLOF (desborde violento de laguna glaciar) y qué factores lo desencadenan en los Andes?,"**Hechos del grafo** (18 filas):
+- Glof —ubicadaEn→ Blanca (Cordillera) · en 2 documento(s) [1]
+- Aluvión Glof 1941 —ocurrioEn→ Glof (Evento) · en 2 documento(s) [2]
+- Glof —ubicadaEn→ Cancahuapampa (Quebrada) · en 1 documento(s) [3]
+- Glof —ubicadaEn→ Real (Cordillera) · en 1 documento(s) [4]
+- Glof —monitoreadoCon→ InSAR / DInSAR (MetodoMonitoreo) · en 1 documento(s) [5]
+- Glof —ubicadaEn→ Arkhata (Cuenca) · en 1 documento(s) [6]
+- Glof —monitoreadoCon→ Modelamiento de flujo (HEC-RAS / FLO-2D / RAMMS) (MetodoMonitoreo) · en 1 documento(s) [7]
+- Glof —monitoreadoCon→ Teledetección (MetodoMonitoreo) · en 1 documento(s) [8]
+- Glof —relacionadoCon→ Kedarnath (CentroPoblado) · en 1 documento(s) [9]
+- Glof —relacionadoCon→ Caraz (CentroPoblado) · en 1 documento(s) [10]
+- Aluvión Glof 2025 —ocurrioEn→ Glof (Evento) · en 1 documento(s) [11]
+- Aluvión Glof 2013 —ocurrioEn→ Glof (Evento) · en 1 documento(s) [12]
+- Aluvión Glof 2020 —ocurrioEn→ Glof (Evento) · en 1 documento(s) [13]
+- Universidad Mayor de San Andre ́s —relacionadoCon→ Glof (Institucion) · en 1 documento(s) [14]
+- Real —relacionadoCon→ Glof (Cordillera) · en 1 documento(s) [15]
+- Arkhata —relacionadoCon→ Glof (Rio) · en 1 do",0.95,0.68,0.862
+D7,¿Qué sucedió en el aluvión de Chavín de Huántar de 1945 y qué laguna lo originó?,"**Hechos del grafo** (23 filas):
+- Huántar —relacionadoCon→ Huari (CentroPoblado) · en 2 documento(s) [1]
+- San —ubicadaEn→ Huántar (Nevado) · en 2 documento(s) [2]
+- Tumarina —ubicadaEn→ Huántar (Laguna) · en 2 documento(s) [3]
+- Chavín —ubicadaEn→ Huaraz (Distrito) · en 1 documento(s) [4]
+- Chavín —ubicadaEn→ Huancano (Distrito) · en 1 documento(s) [5]
+- Chavín —ubicadaEn→ Mosna (Rio) · en 1 documento(s) [6]
+- Chavín —ubicadaEn→ Quillcay (Cuenca) · en 1 documento(s) [7]
+- Chavín —ubicadaEn→ Santa (Cuenca) · en 1 documento(s) [8]
+- Chavín —ubicadaEn→ Shongo (Quebrada) · en 1 documento(s) [9]
+- Chavín —relacionadoCon→ Huaraz (CentroPoblado) · en 1 documento(s) [10]
+- Chavín —relacionadoCon→ Drenaje ácido de roca (Fenomeno) · en 1 documento(s) [11]
+- Chavín —relacionadoCon→ Paccharuri (Quebrada) · en 1 documento(s) [12]
+- Chavín —relacionadoCon→ Bayoraju (Nevado) · en 1 documento(s) [13]
+- Chavín —relacionadoCon→ Cátac (Distrito) · en 1 documento(s) [14]
+- Raimondi —relacionadoCon→ Chavín (Glaciar) · en 1 documento(s) [15]
+- Mullaca —amenazaA→ Chavín (Laguna) · en 1 documento(s) [16]
+- Aluvión 1941 —afectoA→ Chavín (Evento) · en 1 documento(s) [17]
+- Alhuaina —relacionadoCon→ Chavín",0.955,0.68,0.75
+D8,"¿Qué rol cumplen el INAIGEM, la ANA y el SENAMHI en el monitoreo de glaciares del Perú?","**Hechos del grafo** (37 filas):
+- laguna: Artizón · metodo: Batimetría · instituciones_en_texto: Unidad de Glaciología · institucion_del_documento: INAIGEM [1]
+- laguna: Artizón · metodo: Fotogrametría · instituciones_en_texto: Unidad de Glaciología · institucion_del_documento: INAIGEM [2]
+- laguna: Cuchillacocha · metodo: Batimetría · instituciones_en_texto: Autoridad Administrativa del Agua, ANA · institucion_del_documento: ANA [3]
+- laguna: Cuchillacocha · metodo: Limnígrafo / limnímetro · instituciones_en_texto: Autoridad Administrativa del Agua, ANA · institucion_del_documento: ANA [4]
+- laguna: Gangrajanca · metodo: Batimetría · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [5]
+- laguna: Gangrajanca · metodo: Dron (UAV) · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [6]
+- laguna: Gangrajanca · metodo: Fotogrametría · instituciones_en_texto: Municipalidad Distrital de Queropalca, INDECI, ANA, Unidad de Glaciología · institucion_del_documento: INAIGEM [7]
+- laguna: Gangrajanca · metodo: Modelamiento d",0.9,0.714,0.9
+D9,¿Qué riesgos presenta la laguna Gangrajanca en la Cordillera Huayhuash?,"**Hechos del grafo** (60 filas):
+- Gangrajanca —ubicadaEn→ Huánuco (Departamento) · en 5 documento(s) [1]
+- Gangrajanca —tieneObraSeguridad→ Dique (ObraSeguridad) · en 4 documento(s) [2]
+- Huayhuash —tieneSuperficieGlaciar→ tieneSuperficieGlaciar 53.06 km2 (2016) (Medicion) · en 4 documento(s) [3]
+- Inventario Huayhuash 1955 —inventarioDe→ Huayhuash (Inventario) · en 4 documento(s) [4]
+- Kinzl —ubicadaEn→ Huayhuash (Glaciar) · en 4 documento(s) [5]
+- Inventario Huayhuash 2016 —inventarioDe→ Huayhuash (Inventario) · en 4 documento(s) [6]
+- Inventario Huayhuash 2014 —inventarioDe→ Huayhuash (Inventario) · en 3 documento(s) [7]
+- Gangrajanca —monitoreadoCon→ Batimetría (MetodoMonitoreo) · en 3 documento(s) [8]
+- Gangrajanca —ubicadaEn→ Queropalca (Distrito) · en 3 documento(s) [9]
+- Jahuacocha —ubicadaEn→ Huayhuash (Laguna) · en 3 documento(s) [10]
+- Solterococha —ubicadaEn→ Huayhuash (Laguna) · en 3 documento(s) [11]
+- Carhuacocha —ubicadaEn→ Huayhuash (Laguna) · en 3 documento(s) [12]
+- Gangrajanca —amenazaA→ Queropalca (CentroPoblado) · en 2 documento(s) [13]
+- Huayhuash —tieneSuperficieGlaciar→ tieneSuperficieGlaciar 55.27 km2 (2014) (Medicion) · en 2 documento(s) [14]
+- Huayhuash",0.952,0.734,0.82
+G4,¿Cómo se conecta la laguna Llaca con el glaciar Ranrapalca y la ciudad de Huaraz?,"**Hechos del grafo** (2 filas):
+- Paso 1: Llaca —presentaFenomeno→ Retroceso glaciar [1]
+- Paso 2: Retroceso glaciar —presentaFenomeno→ Ranrapalca [2]
+
+**Fragmentos relacionados:**
+- El 26 de marzo de 2025 en la microcuenca Llaca ocurrió un GLOF como resultado del desborde súbito en cadena de dos lagunas ubicadas al suroeste del nevado Vallunaraju. Estas lagunas no tienen nombre oficial, por lo que e… [3]
+- Patrimonial La quebrada Llaca congrega a una serie de montañas glaciares de atracción paisajística incomparables, tenemos a los glaciares Ucro, Vallunaraju, Llaca, Ocshapalca, Ranrapalca y Carhuac. Del retroceso del glac… [4]
+- La zona de estudio geográficamente está ubicada en la vertiente occidental de la Cordillera Blanca, cuenca del río Santa y subcuenca del río Cascas. Políticamente se ubica en el distrito de Independencia, provincia de Hu… [5]
+- Google Earth Distancia: 8.7 km Huari Perfil longitudinal: Trocha LLACA 4 472 m s. n. m. Está en proceso de formación a consecuencia del retroceso de los glaciares Ranrapalca (6 071 m s. n. m.) y Ocshapalca (6 109 m s. n.… [6]",1.0,0.809,0.858
+G5,¿Qué departamentos del Perú concentran la mayor cantidad de lagunas con peligro de aluvión?,"
+**Fragmentos relacionados:**
+- ORIGEN GLACIAR Laguna Upiscocha Foto: Ricardo Vila Asimismo, se han identificado 13 lagunas periglaciares que se encuentran compar tidas entre dos departamentos12, es decir el límite político atraviesa la laguna. Es tas … [1]
+- de los glaciares por departamentos En cuanto a la ubicación política de los glaciares en el Perú, estos se encuentran distribuidos en 13 departamentos (Cuadro 7). Los departamentos de Áncash y Cusco, debido a las cordill… [2]
+- El departamento de Áncash posee 937 lagunas de origen glaciar que cubren un área de 59.88 km2 (equivalente al 6 % del total nacional de la cobertura por lagunas) (tabla 11). Del total de lagunas del departamento de Áncas… [3]
+- 110 5. En la huella del aluvión generado a partir del desembalse de la laguna Gangrajanca, se han determinado 04 niveles de peligros: ● Nivel de peligro muy alto: Aluvión con altura de flujo mayor o igual a 1.2 m, con pr… [4]",1.0,0.933,0.834
+G6,¿Qué recomendaciones técnicas proponen los informes ante el retroceso acelerado en la Cordillera Blanca?,"**Hechos del grafo** (60 filas):
+- Blanca —presentaFenomeno→ Retroceso glaciar (Fenomeno) · en 50 documento(s) [1]
+- Palcacocha —ubicadaEn→ Blanca (Laguna) · en 31 documento(s) [2]
+- Blanca —presentaFenomeno→ Cambio climático (Fenomeno) · en 29 documento(s) [3]
+- Shallap —ubicadaEn→ Blanca (Glaciar) · en 22 documento(s) [4]
+- Blanca —presentaFenomeno→ Drenaje ácido de roca (Fenomeno) · en 17 documento(s) [5]
+- Blanca —presentaFenomeno→ Aumento de temperatura (Fenomeno) · en 15 documento(s) [6]
+- Artesonraju —ubicadaEn→ Blanca (Glaciar) · en 15 documento(s) [7]
+- Huascarán —ubicadaEn→ Blanca (Nevado) · en 14 documento(s) [8]
+- Yanamarey —ubicadaEn→ Blanca (Glaciar) · en 13 documento(s) [9]
+- 513 —ubicadaEn→ Blanca (Laguna) · en 10 documento(s) [10]
+- Arhuaycocha —ubicadaEn→ Blanca (Laguna) · en 9 documento(s) [11]
+- Parón —ubicadaEn→ Blanca (Laguna) · en 8 documento(s) [12]
+- Blanca —ubicadaEn→ Áncash (Departamento) · en 7 documento(s) [13]
+- Blanca —presentaFenomeno→ Formación de nuevas lagunas (Fenomeno) · en 7 documento(s) [14]
+- Yanapaccha —ubicadaEn→ Blanca (Glaciar) · en 7 documento(s) [15]
+- Huillca —ubicadaEn→ Blanca (Glaciar) · en 7 documento(s) [16]
+- Llaca —ubicadaEn→ Bla",0.955,0.68,0.75

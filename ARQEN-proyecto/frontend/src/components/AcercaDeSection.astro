@@ -1,0 +1,315 @@
+---
+import { SITE_CONFIG } from '../config/site.config';
+import { RESUMEN_EVALUACION, PREGUNTAS_EVALUACION } from '../config/evaluacion.data';
+
+const resumen = RESUMEN_EVALUACION;
+const preguntasIniciales = PREGUNTAS_EVALUACION.slice(0, 8);
+
+function formatScore(val: number | null | undefined): string {
+  if (val === null || val === undefined) return '—';
+  return val.toFixed(2);
+}
+
+function scoreClass(val: number | null | undefined): string {
+  if (val === null || val === undefined) return 'bg-slate-100 text-slate-400';
+  if (val >= 0.8) return 'bg-emerald-100 text-emerald-800';
+  if (val >= 0.5) return 'bg-amber-100 text-amber-800';
+  return 'bg-rose-100 text-rose-800';
+}
+---
+
+<section id="acerca" data-contexto="Metodología" class="relative w-full py-12 sm:py-14">
+  <div class="mx-auto w-full max-w-[1400px] space-y-6 px-4 sm:px-8 lg:px-12">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="max-w-2xl">
+        <span class="sobretitulo">Metodología</span>
+        <h1 class="seccion-titulo mt-2">¿Por qué confiar en ARQEN?</h1>
+        <p class="seccion-sub">Respondemos solo con {SITE_CONFIG.corpus.documentos_totales} informes oficiales del INAIGEM, la ANA y el SENAMHI, y medimos cada respuesta.</p>
+      </div>
+      <a id="btn-descargar-excel-ragas" href="/Validacion_RAGAS_30_Preguntas.xlsx" download="Validacion_RAGAS_ARQEN_30_Preguntas.xlsx" class="btn btn-pri">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+        Descargar la evaluación (Excel)
+      </a>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Banco de preguntas">
+        <p class="text-sm font-semibold text-slate-600">Preguntas validadas</p>
+        <p id="acerca-stat-cobertura" class="mt-2 font-display text-4xl font-bold text-noche-900 tabular">{resumen.validadas_exito} / {resumen.total_banco}</p>
+        <p id="acerca-stat-sub" class="mt-auto pt-2 text-sm text-slate-600">{resumen.cobertura_pct}% validadas · {resumen.observadas} con observaciones</p>
+      </article>
+      <article class="tarjeta tarjeta-laguna tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Fidelidad">
+        <p class="text-sm font-semibold text-slate-600">Fidelidad</p>
+        <p id="acerca-stat-faith" class="mt-2 font-display text-4xl font-bold text-laguna-700 tabular">{resumen.fidelidad_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">No inventa: se apoya en las fuentes.</p>
+      </article>
+      <article class="tarjeta tarjeta-hielo tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Relevancia">
+        <p class="text-sm font-semibold text-slate-600">Relevancia</p>
+        <p id="acerca-stat-relev" class="mt-2 font-display text-4xl font-bold text-hielo-700 tabular">{resumen.relevancia_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">Responde lo que se preguntó.</p>
+      </article>
+      <article class="tarjeta tarjeta-marca tejida flex flex-col p-5" data-arqen-grafico="ragas" data-arqen-valor="Precisión del contexto">
+        <p class="text-sm font-semibold text-slate-600">Precisión del contexto</p>
+        <p id="acerca-stat-ctx" class="mt-2 font-display text-4xl font-bold text-cochinilla-600 tabular">{resumen.precision_contexto_promedio.toFixed(2)}</p>
+        <p class="mt-auto pt-2 text-sm text-slate-600">Usa los fragmentos correctos.</p>
+      </article>
+    </div>
+
+    <!-- Tabla Desplegable / Vista de las 30 Preguntas Validadas -->
+    <div class="tarjeta overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80">
+        <div>
+          <h3 class="font-display text-lg font-bold text-noche-900">Las 30 preguntas de prueba</h3>
+          <p class="text-sm text-slate-500">Abre cualquiera para ver la respuesta y sus fuentes.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-toggle-tabla-acerca"
+            type="button"
+            class="btn btn-sec btn-sm"
+          >
+            Mostrar las 30 preguntas
+          </button>
+        </div>
+      </div>
+
+      <div id="acerca-status-banner" class="hidden px-5 py-2.5 bg-sky-50 border-b border-sky-200 text-xs font-medium text-sky-900"></div>
+
+      <div class="overflow-x-auto">
+        <table class="tabla-eval w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
+              <th class="py-3 px-4 font-bold">ID</th>
+              <th class="py-3 px-4 font-bold">Categoría</th>
+              <th class="py-3 px-4 font-bold">Pregunta</th>
+              <th class="py-3 px-4 font-bold">Estado de Validación</th>
+              <th class="py-3 px-3 font-bold text-right">Fidelidad</th>
+              <th class="py-3 px-3 font-bold text-right">Relevancia</th>
+              <th class="py-3 px-3 font-bold text-right">Contexto</th>
+              <th class="py-3 px-4 font-bold text-right">Citas</th>
+              <th class="py-3 px-4 font-bold text-right">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="acerca-tabla-body" class="divide-y divide-slate-100">
+            {preguntasIniciales.map((p, idx) => (
+              <tr class="hover:bg-slate-50/90 transition">
+                <td class="py-3 px-4 font-mono font-bold text-slate-900">{p.id}</td>
+                <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{p.tipo}</span></td>
+                <td class="py-3 px-4 text-slate-800 font-medium max-w-md">{p.pregunta}</td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {p.estado === 'validada' && (
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">Validada con Fuentes</span>
+                  )}
+                  {p.estado === 'observada' && (
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">{p.estado_label}</span>
+                  )}
+                  {p.estado === 'fuera_dominio' && (
+                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Fuera de Dominio</span>
+                  )}
+                </td>
+                <td class="py-3 px-3 text-right">
+                  <span class={`inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${scoreClass(p.ragas?.faithfulness)}`}>
+                    {formatScore(p.ragas?.faithfulness)}
+                  </span>
+                </td>
+                <td class="py-3 px-3 text-right">
+                  <span class={`inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${scoreClass(p.ragas?.answer_relevancy)}`}>
+                    {formatScore(p.ragas?.answer_relevancy)}
+                  </span>
+                </td>
+                <td class="py-3 px-3 text-right">
+                  <span class={`inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${scoreClass(p.ragas?.context_precision)}`}>
+                    {formatScore(p.ragas?.context_precision)}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-right font-mono text-slate-600">{p.n_fuentes || 0}</td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <button type="button" data-acerca-idx={idx} class="btn-acerca-ver btn btn-hielo btn-sm">
+                    Ver evidencia
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Evidencia de Pregunta -->
+  <div id="modal-acerca-eval" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+    <div class="w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden max-h-[85vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div>
+          <span id="modal-acerca-id" class="text-[11px] font-bold uppercase tracking-wider text-sky-700"></span>
+          <h4 id="modal-acerca-pregunta" class="text-sm font-bold text-slate-900 mt-0.5"></h4>
+        </div>
+        <button id="btn-cerrar-modal-acerca" type="button" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 cursor-pointer">✕</button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-5 text-xs">
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Respuesta y Evidencia Consolidada</div>
+          <div id="modal-acerca-respuesta" class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800 whitespace-pre-wrap leading-relaxed font-sans"></div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Fuentes Documentales Oficiales</div>
+          <ul id="modal-acerca-fuentes" class="space-y-1.5 text-slate-600 list-disc pl-4"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ API_BASE: SITE_CONFIG.apiBaseUrl, PREGUNTAS_LOCALES: PREGUNTAS_EVALUACION }}>
+  const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"'`]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
+  let preguntasData = PREGUNTAS_LOCALES || [];
+  let mostrarTodas = false;
+
+  function badgeScore(val) {
+    if (val === null || val === undefined) return '<span class="text-slate-300">—</span>';
+    const cls = val >= 0.8 ? 'bg-emerald-100 text-emerald-800' :
+                val >= 0.5 ? 'bg-amber-100 text-amber-800' :
+                'bg-rose-100 text-rose-800';
+    return `<span class="inline-block rounded px-1.5 py-0.5 font-mono font-bold text-[11px] ${cls}">${Number(val).toFixed(2)}</span>`;
+  }
+
+  function badgeEstado(p) {
+    if (p.estado === 'validada') {
+      return '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">Validada con Fuentes</span>';
+    }
+    if (p.estado === 'observada') {
+      return `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">${esc(p.estado_label || 'Evidencia parcial')}</span>`;
+    }
+    if (p.estado === 'fuera_dominio') {
+      return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">Fuera de Dominio</span>';
+    }
+    return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">Pendiente</span>';
+  }
+
+  function vincularEventosVer(slice) {
+    const tbody = document.getElementById('acerca-tabla-body');
+    if (!tbody) return;
+    tbody.querySelectorAll('.btn-acerca-ver').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const item = slice[Number(btn.getAttribute('data-acerca-idx'))];
+        if (!item) return;
+        document.getElementById('modal-acerca-id').textContent = `${item.id} · ${item.herramienta || 'Grafo Kùzu'} · ${item.modelo || 'Sistema Científico'}`;
+        document.getElementById('modal-acerca-pregunta').textContent = item.pregunta;
+        document.getElementById('modal-acerca-respuesta').textContent = item.respuesta || 'Sin respuesta registrada.';
+        const ul = document.getElementById('modal-acerca-fuentes');
+        ul.innerHTML = (item.fuentes && item.fuentes.length > 0)
+          ? item.fuentes.map(f => `<li>${esc(f)}</li>`).join('')
+          : '<li class="text-slate-400">Sin fuentes requeridas (control negativo fuera de dominio)</li>';
+        document.getElementById('modal-acerca-eval')?.classList.remove('hidden');
+      });
+    });
+  }
+
+  function renderFilas() {
+    const tbody = document.getElementById('acerca-tabla-body');
+    if (!tbody) return;
+    const slice = mostrarTodas ? preguntasData : preguntasData.slice(0, 8);
+
+    tbody.innerHTML = slice.map((p, idx) => `
+      <tr class="hover:bg-slate-50/90 transition">
+        <td class="py-3 px-4 font-mono font-bold text-slate-900">${esc(p.id)}</td>
+        <td class="py-3 px-4"><span class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">${esc(p.tipo)}</span></td>
+        <td class="py-3 px-4 text-slate-800 font-medium max-w-md">${esc(p.pregunta)}</td>
+        <td class="py-3 px-4 whitespace-nowrap">${badgeEstado(p)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.faithfulness)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.answer_relevancy)}</td>
+        <td class="py-3 px-3 text-right">${badgeScore(p.ragas?.context_precision)}</td>
+        <td class="py-3 px-4 text-right font-mono text-slate-600">${esc(p.n_fuentes || 0)}</td>
+        <td class="py-3 px-4 text-right whitespace-nowrap">
+          <button type="button" data-acerca-idx="${idx}" class="btn-acerca-ver btn btn-hielo btn-sm">
+            Ver evidencia
+          </button>
+        </td>
+      </tr>
+    `).join('');
+
+    vincularEventosVer(slice);
+  }
+
+  async function sincronizarConBackend() {
+    try {
+      const res = await fetch(`${API_BASE}/api/evaluacion/ragas`);
+      if (!res.ok) throw new Error('Error al conectar con backend');
+      const data = await res.json();
+      const r = data.resumen || {};
+      if (data.preguntas && data.preguntas.length > 0) {
+        preguntasData = data.preguntas;
+      }
+
+      const validadas = r.validadas_exito ?? r.validadas_evidencia ?? 27;
+      const total = r.total_banco ?? 30;
+      const observadas = r.observadas ?? (total - validadas);
+      const cobertura = r.cobertura_pct ?? 90;
+
+      const statCob = document.getElementById('acerca-stat-cobertura');
+      if (statCob) statCob.textContent = `${validadas} / ${total}`;
+
+      const statSub = document.getElementById('acerca-stat-sub');
+      if (statSub) statSub.textContent = `${cobertura}% validadas · ${observadas} con observaciones`;
+
+      const fAvg = r.fidelidad_promedio ?? r.faithfulness_avg;
+      if (fAvg !== null && fAvg !== undefined) {
+        const el = document.getElementById('acerca-stat-faith');
+        if (el) el.textContent = Number(fAvg).toFixed(2);
+      }
+
+      const rAvg = r.relevancia_promedio ?? r.answer_relevancy_avg;
+      if (rAvg !== null && rAvg !== undefined) {
+        const el = document.getElementById('acerca-stat-relev');
+        if (el) el.textContent = Number(rAvg).toFixed(2);
+      }
+
+      const cAvg = r.precision_contexto_promedio ?? r.context_precision_avg;
+      if (cAvg !== null && cAvg !== undefined) {
+        const el = document.getElementById('acerca-stat-ctx');
+        if (el) el.textContent = Number(cAvg).toFixed(2);
+      }
+
+      renderFilas();
+    } catch {
+      // Si el backend no responde (ej. producción estática), se conservan los datos pre-renderizados
+      // y se asegura que el enlace de descarga apunte al archivo estático en public/
+      const btnExcel = document.getElementById('btn-descargar-excel-ragas');
+      if (btnExcel) btnExcel.setAttribute('href', '/Validacion_RAGAS_30_Preguntas.xlsx');
+    }
+  }
+
+  document.getElementById('btn-toggle-tabla-acerca')?.addEventListener('click', (e) => {
+    mostrarTodas = !mostrarTodas;
+    e.currentTarget.textContent = mostrarTodas ? 'Mostrar resumen (8)' : `Mostrar las ${preguntasData.length || 30} preguntas`;
+    renderFilas();
+  });
+
+  document.getElementById('btn-cerrar-modal-acerca')?.addEventListener('click', () => {
+    document.getElementById('modal-acerca-eval')?.classList.add('hidden');
+  });
+
+  // Vincular eventos a las filas iniciales pre-renderizadas por Astro
+  vincularEventosVer(preguntasData.slice(0, 8));
+
+  // Opcional: verificar si hay actualizaciones en el backend
+  document.addEventListener('DOMContentLoaded', sincronizarConBackend);
+</script>
+
+
+<style is:global>
+  /* En pantallas medianas y pequeñas se ocultan columnas secundarias: nada se corta */
+  @media (max-width: 1023px) {
+    .tabla-eval th:nth-child(2), .tabla-eval td:nth-child(2),
+    .tabla-eval th:nth-child(6), .tabla-eval td:nth-child(6),
+    .tabla-eval th:nth-child(7), .tabla-eval td:nth-child(7),
+    .tabla-eval th:nth-child(8), .tabla-eval td:nth-child(8) { display: none; }
+  }
+  @media (max-width: 639px) {
+    .tabla-eval th:nth-child(4), .tabla-eval td:nth-child(4),
+    .tabla-eval th:nth-child(5), .tabla-eval td:nth-child(5) { display: none; }
+    .tabla-eval td, .tabla-eval th { padding-left: .6rem !important; padding-right: .6rem !important; }
+  }
+</style>
