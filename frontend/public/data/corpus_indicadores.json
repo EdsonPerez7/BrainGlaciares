@@ -1,0 +1,47 @@
+{
+  "fecha_corte": "2026-11-25",
+  "generado_por": "frontend/scripts/generar_indicadores.mjs",
+  "archivos_origen": [
+    "Semana 6/G8-enterprise-brain-glaciares/data/persona1/papers.csv"
+  ],
+  "calculado": {
+    "total_documentos": 398,
+    "por_institucion": {
+      "INAIGEM": 175,
+      "ANA": 171,
+      "SENAMHI": 52
+    },
+    "por_eje_principal": {
+      "peligros": 106,
+      "monitoreo": 91,
+      "retroceso_glaciar": 92,
+      "hidrologia": 45,
+      "ecosistemas": 64
+    },
+    "por_idioma": {
+      "Español": 319,
+      "Inglés": 79
+    },
+    "rango_anios": {
+      "desde": 1964,
+      "hasta": 2026
+    },
+    "por_decada": {
+      "2020s": 155,
+      "2010s": 149,
+      "2000s": 68,
+      "1960s": 2,
+      "1990s": 12,
+      "1980s": 10,
+      "1970s": 2
+    }
+  },
+  "citado_de_docs": {
+    "nota": "Lo siguiente no es calculable desde papers.csv (no tiene esa columna); se cita tal como aparece en la documentación del proyecto.",
+    "porcentaje_ocr": {
+      "aproximado": "≈180 de 398 documentos necesitaron OCR (Tesseract)",
+      "motivo": "papers.csv no registra si un documento necesitó OCR; ese dato vive en el campo fuente_texto, fuera del alcance de este script.",
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona2/chunks.jsonl.gz (campo fuente_texto)"
+    }
+  }
+}

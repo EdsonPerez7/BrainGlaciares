@@ -1,0 +1,50 @@
+{
+  "escrito_a_mano": true,
+  "fecha_transcripcion": "2026-11-24",
+  "nota_general": "Estas cifras no vienen de ningún CSV del repo: son las que reporta el informe nacional de INAIGEM. Son dos documentos distintos, no uno solo. Compáralas con la columna 'Nuestro grafo de conocimiento' del dashboard, que mide un catálogo interno mucho más chico (unas decenas de lagunas), no el universo nacional.",
+  "inventario_nacional": {
+    "fuente": "Inventario Nacional de Glaciares y Lagunas 2023, INAIGEM",
+    "anio": 2023,
+    "pagina_pdf": null,
+    "nota_pagina": "Página no registrada en nuestras notas sobre este informe.",
+    "lagunas_origen_glaciar_total": 8466,
+    "cordilleras_total": 20
+  },
+  "evaluacion_riesgo_desborde": {
+    "fuente": "Evaluación nacional de lagunas glaciares con riesgo de desborde 2024, INAIGEM",
+    "anio": 2024,
+    "documento_corpus": "20.500.12748/608",
+    "nota_paginas": "Páginas del PDF del informe (verificadas contra ese documento en nuestro corpus), no necesariamente la numeración impresa del documento.",
+    "totales_nacionales": {
+      "lagunas_en_riesgo_total": 528,
+      "pagina_pdf_en_riesgo_total": 7,
+      "lagunas_riesgo_muy_alto_total": 58,
+      "pagina_pdf_muy_alto_total": 40
+    },
+    "por_nivel_nacional": {
+      "pagina_pdf": 40,
+      "niveles": [
+        { "nivel": "Muy alto", "valor": 58, "calculado": false },
+        { "nivel": "Alto", "valor": 91, "calculado": false },
+        { "nivel": "Medio", "valor": 43, "calculado": false },
+        { "nivel": "Bajo", "valor": 336, "calculado": true, "nota": "Calculado como 528 − 58 − 91 − 43; la p. 40 no lo cita como cifra aparte." }
+      ]
+    },
+    "departamentos": [
+      { "departamento": "Áncash", "total": 169, "pagina_pdf_total": 66, "muy_alto": 26, "pagina_pdf_muy_alto": 68 },
+      { "departamento": "Lima", "total": 96, "pagina_pdf_total": 66, "muy_alto": 6, "pagina_pdf_muy_alto": 85 },
+      { "departamento": "Cusco", "total": 76, "pagina_pdf_total": 66, "muy_alto": 13, "pagina_pdf_muy_alto": 75 },
+      { "departamento": "Puno", "total": 72, "pagina_pdf_total": 66, "muy_alto": 5, "pagina_pdf_muy_alto": 90 },
+      { "departamento": "Junín", "total": 53, "pagina_pdf_total": 66, "muy_alto": 5, "pagina_pdf_muy_alto": 82 },
+      {
+        "departamento": "Huánuco",
+        "total": null,
+        "pagina_pdf_total": null,
+        "muy_alto": null,
+        "pagina_pdf_muy_alto": null,
+        "nota": "El informe lo incluye entre los 6 departamentos con riesgo muy alto, sin darle una cifra en nuestro corpus. Tampoco aparece en el ranking de 'total en riesgo' (ese ranking solo da Áncash, Lima, Cusco, Puno y Junín)."
+      }
+    ],
+    "nota_desglose": "El informe no publica (en nuestras notas) el listado completo de los departamentos con glaciares: solo se transcriben los que destaca este mismo documento."
+  }
+}

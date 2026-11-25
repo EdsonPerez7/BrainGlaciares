@@ -1,0 +1,201 @@
+---
+// Perspectiva BSC "Usuario / misión (INAIGEM)": dos fuentes que miden universos
+// distintos, mostradas lado a lado en vez de mezclarse como hoy ocurre en /panorama.
+import FuenteCorte from './FuenteCorte.astro';
+import { formatoEs } from './formato';
+import { explicarCatalogoRiesgo } from './explicacionRiesgo';
+import riesgoInaigem from '../../../public/data/riesgo_inaigem.json';
+import grafoIndicadores from '../../../public/data/grafo_indicadores.json';
+import { DEPARTAMENTOS_RIESGO } from '../../config/metrics.data';
+
+interface DepartamentoInaigem {
+  departamento: string;
+  total: number | null;
+  pagina_pdf_total: number | null;
+  muy_alto: number | null;
+  pagina_pdf_muy_alto: number | null;
+  nota?: string;
+}
+
+const inv = riesgoInaigem.inventario_nacional;
+const evalRiesgo = riesgoInaigem.evaluacion_riesgo_desborde;
+const departamentosInaigem = evalRiesgo.departamentos as DepartamentoInaigem[];
+const niveles = evalRiesgo.por_nivel_nacional.niveles;
+const maxNivel = Math.max(...niveles.map((n) => n.valor));
+const colorNivel: Record<string, string> = { 'Muy alto': '#e11d48', Alto: '#f97316', Medio: '#eab308', Bajo: '#94a3b8' };
+
+const deptosFallback = DEPARTAMENTOS_RIESGO.filter((d) => d.total > 0).sort((a, b) => b.total - a.total);
+const maxDeptoFallback = Math.max(...deptosFallback.map((d) => d.total), 1);
+const totalGrafoFallback = deptosFallback.reduce((a, d) => a + d.total, 0);
+
+// Línea base antes de hidratar: nCatalogo sale de grafo_indicadores.json (calculado
+// desde nodos.csv), nConDepto del mismo respaldo que usa ApiService si el fetch falla.
+// Así el encabezado y la explicación nunca arrancan contradiciéndose.
+const nivelesRiesgo = grafoIndicadores.calculado.lagunas_catalogo_por_nivel_riesgo as Record<string, number>;
+const nCatalogoInicial = (nivelesRiesgo['Alto'] || 0) + (nivelesRiesgo['Muy alto'] || 0);
+const explicacionInicial = explicarCatalogoRiesgo(nCatalogoInicial, totalGrafoFallback);
+---
+<div class="grid gap-5 lg:grid-cols-2">
+  <article class="tarjeta tarjeta-riesgo tejida flex flex-col p-5">
+    <h3 class="font-display text-lg font-bold text-noche-900">Informe nacional (INAIGEM)</h3>
+    <p class="mt-1 text-sm text-slate-600">Dos documentos distintos, sobre el universo completo del país — no sobre nuestro catálogo.</p>
+
+    <div class="mt-4 rounded-xl bg-white/70 p-3 ring-1 ring-slate-100">
+      <span class="block font-display text-3xl font-bold text-noche-900 tabular">{formatoEs(inv.lagunas_origen_glaciar_total)}</span>
+      <span class="text-sm text-slate-600">lagunas de origen glaciar en {inv.cordilleras_total} cordilleras</span>
+      <p class="fuente">{inv.fuente}, {inv.anio}{inv.pagina_pdf ? ` · p. ${inv.pagina_pdf} del PDF` : ' · página no registrada en nuestras notas'}</p>
+    </div>
+
+    <div class="mt-3 flex items-end gap-4 rounded-xl bg-white/70 p-3 ring-1 ring-slate-100">
+      <div>
+        <span class="block font-display text-3xl font-bold text-rose-700 tabular">{formatoEs(evalRiesgo.totales_nacionales.lagunas_en_riesgo_total)}</span>
+        <span class="text-xs text-slate-600">en riesgo de desborde · p. {evalRiesgo.totales_nacionales.pagina_pdf_en_riesgo_total}</span>
+      </div>
+      <div>
+        <span class="block font-display text-3xl font-bold text-rose-700 tabular">{formatoEs(evalRiesgo.totales_nacionales.lagunas_riesgo_muy_alto_total)}</span>
+        <span class="text-xs text-slate-600">de riesgo muy alto · p. {evalRiesgo.totales_nacionales.pagina_pdf_muy_alto_total}</span>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <h4 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Por nivel de riesgo (nacional, p. {evalRiesgo.por_nivel_nacional.pagina_pdf})</h4>
+      <ul class="mt-2 space-y-1.5">
+        {niveles.map((n) => (
+          <li class="flex items-center gap-2 text-sm">
+            <span class="w-16 flex-none text-slate-700">{n.nivel}</span>
+            <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white"><span style={`width:${(n.valor / maxNivel) * 100}%; background:${colorNivel[n.nivel]}`}></span></span>
+            <span class="w-14 flex-none text-right font-mono text-xs text-slate-700">{formatoEs(n.valor)}{n.calculado ? '*' : ''}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-1 text-xs text-slate-500">* Bajo no está citado como cifra aparte: se calcula como 528 − 58 − 91 − 43.</p>
+    </div>
+
+    <h4 class="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Por departamento</h4>
+    <ul class="mt-2 space-y-1.5">
+      {departamentosInaigem.map((d) => (
+        <li class="text-sm text-slate-700">
+          <div class="flex items-center justify-between gap-2">
+            <span class="truncate font-medium">{d.departamento}</span>
+            <span class="font-mono text-xs">
+              {d.total !== null ? `${formatoEs(d.total)} en riesgo (p. ${d.pagina_pdf_total})` : 'sin cifra de total'}
+              {' · '}
+              {d.muy_alto !== null ? `${formatoEs(d.muy_alto)} muy alto (p. ${d.pagina_pdf_muy_alto})` : 'sin cifra de muy alto'}
+            </span>
+          </div>
+          {d.nota && <p class="mt-0.5 text-xs text-slate-500">{d.nota}</p>}
+        </li>
+      ))}
+    </ul>
+
+    <FuenteCorte
+      fuente={`${evalRiesgo.fuente}, ${evalRiesgo.anio} (doc. ${evalRiesgo.documento_corpus})`}
+      corte={String(evalRiesgo.anio)}
+      nota={evalRiesgo.nota_paginas}
+    />
+  </article>
+
+  <article id="dash-riesgo-grafo" class="tarjeta tarjeta-laguna tejida flex flex-col p-5">
+    <h3 class="font-display text-lg font-bold text-noche-900">Nuestro grafo de conocimiento</h3>
+    <p class="mt-1 text-sm text-slate-600">Catálogo interno curado por el proyecto — no el universo nacional de la izquierda.</p>
+
+    <span id="dash-riesgo-catalogo" class="mt-4 block font-display text-3xl font-bold text-noche-900 tabular">{formatoEs(nCatalogoInicial)} en el catálogo</span>
+    <span id="dash-riesgo-con-depto" class="text-xs text-slate-600">{formatoEs(totalGrafoFallback)} con departamento asignado en el desglose por departamento</span>
+
+    <div id="dash-riesgo-explicacion" class="mt-3 rounded-xl bg-white/70 p-3 text-xs text-slate-600 ring-1 ring-slate-100" set:html={explicacionInicial} />
+    <p id="dash-riesgo-estado-datos" class="mt-1 text-xs text-slate-400"></p>
+
+    <ul id="dash-riesgo-grafo-lista" class="mt-3 space-y-1.5">
+      {deptosFallback.map((d) => (
+        <li class="flex items-center gap-2 text-sm">
+          <span class="w-20 flex-none truncate text-slate-700">{d.departamento}</span>
+          <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white">
+            <span class="bg-rose-600" style={`width:${(d.muy_alto / maxDeptoFallback) * 100}%`}></span>
+            <span class="bg-orange-500" style={`width:${(d.alto / maxDeptoFallback) * 100}%`}></span>
+          </span>
+          <span class="w-6 flex-none text-right font-mono text-xs text-slate-700">{formatoEs(d.total)}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-4 rounded-xl bg-ocre-50 p-3 text-xs text-slate-600 ring-1 ring-ocre-100">
+      <b class="text-ocre-700">Lo que este catálogo NO permite concluir:</b> en <code>/api/lagunas/lista</code>, los campos <code>tiene_obras</code>
+      (= verdadero para toda laguna Alto/Muy alto, por fórmula), <code>volumen_hm3</code> (3 valores fijos según el nivel de riesgo), <code>altitud_msnm</code>
+      (4450 para las 30 filas) y <code>poblado_amenazado</code> ("Población aguas abajo" fijo) son valores por defecto del backend, no mediciones reales por laguna
+      (ver <code>backend/api.py</code>, función <code>lagunas_lista</code>, líneas 482-517). Este dashboard no sacó conclusiones de "lagunas sin obras de
+      seguridad" a partir de ellos.
+    </div>
+
+    <FuenteCorte
+      id="dash-riesgo-fuente-grafo"
+      fuente="Comprobando si el backend está arriba…"
+      nota="Mide el catálogo interno del proyecto (decenas de lagunas), no las 528/58 del informe nacional de la izquierda."
+    />
+  </article>
+</div>
+
+<script>
+  import { ApiService } from '../../services/api';
+  import { esc } from '../../utils/seguridad';
+  import { formatoEs } from './formato';
+  import { explicarCatalogoRiesgo } from './explicacionRiesgo';
+
+  async function cargar() {
+    // Primero resolvemos a qué host responde (localhost:8080, túnel, etc.) para
+    // que las llamadas de abajo no se queden pegadas a la URL por defecto y
+    // parezcan "en vivo" cuando en realidad fallaron en silencio.
+    const salud = await ApiService.getSalud();
+
+    const [deptos, lagunas] = await Promise.all([
+      ApiService.getDepartamentosRiesgo(),
+      ApiService.getLagunasLista()
+    ]);
+
+    let sumaTotal = 0;
+    const lista = document.getElementById('dash-riesgo-grafo-lista');
+    const conDepto = document.getElementById('dash-riesgo-con-depto');
+    if (deptos && deptos.length > 0) {
+      const filtrados = deptos.filter((d) => d.total > 0).sort((a, b) => b.total - a.total);
+      const max = Math.max(...filtrados.map((d) => d.total), 1);
+      sumaTotal = filtrados.reduce((a, d) => a + d.total, 0);
+      if (conDepto) conDepto.textContent = `${formatoEs(sumaTotal)} con departamento asignado en el desglose por departamento`;
+      if (lista) {
+        lista.innerHTML = filtrados.map((d) => `
+          <li class="flex items-center gap-2 text-sm">
+            <span class="w-20 flex-none truncate text-slate-700">${esc(d.departamento)}</span>
+            <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white">
+              <span class="bg-rose-600" style="width:${(d.muy_alto / max) * 100}%"></span>
+              <span class="bg-orange-500" style="width:${(d.alto / max) * 100}%"></span>
+            </span>
+            <span class="w-6 flex-none text-right font-mono text-xs text-slate-700">${esc(formatoEs(d.total))}</span>
+          </li>`).join('');
+      }
+    }
+
+    let nCatalogo = 0;
+    if (lagunas && lagunas.length > 0) {
+      nCatalogo = lagunas.filter((l) => l.riesgo === 'Alto' || l.riesgo === 'Muy alto').length;
+    }
+
+    const catalogo = document.getElementById('dash-riesgo-catalogo');
+    const explicacion = document.getElementById('dash-riesgo-explicacion');
+    const estadoDatos = document.getElementById('dash-riesgo-estado-datos');
+    const sufijoEstado = salud ? '' : ' (respaldo local)';
+    if (catalogo && nCatalogo > 0) catalogo.textContent = `${formatoEs(nCatalogo)} en el catálogo${sufijoEstado}`;
+    if (explicacion && nCatalogo > 0) explicacion.innerHTML = explicarCatalogoRiesgo(nCatalogo, sumaTotal);
+    if (estadoDatos) {
+      estadoDatos.textContent = salud
+        ? '' // sin backend caído no hace falta aclarar nada más
+        : 'El backend no respondió: estos números son del respaldo local (metrics.data.ts), no del grafo en vivo.';
+    }
+
+    const fuenteTexto = document.getElementById('dash-riesgo-fuente-grafo-texto');
+    if (fuenteTexto) {
+      fuenteTexto.textContent = salud
+        ? 'ApiService.getDepartamentosRiesgo() + getLagunasLista() (en vivo)'
+        : 'Backend no disponible ahora: respaldo local (DEPARTAMENTOS_RIESGO / LAGUNAS_DESTACADAS en metrics.data.ts)';
+    }
+  }
+
+  cargar();
+</script>

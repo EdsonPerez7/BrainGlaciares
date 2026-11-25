@@ -1,0 +1,110 @@
+---
+// Perspectiva BSC "Calidad de respuestas": en vivo vía /api/evaluacion/ragas,
+// con respaldo al snapshot pre-renderizado de evaluacion.data.ts (semana 9/12).
+import { RESUMEN_EVALUACION, PREGUNTAS_EVALUACION } from '../../config/evaluacion.data';
+
+const r = RESUMEN_EVALUACION;
+const ESTADO_CLASE: Record<string, string> = {
+  validada: 'bg-laguna-100 text-laguna-700',
+  observada: 'bg-ocre-100 text-ocre-700',
+  fuera_dominio: 'bg-slate-100 text-slate-600'
+};
+---
+<article class="tarjeta tarjeta-marca tejida flex flex-col p-5">
+  <h3 class="font-display text-lg font-bold text-noche-900">Calidad de respuestas (RAGAS)</h3>
+  <p class="mt-1 text-sm text-slate-600">Banco de {r.total_banco} preguntas: competencia, descriptivas, históricas y multilingües.</p>
+
+  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="rounded-xl bg-white/70 p-3 text-center ring-1 ring-slate-100">
+      <span id="dash-ragas-cobertura" class="block font-display text-2xl font-bold text-noche-900 tabular">{r.cobertura_pct}%</span>
+      <span class="text-xs text-slate-600">cobertura</span>
+    </div>
+    <div class="rounded-xl bg-white/70 p-3 text-center ring-1 ring-slate-100">
+      <span id="dash-ragas-fidelidad" class="block font-display text-2xl font-bold text-noche-900 tabular">{r.fidelidad_promedio.toFixed(2)}</span>
+      <span class="text-xs text-slate-600">fidelidad</span>
+    </div>
+    <div class="rounded-xl bg-white/70 p-3 text-center ring-1 ring-slate-100">
+      <span id="dash-ragas-relevancia" class="block font-display text-2xl font-bold text-noche-900 tabular">{r.relevancia_promedio.toFixed(2)}</span>
+      <span class="text-xs text-slate-600">relevancia</span>
+    </div>
+    <div class="rounded-xl bg-white/70 p-3 text-center ring-1 ring-slate-100">
+      <span id="dash-ragas-precision" class="block font-display text-2xl font-bold text-noche-900 tabular">{r.precision_contexto_promedio.toFixed(2)}</span>
+      <span class="text-xs text-slate-600">precisión de contexto</span>
+    </div>
+  </div>
+
+  <div class="mt-4 overflow-x-auto rounded-xl ring-1 ring-slate-100">
+    <table class="w-full min-w-[480px] text-left text-sm">
+      <thead class="bg-white/70 text-xs uppercase tracking-wide text-slate-500">
+        <tr>
+          <th class="px-3 py-2">#</th>
+          <th class="px-3 py-2">Pregunta</th>
+          <th class="px-3 py-2">Estado</th>
+          <th class="px-3 py-2 text-right">Fuentes</th>
+        </tr>
+      </thead>
+      <tbody id="dash-ragas-filas" class="divide-y divide-slate-100 bg-white/40">
+        {PREGUNTAS_EVALUACION.map((p) => (
+          <tr>
+            <td class="px-3 py-2 font-mono text-xs text-slate-500">{p.id}</td>
+            <td class="max-w-[360px] truncate px-3 py-2 text-slate-700">{p.pregunta}</td>
+            <td class="px-3 py-2"><span class={`rounded-full px-2 py-0.5 text-xs font-medium ${ESTADO_CLASE[p.estado] || 'bg-slate-100 text-slate-600'}`}>{p.estado_label}</span></td>
+            <td class="px-3 py-2 text-right font-mono text-xs text-slate-600">{p.n_fuentes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fuente mt-3" id="dash-ragas-fuente">Comprobando si el backend está arriba…</p>
+</article>
+
+<script>
+  import { ApiService } from '../../services/api';
+  import { esc } from '../../utils/seguridad';
+  import { PREGUNTAS_EVALUACION } from '../../config/evaluacion.data';
+
+  const ESTADO_CLASE: Record<string, string> = {
+    validada: 'bg-laguna-100 text-laguna-700',
+    observada: 'bg-ocre-100 text-ocre-700',
+    fuera_dominio: 'bg-slate-100 text-slate-600'
+  };
+
+  async function cargar() {
+    // Resuelve el host correcto (localhost:8080, túnel, etc.) antes de pedir
+    // los datos, para que "en vivo" no quede pegado a una URL muerta.
+    const salud = await ApiService.getSalud();
+    const data = await ApiService.getEvaluacionRagas();
+    const r = data.resumen;
+    // getEvaluacionRagas() devuelve la MISMA referencia de PREGUNTAS_EVALUACION
+    // cuando usa el respaldo (ver api.ts): comparar por referencia nos dice con
+    // certeza si esta carga fue en vivo o de respaldo, sin adivinar.
+    const fueEnVivo = Boolean(salud) && data.preguntas !== PREGUNTAS_EVALUACION;
+
+    const set = (id: string, val: string) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('dash-ragas-cobertura', `${r.cobertura_pct}%`);
+    set('dash-ragas-fidelidad', r.fidelidad_promedio.toFixed(2));
+    set('dash-ragas-relevancia', r.relevancia_promedio.toFixed(2));
+    set('dash-ragas-precision', r.precision_contexto_promedio.toFixed(2));
+
+    const filas = document.getElementById('dash-ragas-filas');
+    if (filas && data.preguntas?.length) {
+      filas.innerHTML = data.preguntas.map((p) => `
+        <tr>
+          <td class="px-3 py-2 font-mono text-xs text-slate-500">${esc(p.id)}</td>
+          <td class="max-w-[360px] truncate px-3 py-2 text-slate-700">${esc(p.pregunta)}</td>
+          <td class="px-3 py-2"><span class="rounded-full px-2 py-0.5 text-xs font-medium ${ESTADO_CLASE[p.estado] || 'bg-slate-100 text-slate-600'}">${esc(p.estado_label)}</span></td>
+          <td class="px-3 py-2 text-right font-mono text-xs text-slate-600">${esc(p.n_fuentes)}</td>
+        </tr>`).join('');
+    }
+
+    const fuenteEl = document.getElementById('dash-ragas-fuente');
+    if (fuenteEl) {
+      fuenteEl.textContent = fueEnVivo
+        ? '/api/evaluacion/ragas (en vivo)'
+        : 'respaldo local: evaluacion.data.ts (snapshot semana 9/12) — backend no disponible';
+    }
+  }
+
+  cargar();
+</script>

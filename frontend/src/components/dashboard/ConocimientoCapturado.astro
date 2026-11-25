@@ -1,0 +1,96 @@
+---
+// Perspectiva BSC "Conocimiento capturado": calculado por
+// frontend/scripts/generar_indicadores.mjs desde papers.csv (Semana 6).
+import FuenteCorte from './FuenteCorte.astro';
+import { formatoEs } from './formato';
+import corpus from '../../../public/data/corpus_indicadores.json';
+
+const { calculado, citado_de_docs: citado, fecha_corte, archivos_origen } = corpus;
+
+const coloresInstitucion: Record<string, string> = {
+  INAIGEM: '#0d9488',
+  ANA: '#0ea5e9',
+  SENAMHI: '#d97706'
+};
+const institucion = Object.entries(calculado.por_institucion) as [string, number][];
+const totalInstitucion = institucion.reduce((a, [, n]) => a + n, 0);
+
+const idioma = Object.entries(calculado.por_idioma) as [string, number][];
+const totalIdioma = idioma.reduce((a, [, n]) => a + n, 0);
+
+const EJE_LABEL: Record<string, string> = {
+  peligros: 'Peligros',
+  retroceso_glaciar: 'Retroceso glaciar',
+  monitoreo: 'Monitoreo',
+  ecosistemas: 'Ecosistemas',
+  hidrologia: 'Hidrología'
+};
+const eje = Object.entries(calculado.por_eje_principal) as [string, number][];
+eje.sort((a, b) => b[1] - a[1]);
+const maxEje = Math.max(...eje.map(([, n]) => n));
+---
+<article class="tarjeta tarjeta-hielo tejida flex flex-col p-5">
+  <h3 class="font-display text-lg font-bold text-noche-900">{formatoEs(calculado.total_documentos)} documentos del corpus</h3>
+  <p class="mt-1 text-sm text-slate-600">Por institución, idioma y eje temático. {calculado.rango_anios ? `Años ${calculado.rango_anios.desde}–${calculado.rango_anios.hasta}.` : ''}</p>
+
+  <div class="mt-4 grid gap-5 sm:grid-cols-2">
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Por institución</h4>
+      <div class="mt-2 flex h-5 overflow-hidden rounded-full">
+        {institucion.map(([nombre, n]) => (
+          <span style={`flex:${n}; background:${coloresInstitucion[nombre] || '#94a3b8'}`} title={`${nombre}: ${n}`}></span>
+        ))}
+      </div>
+      <ul class="mt-2 space-y-1 text-sm text-slate-700">
+        {institucion.map(([nombre, n]) => (
+          <li class="flex items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5"><i class="h-2.5 w-2.5 rounded-full" style={`background:${coloresInstitucion[nombre] || '#94a3b8'}`}></i>{nombre}</span>
+            <span class="font-mono text-xs">{n} ({Math.round((n / totalInstitucion) * 100)}%)</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Por idioma</h4>
+      <div class="mt-2 flex h-5 overflow-hidden rounded-full">
+        {idioma.map(([nombre, n]) => (
+          <span style={`flex:${n}; background:${nombre === 'Español' ? '#0d9488' : nombre === 'Inglés' ? '#d97706' : '#94a3b8'}`} title={`${nombre}: ${n}`}></span>
+        ))}
+      </div>
+      <ul class="mt-2 space-y-1 text-sm text-slate-700">
+        {idioma.map(([nombre, n]) => (
+          <li class="flex items-center justify-between gap-2">
+            <span>{nombre}</span>
+            <span class="font-mono text-xs">{n} ({Math.round((n / totalIdioma) * 100)}%)</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <h4 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Por eje temático</h4>
+    <ul class="mt-2 space-y-1.5">
+      {eje.map(([clave, n]) => (
+        <li class="flex items-center gap-2 text-sm">
+          <span class="w-36 flex-none truncate text-slate-700">{EJE_LABEL[clave] || clave}</span>
+          <span class="flex h-3 flex-1 overflow-hidden rounded-full bg-white">
+            <span class="bg-ocre-500" style={`width:${(n / maxEje) * 100}%; background:#0d9488`}></span>
+          </span>
+          <span class="w-8 flex-none text-right font-mono text-xs text-slate-700">{n}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="mt-4 rounded-xl bg-white/70 p-3 text-sm text-slate-600 ring-1 ring-slate-100">
+    <b class="text-slate-800">% con OCR:</b> {citado.porcentaje_ocr.aproximado} <span class="text-xs">— cifra citada, no calculada por este script: {citado.porcentaje_ocr.motivo}</span>
+  </div>
+
+  <FuenteCorte
+    fuente={`Calculado desde ${archivos_origen.join(', ')}`}
+    corte={fecha_corte}
+    nota={`% de OCR citado de ${citado.porcentaje_ocr.fuente}.`}
+  />
+</article>

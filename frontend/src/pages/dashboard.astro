@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EstadoServicio from '../components/dashboard/EstadoServicio.astro';
+import ConocimientoCapturado from '../components/dashboard/ConocimientoCapturado.astro';
+import BaseConocimiento from '../components/dashboard/BaseConocimiento.astro';
+import RiesgoDominio from '../components/dashboard/RiesgoDominio.astro';
+import CalidadRespuestas from '../components/dashboard/CalidadRespuestas.astro';
+import SubgrafoViewer from '../components/dashboard/SubgrafoViewer.astro';
+import OkrEjemplo from '../components/dashboard/OkrEjemplo.astro';
+---
+<Layout
+  title="Dashboard de indicadores · ARQEN"
+  description="Indicadores KPI/OKR/Balanced Scorecard de ARQEN: conocimiento capturado, base de conocimiento, riesgo de lagunas glaciares y calidad de respuestas, cada uno con su fuente y fecha de corte."
+>
+  <section id="dashboard" data-contexto="Dashboard" class="relative w-full py-12 sm:py-14">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Semana 13 · KPI / OKR / Balanced Scorecard</span>
+      <h1 class="seccion-titulo mt-2">Dashboard de indicadores</h1>
+      <p class="seccion-sub max-w-3xl">
+        Cada número de esta página trae su fuente y su fecha de corte. Donde hoy conviven varias cifras distintas
+        para "lo mismo" (como el riesgo de lagunas), se muestran por separado en vez de elegir una sola: el informe
+        nacional de INAIGEM mide el universo del país; nuestro grafo mide un catálogo interno mucho más chico.
+      </p>
+
+      <div class="mt-6">
+        <span class="sobretitulo">Procesos internos · estado del servicio</span>
+        <EstadoServicio />
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full pb-10">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Aprendizaje y crecimiento</span>
+      <h2 class="seccion-titulo mt-2">Conocimiento capturado y base de conocimiento</h2>
+      <p class="seccion-sub">Calculado desde el CSV real del corpus (Semana 6), reejecutable con un script.</p>
+      <div class="mt-5 grid gap-5 lg:grid-cols-2">
+        <ConocimientoCapturado />
+        <BaseConocimiento />
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full pb-10">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Usuario / misión (INAIGEM)</span>
+      <h2 class="seccion-titulo mt-2">Riesgo (dominio): informe nacional vs. nuestro grafo</h2>
+      <p class="seccion-sub">Dos universos distintos, mostrados por separado a propósito.</p>
+      <div class="mt-5">
+        <RiesgoDominio />
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full pb-10">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Procesos internos</span>
+      <h2 class="seccion-titulo mt-2">Calidad de respuestas</h2>
+      <p class="seccion-sub">Evaluación RAGAS sobre el banco de 30 preguntas, en vivo desde el backend.</p>
+      <div class="mt-5">
+        <CalidadRespuestas />
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full pb-10">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Explorar el grafo</span>
+      <h2 class="seccion-titulo mt-2">Subgrafo de conocimiento</h2>
+      <p class="seccion-sub">Una porción navegable del grafo, nunca los más de 13 000 nodos completos.</p>
+      <div class="mt-5">
+        <SubgrafoViewer />
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full pb-14">
+    <div class="mx-auto w-full max-w-[1400px] px-4 sm:px-8 lg:px-12">
+      <span class="sobretitulo">Objetivos</span>
+      <h2 class="seccion-titulo mt-2">OKR de ejemplo: ¿a dónde podría apuntar INAIGEM?</h2>
+      <p class="seccion-sub">Ejemplo ilustrativo del equipo, redactado a partir de lo que el sistema ya mide.</p>
+      <div class="mt-5">
+        <OkrEjemplo />
+      </div>
+    </div>
+  </section>
+</Layout>

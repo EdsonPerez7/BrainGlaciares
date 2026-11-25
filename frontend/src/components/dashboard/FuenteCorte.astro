@@ -1,0 +1,13 @@
+---
+interface Props {
+  fuente: string;
+  corte?: string;
+  nota?: string;
+  id?: string;
+}
+const { fuente, corte, nota, id } = Astro.props;
+---
+<p class="fuente" id={id}>
+  <span id={id ? `${id}-texto` : undefined}>{fuente}{corte ? ` · corte: ${corte}` : ''}</span>
+  {nota && <span class="mt-1 block text-slate-500">{nota}</span>}
+</p>

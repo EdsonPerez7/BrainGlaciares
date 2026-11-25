@@ -1,0 +1,105 @@
+{
+  "fecha_corte": "2026-11-25",
+  "generado_por": "frontend/scripts/generar_indicadores.mjs",
+  "archivos_origen": [
+    "Semana 7/grafo_glaciares/nodos.csv",
+    "Semana 7/grafo_glaciares/relaciones.csv",
+    "Semana 7/grafo_glaciares/glaciares.owl",
+    "Semana 7/grafo_glaciares/revision_ontologia.md"
+  ],
+  "calculado": {
+    "nodos_total": 13829,
+    "nodos_por_tipo": {
+      "Documento": 398,
+      "Cordillera": 325,
+      "Fenomeno": 9,
+      "Provincia": 194,
+      "Departamento": 26,
+      "Laguna": 2038,
+      "Glaciar": 1530,
+      "Evento": 201,
+      "Ecosistema": 6,
+      "Especie": 528,
+      "ObraSeguridad": 28,
+      "CentroPoblado": 894,
+      "Distrito": 296,
+      "Institucion": 877,
+      "Cuenca": 1044,
+      "Nevado": 545,
+      "ServicioEcosistemico": 9,
+      "Bofedal": 471,
+      "MetodoMonitoreo": 20,
+      "Quebrada": 349,
+      "Inventario": 198,
+      "Medicion": 2626,
+      "NivelRiesgo": 4,
+      "EstadoObra": 7,
+      "Rio": 1206
+    },
+    "relaciones_total": 36596,
+    "relaciones_por_tipo": {
+      "PRESENTA_FENOMENO": 555,
+      "UBICADA_EN": 4638,
+      "OCURRIO_EN": 134,
+      "ALBERGA_ESPECIE": 260,
+      "TIENE_OBRA": 503,
+      "INTERVIENE_EN": 474,
+      "AFECTO_A": 168,
+      "AMENAZA_A": 133,
+      "PROVEE_SERVICIO": 105,
+      "TIENE_ECOSISTEMA": 369,
+      "MONITOREADO_CON": 412,
+      "RELACIONADO_CON": 1306,
+      "ALIMENTADA_POR": 120,
+      "INVENTARIO_DE": 190,
+      "TIENE_MEDICION": 2626,
+      "TIENE_NIVEL_RIESGO": 40,
+      "ESTADO_OBRA": 85,
+      "DRENA_HACIA": 30,
+      "ABASTECE_A": 4,
+      "MENCIONA": 23359,
+      "USA_METODO": 687,
+      "PUBLICADO_POR": 398
+    },
+    "lagunas_catalogo_por_nivel_riesgo": {
+      "Muy alto": 9,
+      "Bajo": 3,
+      "Alto": 13,
+      "Sin clasificar": 2010,
+      "Medio": 3
+    },
+    "owl_clases": 36,
+    "owl_propiedades_objeto": 46,
+    "owl_propiedades_dato": 10,
+    "owl_propiedades_total": 56,
+    "owl_categorias_pitfalls_v1_0": 5,
+    "owl_categorias_pitfalls_v1_1": 0
+  },
+  "nota_discrepancia_relaciones": {
+    "nota": "Tres fuentes distintas dan un número distinto de relaciones del grafo. Este script calcula la primera; las otras dos se citan porque no hay un CSV de Aura en el repo.",
+    "este_csv_semana_7": 36596,
+    "readme_presentacion": {
+      "valor": 37264,
+      "fuente": "README.md (raíz del repositorio)"
+    },
+    "neo4j_aura_produccion": {
+      "valor": 35374,
+      "fuente": "consola de Neo4j Aura (verificado por el equipo)"
+    }
+  },
+  "citado_de_docs": {
+    "nota": "Lo siguiente no está en nodos.csv ni en relaciones.csv: viene de tripletas_consolidadas.csv (persona 3), un archivo con columnas distintas (predicate/subject_id/object_id/n_docs) que este script no recalcula todavía.",
+    "hechos_tripletas": {
+      "valor": 13256,
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv"
+    },
+    "entidades_unicas": {
+      "valor": 11343,
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv"
+    },
+    "hechos_confirmados_2_o_mas_documentos": {
+      "valor": 2502,
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv (columna n_docs)"
+    }
+  }
+}
