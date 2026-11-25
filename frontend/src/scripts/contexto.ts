@@ -1,13 +1,14 @@
-/**
- * Contexto compartido de la página para el asistente único.
- * Cualquier componente informa dónde está la persona (sección, laguna, gráfico)
- * y el asistente adapta sus sugerencias. Sin dependencias, solo eventos del navegador.
- */
 export interface Contexto {
   seccion?: string;
   laguna?: string;
   lagunaId?: string;
   departamento?: string;
+  riesgo?: string;
+  volumen?: number;
+  tieneObras?: boolean;
+  obrasDetalle?: string;
+  pobladoAmenazado?: string;
+  glaciarOrigen?: string;
   comparacion?: [string, string];
   grafico?: string;
   valor?: string;
@@ -20,12 +21,34 @@ export function obtenerContexto(): Contexto {
 }
 
 export function fijarContexto(parcial: Contexto, reemplazar = false) {
-  if (reemplazar) for (const k of Object.keys(estado)) delete (estado as any)[k];
+  const lagunaAnterior = estado.lagunaId;
+  if (reemplazar) {
+    for (const k of Object.keys(estado)) delete (estado as any)[k];
+  }
   Object.assign(estado, parcial);
-  window.dispatchEvent(new CustomEvent('arqen:contexto', { detail: obtenerContexto() }));
+  const actual = obtenerContexto();
+  (window as any).__ARQEN_CTX__ = actual;
+  window.dispatchEvent(
+    new CustomEvent('arqen:contexto', {
+      detail: { ...actual, cambioLaguna: Boolean(actual.lagunaId && actual.lagunaId !== lagunaAnterior) },
+    })
+  );
 }
 
-/** Abre el asistente (con contexto opcional y, si se quiere, una pregunta ya escrita). */
+export function limpiarLagunaContexto() {
+  delete estado.laguna;
+  delete estado.lagunaId;
+  delete estado.riesgo;
+  delete estado.volumen;
+  delete estado.tieneObras;
+  delete estado.obrasDetalle;
+  delete estado.pobladoAmenazado;
+  delete estado.glaciarOrigen;
+  const actual = obtenerContexto();
+  (window as any).__ARQEN_CTX__ = actual;
+  window.dispatchEvent(new CustomEvent('arqen:contexto', { detail: actual }));
+}
+
 export function abrirAsistente(ctx?: Contexto, pregunta?: string, enviar = false) {
   if (ctx) fijarContexto(ctx, true);
   window.dispatchEvent(new CustomEvent('arqen:abrir', { detail: { pregunta, enviar } }));

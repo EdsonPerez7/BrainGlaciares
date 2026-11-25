@@ -74,6 +74,7 @@ class EstadoAgente(TypedDict, total=False):
     modo: str
     modelo: str
     autocorregida: bool
+    laguna: dict | None
 
 
 class Agente:
@@ -101,7 +102,7 @@ class Agente:
             return {"respuesta": PRESENTACION, "modo": "guardia", "avisos": []}
         indice = self.m.indice
         # interpretar la pregunta le toca al LLM: aquí solo se descarta lo que claramente no es del tema
-        if s.get("con_historial") or indice is None or self._del_tema(ctx.pregunta):
+        if s.get("laguna") or s.get("con_historial") or indice is None or self._del_tema(ctx.pregunta):
             return {}
         try:
             umbral = indice.cfg.get("UMBRAL_SIM")
@@ -114,10 +115,21 @@ class Agente:
             self.log(f"Guardia sin similitud: {str(e)[:120]}")
         return {}
 
-    def _mensajes_llm(self, mensajes):
+    def _mensajes_llm(self, mensajes, laguna=None):
         """Lo que recibe el LLM: los resultados de las herramientas como texto, no como llamadas nativas de un proveedor.
         Así otro modelo puede seguir a mitad de pregunta (Gemini rechaza el historial de llamadas de Groq) y se gastan menos tokens."""
-        salida, resultados = [SystemMessage(self.sistema)], []
+        anclaje = ""
+        if laguna and laguna.get("nombre"):
+            anclaje = (
+                f"\n\nCONTEXTO ACTIVO EN PANTALLA: El usuario está viendo la ficha de '{laguna['nombre']}' "
+                f"(Departamento: {laguna.get('departamento') or 'N/D'}, Riesgo en ficha: {laguna.get('riesgo') or 'N/D'}, "
+                f"Volumen: {laguna.get('volumen') or 'N/D'} hm³, Glaciar: {laguna.get('glaciar_origen') or 'N/D'}). "
+                f"Todas las preguntas implícitas ('esta laguna', 'su volumen', 'qué obras tiene', 'es peligrosa') "
+                f"se refieren EXCLUSIVAMENTE a '{laguna['nombre']}'. "
+                f"Llama siempre a ficha_entidad(nombres=['{laguna['nombre']}']) y/o buscar_documentos incluyendo "
+                f"'{laguna['nombre']}' en la búsqueda. Responde netamente sobre esta laguna salvo que pidan compararla.\n"
+            )
+        salida, resultados = [SystemMessage(self.sistema + anclaje)], [] # AQUÍ HICE LOS CAMBIOS
         for m in mensajes:
             if isinstance(m, ToolMessage):
                 resultados.append(f"### {m.name}\n{m.content}")
@@ -135,7 +147,7 @@ class Agente:
         if time.time() >= s["fecha_limite"]:
             return {"falla": "se acabó el tiempo de la pregunta"}
         try:
-            r = self.cadena.invocar(self._mensajes_llm(s["messages"]), self.caja.herramientas, s["fecha_limite"])
+            r = self.cadena.invocar(self._mensajes_llm(s["messages"], s.get("laguna")), self.caja.herramientas, s["fecha_limite"])
         except SinModelos as e:
             return {"falla": str(e)}
         ctx.pasos.append({"tipo": "decision", "modelo": self.cadena.ultimo, "herramientas": [c["name"] for c in r.tool_calls]})
@@ -268,18 +280,18 @@ class Agente:
         return g.compile()
 
     # ---------- ejecución ----------
-    def _inicial(self, pregunta, historial):
-        ctx = Contexto(pregunta=pregunta)
-        previos = []
-        for q, a in historial or []:
-            previos += [HumanMessage(q), AIMessage(a)]
-        return {"messages": previos + [HumanMessage(pregunta)], "ctx": ctx, "con_historial": bool(historial),
-                "fecha_limite": time.time() + self.cfg.timeout_pregunta, "iteraciones": 0}
+    def _inicial(self, pregunta, historial, laguna=None):
+      ctx = Contexto(pregunta=pregunta, laguna_nombre=(laguna or {}).get("nombre"))
+      previos = []
+      for q, a in historial or []:
+          previos += [HumanMessage(q), AIMessage(a)]
+      return {"messages": previos + [HumanMessage(pregunta)], "ctx": ctx, "con_historial": bool(historial),
+              "fecha_limite": time.time() + self.cfg.timeout_pregunta, "iteraciones": 0, "laguna": laguna}
 
-    def en_pasos(self, pregunta, historial=None):
+    def en_pasos(self, pregunta, historial=None, laguna=None):
         """Generador: emite {"tipo": "paso", ...} según ocurren y termina con {"tipo": "final", ...}."""
         t0 = time.time()
-        inicial = self._inicial(pregunta, historial)
+        inicial = self._inicial(pregunta, historial, laguna=laguna)
         ctx = inicial["ctx"]
         limite = 4 * self.cfg.max_iter + 20
         final, enviados = inicial, 0
@@ -297,11 +309,11 @@ class Agente:
             enviados += 1
         yield {"tipo": "final", "resultado": self._resultado(final, time.time() - t0)}
 
-    def responder(self, pregunta, historial=None):
-        ultimo = None
-        for ev in self.en_pasos(pregunta, historial):
-            ultimo = ev
-        return ultimo["resultado"]
+    def responder(self, pregunta, historial=None, laguna=None):
+      ultimo = None
+      for ev in self.en_pasos(pregunta, historial, laguna=laguna):
+          ultimo = ev
+      return ultimo["resultado"]
 
     def _resultado(self, s, segundos):
         ctx = s["ctx"]

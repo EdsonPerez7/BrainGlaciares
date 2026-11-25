@@ -115,11 +115,26 @@ class Limitador:
                     self._ips.pop(k, None)
             return True
 
+class LagunaContexto(BaseModel):
+    id: Optional[str] = None
+    nombre: str
+    departamento: Optional[str] = None
+    riesgo: Optional[str] = None
+    volumen: Optional[float] = None
+    tiene_obras: Optional[bool] = None
+    obras_detalle: Optional[str] = None
+    poblado_amenazado: Optional[str] = None
+    glaciar_origen: Optional[str] = None
 
 class Pregunta(BaseModel):
     pregunta: str = Field(min_length=2, max_length=2000, description="La pregunta en lenguaje natural.")
-    sesion_id: Optional[str] = Field(default=None, pattern=r"^[A-Za-z0-9_-]{8,64}$",
-                                     description="Identificador de la conversación, para preguntas de seguimiento.")
+    sesion_id: Optional[str] = Field(default=None, pattern=r"^[A-Za-z0-9_-]{8,64}$")
+    laguna: Optional[LagunaContexto] = Field(default=None, description="Laguna seleccionada en la interfaz.")
+
+# class Pregunta(BaseModel):
+#    pregunta: str = Field(min_length=2, max_length=2000, description="La pregunta en lenguaje natural.")
+#    sesion_id: Optional[str] = Field(default=None, pattern=r"^[A-Za-z0-9_-]{8,64}$",
+#                                     description="Identificador de la conversación, para preguntas de seguimiento.")
 
 
 def publico(r):
@@ -1020,7 +1035,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
             raise HTTPException(503, "El agente está ocupado con otras preguntas; intenta en unos segundos.", headers={"Retry-After": "15"})
         ident = uuid.uuid4().hex[:8]
         try:
-            r = servicio.responder(pregunta, p.sesion_id)
+            r = servicio.responder(pregunta, p.sesion_id, p.laguna.model_dump() if p.laguna else None)
         finally:
             turnos.release()
         _registrar(ident, r)
@@ -1041,7 +1056,7 @@ def crear_app(cfg=None, servicio=None, cargar=True):
                 return
             try:
                 yield sse({"tipo": "inicio", "id": ident})
-                for ev in servicio.en_pasos(pregunta, p.sesion_id):
+                for ev in servicio.en_pasos(pregunta, p.sesion_id, p.laguna.model_dump() if p.laguna else None):
                     if ev["tipo"] == "final":
                         _registrar(ident, ev["resultado"])
                         yield sse({"tipo": "final", "resultado": {"id": ident, **publico(ev["resultado"])}})

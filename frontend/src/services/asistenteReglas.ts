@@ -84,7 +84,14 @@ export function sugerenciasPara(ctx: Contexto): string[] {
   }
   if (ctx.laguna) {
     const n = ctx.laguna.startsWith('Laguna') ? ctx.laguna : `la laguna ${ctx.laguna}`;
-    return [`¿Por qué ${n} es peligrosa?`, `¿Qué poblados amenaza ${n}?`, `¿Qué obras de seguridad tiene ${n}?`];
+    const p1 = ctx.riesgo === 'Sin evaluar'
+      ? `¿Por qué ${n} figura con riesgo sin evaluar en los informes?`
+      : `¿Por qué ${n} tiene nivel de riesgo ${ctx.riesgo?.toLowerCase() || 'crítico'}?`;
+    const p2 = ctx.tieneObras
+      ? `¿Qué función cumplen las obras de seguridad de ${n}?`
+      : `¿Qué riesgos implica que ${n} no tenga obras de seguridad?`;
+    const p3 = `¿Qué poblados aguas abajo podrían verse afectados por ${n}?`;
+    return [p1, p2, p3];
   }
   if (ctx.departamento) return [`¿Qué lagunas de ${ctx.departamento} tienen riesgo muy alto?`, `¿Qué lagunas de ${ctx.departamento} no tienen obras?`, '¿Qué hago si ocurre un aluvión?'];
   if (ctx.seccion === 'El camino de un aluvión' || ctx.seccion === 'Así ocurre un aluvión') return ['¿Qué pasó en la Laguna 513 en 2010?', '¿Cómo se forma un aluvión?', '¿Qué es un sistema de alerta temprana?'];

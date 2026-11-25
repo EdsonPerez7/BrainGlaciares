@@ -8,7 +8,7 @@ import { SITE_CONFIG } from '../config/site.config';
 ---
 
 <Layout title="Buscar lagunas y zonas de riesgo · ARQEN">
-  <div class="min-h-screen pb-12 pt-8" data-contexto="Ficha de laguna">
+  <div class="min-h-screen pb-12 pt-8">
     <div class="mx-auto w-full max-w-[1400px] space-y-5 px-4 sm:px-8 lg:px-12">
 
       <!-- Encabezado + buscador -->
@@ -302,6 +302,28 @@ import { SITE_CONFIG } from '../config/site.config';
     cont.innerHTML = hitos.map(([a, t]) => `<p><b class="font-mono text-noche-900">${esc(a)}</b> ${esc(t)}</p>`).join('');
   }
 
+  function sincronizarLagunaConAsistente(laguna) {
+    if (!laguna) return;
+    const payload = {
+      seccion: 'Ficha de laguna',
+      laguna: laguna.nombre,
+      lagunaId: laguna.id,
+      departamento: laguna.departamento,
+      riesgo: laguna.riesgo,
+      volumen: Number(laguna.volumen_hm3) || 0,
+      tieneObras: Boolean(laguna.tiene_obras),
+      obrasDetalle: laguna.obras_detalle || '',
+      pobladoAmenazado: laguna.poblado_amenazado || '',
+      glaciarOrigen: laguna.glaciar_origen || '',
+    };
+    if (window.ARQEN?.fijarContexto) {
+      window.ARQEN.fijarContexto(payload, true);
+    } else {
+      window.__ARQEN_CTX__ = payload;
+      window.dispatchEvent(new CustomEvent('arqen:contexto', { detail: payload }));
+    }
+  }
+
   function renderFicha(laguna) {
     if (!laguna) return;
     currentLaguna = laguna;
@@ -373,7 +395,7 @@ import { SITE_CONFIG } from '../config/site.config';
     pintarLineaTiempo(laguna);
 
     // Contexto para el asistente único
-    window.ARQEN?.fijarContexto({ seccion: 'Ficha de laguna', laguna: laguna.nombre, lagunaId: laguna.id, departamento: laguna.departamento }, true);
+    sincronizarLagunaConAsistente(laguna);  
 
     // Consultar evidencia y citas documentales en vivo desde el RAG (398 Informes oficiales - Cero LLM)
     cargarDetalleRAG(laguna);
@@ -839,7 +861,19 @@ import { SITE_CONFIG } from '../config/site.config';
     });
 
     // Un solo asistente: estos botones lo abren con el contexto de la laguna
-    const ctxLaguna = () => ({ seccion: 'Ficha de laguna', laguna: currentLaguna.nombre, lagunaId: currentLaguna.id, departamento: currentLaguna.departamento });
+    
+    const ctxLaguna = () => ({
+      seccion: 'Ficha de laguna',
+      laguna: currentLaguna.nombre,
+      lagunaId: currentLaguna.id,
+      departamento: currentLaguna.departamento,
+      riesgo: currentLaguna.riesgo,
+      volumen: Number(currentLaguna.volumen_hm3) || 0,
+      tieneObras: Boolean(currentLaguna.tiene_obras),
+      obrasDetalle: currentLaguna.obras_detalle || '',
+      pobladoAmenazado: currentLaguna.poblado_amenazado || '',
+      glaciarOrigen: currentLaguna.glaciar_origen || '',
+    });
     document.getElementById('btn-preguntar-mayu')?.addEventListener('click', () => window.ARQEN?.abrirAsistente(ctxLaguna()));
     document.getElementById('btn-generar-informe')?.addEventListener('click', () => window.ARQEN?.informeLaguna(currentLaguna.id));
     document.getElementById('btn-ver-3d-ficha')?.addEventListener('click', () => {

@@ -32,18 +32,18 @@ class Memoria:
             self._d.move_to_end(sesion)
             return list(v[1])
 
-    def guardar(self, sesion, pregunta, respuesta):
-        if not sesion:
-            return
-        # los [n] solo valen dentro de su pregunta: sin esto, el LLM citaría números de la evidencia anterior
-        limpia = re.sub(r"\s*\[\d+\]", "", respuesta)[:800]
-        with self._candado:
-            _, cola = self._d.get(sesion, (0, deque(maxlen=self.turnos)))
-            cola.append((pregunta, limpia))
-            self._d[sesion] = (self.reloj(), cola)
-            self._d.move_to_end(sesion)
-            while len(self._d) > self.sesiones:
-                self._d.popitem(last=False)
+    def guardar(self, sesion, pregunta, respuesta, laguna=None):
+      if not sesion:
+          return
+      limpia = re.sub(r"\s*\[\d+\]", "", respuesta)[:800]
+      etiqueta = f"[Laguna: {laguna['nombre']}] {pregunta}" if laguna and laguna.get("nombre") else pregunta
+      with self._candado:
+          _, cola = self._d.get(sesion, (0, deque(maxlen=self.turnos)))
+          cola.append((etiqueta, limpia))
+          self._d[sesion] = (self.reloj(), cola)
+          self._d.move_to_end(sesion)
+          while len(self._d) > self.sesiones:
+              self._d.popitem(last=False)
 
 
 class CacheRespuestas:
@@ -55,8 +55,12 @@ class CacheRespuestas:
         self._candado = threading.Lock()
         self.aciertos = 0
 
-    def obtener(self, pregunta):
-        k = GR.norm(pregunta)
+    def _clave(self, pregunta, laguna=None):
+      prefijo = GR.norm(laguna["nombre"]) if laguna and laguna.get("nombre") else "global"
+      return f"{prefijo}:{GR.norm(pregunta)}"
+
+    def obtener(self, pregunta, laguna=None):
+        k = self._clave(pregunta, laguna)
         with self._candado:
             v = self._d.get(k)
             if v is None or self.reloj() - v[0] > self.ttl:
@@ -66,10 +70,11 @@ class CacheRespuestas:
             self._d.move_to_end(k)
             return v[1]
 
-    def guardar(self, pregunta, resultado):
+    def guardar(self, pregunta, resultado, laguna=None):
+        k = self._clave(pregunta, laguna)
         with self._candado:
-            self._d[GR.norm(pregunta)] = (self.reloj(), resultado)
-            self._d.move_to_end(GR.norm(pregunta))
+            self._d[k] = (self.reloj(), resultado)
+            self._d.move_to_end(k)
             while len(self._d) > self.tamano:
                 self._d.popitem(last=False)
 
@@ -112,28 +117,26 @@ class Servicio:
             self.estado, self.detalle = "error", _sin_direcciones(str(e))[:300]
             self.log(f"No se pudo iniciar el agente: {self.detalle}")
 
-    def en_pasos(self, pregunta, sesion=None):
-        historial = self.memoria.historial(sesion)
-        self.preguntas += 1
-        if not historial:
-            guardada = self.cache.obtener(pregunta)
-            if guardada is not None:
-                self.memoria.guardar(sesion, pregunta, guardada["respuesta"])
-                yield {"tipo": "final", "resultado": {**guardada, "desde_cache": True}}
-                return
-        for ev in self.agente.en_pasos(pregunta, historial):
-            if ev["tipo"] == "final":
-                r = ev["resultado"]
-                self.memoria.guardar(sesion, pregunta, r["respuesta"])
-                # solo se reutiliza lo que el LLM redactó y pasó la verificación; no los modos degradados ni un "no encontré",
-                # que podría deberse a una mala decisión del modelo y quedaría fijo una hora
-                if not historial and r["modo"] == "agente" and not r["avisos"] and r["n_citas"] > 0:
-                    self.cache.guardar(pregunta, r)
-            yield ev
+    def en_pasos(self, pregunta, sesion=None, laguna=None):
+      historial = self.memoria.historial(sesion)
+      self.preguntas += 1
+      if not historial:
+          guardada = self.cache.obtener(pregunta, laguna)
+          if guardada is not None:
+              self.memoria.guardar(sesion, pregunta, guardada["respuesta"], laguna)
+              yield {"tipo": "final", "resultado": {**guardada, "desde_cache": True}}
+              return
+      for ev in self.agente.en_pasos(pregunta, historial, laguna=laguna):
+          if ev["tipo"] == "final":
+              r = ev["resultado"]
+              self.memoria.guardar(sesion, pregunta, r["respuesta"], laguna)
+              if not historial and r["modo"] == "agente" and not r["avisos"] and r["n_citas"] > 0:
+                  self.cache.guardar(pregunta, r, laguna)
+          yield ev
 
-    def responder(self, pregunta, sesion=None):
+    def responder(self, pregunta, sesion=None, laguna=None):
         ultimo = None
-        for ev in self.en_pasos(pregunta, sesion):
+        for ev in self.en_pasos(pregunta, sesion, laguna=laguna):
             ultimo = ev
         return ultimo["resultado"]
 

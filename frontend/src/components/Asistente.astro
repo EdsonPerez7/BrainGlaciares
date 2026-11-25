@@ -46,8 +46,9 @@ import Logo from './Logo.astro';
   <!-- Contexto: qué está mirando la persona -->
   <div id="asistente-contexto" class="hidden items-center gap-2 border-b border-slate-100 bg-hielo-50 px-4 py-2 text-xs text-hielo-700">
     <svg class="h-3.5 w-3.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-    <span class="min-w-0 flex-1 truncate">Viendo: <b id="asistente-contexto-texto" class="font-semibold"></b></span>
+    <span class="min-w-0 flex-1 truncate">Vinculado a: <b id="asistente-contexto-texto" class="font-semibold"></b></span>
     <button id="asistente-informe" type="button" class="hidden rounded-md bg-white px-2 py-1 font-semibold text-cochinilla-700 ring-1 ring-cochinilla-100 hover:bg-cochinilla-50">↓ Informe PDF</button>
+    <button id="asistente-desvincular" type="button" title="Dejar de filtrar por esta laguna" class="hidden rounded-md px-1.5 py-0.5 font-bold text-slate-400 hover:bg-slate-200/70 hover:text-slate-700">×</button>
   </div>
 
   <!-- Conversación -->
@@ -103,7 +104,7 @@ import Logo from './Logo.astro';
 <script>
   import { SITE_CONFIG } from '../config/site.config';
   import { esc, markdownSeguro } from '../utils/seguridad';
-  import { obtenerContexto, fijarContexto, abrirAsistente, type Contexto } from '../scripts/contexto';
+  import { obtenerContexto, fijarContexto, abrirAsistente, limpiarLagunaContexto, type Contexto } from '../scripts/contexto';
   import { responderPorReglas, sugerenciasPara } from '../services/asistenteReglas';
 
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T | null;
@@ -118,10 +119,11 @@ import Logo from './Logo.astro';
   const ctxCaja = $('asistente-contexto')!;
   const ctxTexto = $('asistente-contexto-texto')!;
   const btnInforme = $<HTMLButtonElement>('asistente-informe')!;
+  const btnDesvincular = $<HTMLButtonElement>('asistente-desvincular')!;
 
   // Exponer API mínima para scripts en línea (p. ej. /buscar)
   (window as any).ARQEN = {
-    abrirAsistente, fijarContexto,
+    abrirAsistente, fijarContexto, limpiarLagunaContexto,
     informeLaguna: async (id: string) => (await import('../services/informePdf')).generarInformeLaguna(id),
   };
 
@@ -225,6 +227,7 @@ import Logo from './Logo.astro';
     ctxCaja.classList.toggle('flex', !!texto);
     ctxTexto.textContent = texto;
     btnInforme.classList.toggle('hidden', !(c.lagunaId || c.comparacion || c.departamento));
+    btnDesvincular.classList.toggle('hidden', !c.laguna);
     sugerencias.replaceChildren(...sugerenciasPara(c).map((s) => {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'asistente-sug'; b.textContent = s;
@@ -232,6 +235,19 @@ import Logo from './Logo.astro';
       return b;
     }));
   }
+  btnDesvincular.addEventListener('click', () => limpiarLagunaContexto());
+  window.addEventListener('arqen:contexto', (e) => {
+    const det = (e as CustomEvent).detail || {};
+    pintarContexto();
+    if (det.cambioLaguna && det.laguna && mensajes.children.length > 1) {
+      const sep = document.createElement('div');
+      sep.className = 'my-2 text-center text-[11px] font-medium text-slate-400';
+      sep.textContent = `— Contexto cambiado a: ${det.laguna} —`;
+      mensajes.appendChild(sep);
+      mensajes.scrollTop = mensajes.scrollHeight;
+    }
+    if (!abierto) $('asistente-aviso')?.classList.remove('hidden');
+  });
   window.addEventListener('arqen:contexto', () => {
     pintarContexto();
     if (!abierto) $('asistente-aviso')?.classList.remove('hidden');
@@ -338,10 +354,22 @@ import Logo from './Logo.astro';
     const limite = setTimeout(() => ctrl.abort(), 35000);
     try {
       const c = obtenerContexto();
-      const pista = c.laguna ? ` (Contexto: laguna ${c.laguna})` : c.comparacion ? ` (Contexto: ${c.comparacion.join(' y ')})` : c.departamento ? ` (Contexto: ${c.departamento})` : '';
+      const lagunaPayload = c.laguna
+        ? {
+            id: c.lagunaId || null,
+            nombre: c.laguna,
+            departamento: c.departamento || null,
+            riesgo: c.riesgo || null,
+            volumen: c.volumen ?? null,
+            tiene_obras: c.tieneObras ?? null,
+            obras_detalle: c.obrasDetalle || null,
+            poblado_amenazado: c.pobladoAmenazado || null,
+            glaciar_origen: c.glaciarOrigen || null,
+          }
+        : null;
       const res = await fetch(`${SITE_CONFIG.apiBaseUrl}/api/preguntar/stream`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal,
-        body: JSON.stringify({ pregunta: (pregunta + pista).slice(0, 600), sesion_id: sesionId }),
+        body: JSON.stringify({ pregunta: pregunta.slice(0, 600), sesion_id: sesionId, laguna: lagunaPayload }),
       });
       if (!res.ok || !res.body) return false;
       const lector = res.body.getReader(), dec = new TextDecoder();
@@ -395,5 +423,9 @@ import Logo from './Logo.astro';
   entrada.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
   form.addEventListener('submit', (e) => { e.preventDefault(); preguntar(entrada.value); });
 
-  pintarContexto();
+  if ((window as any).__ARQEN_CTX__) {
+    fijarContexto((window as any).__ARQEN_CTX__, true);
+  } else {
+    pintarContexto();
+  }
 </script>

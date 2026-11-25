@@ -74,6 +74,7 @@ class MotorAgente(GR.GraphRAG):
 class Contexto:
     """Lo que el agente va reuniendo mientras responde una pregunta."""
     pregunta: str
+    laguna_nombre: str | None = None
     fuentes: list = field(default_factory=list)
     bloques: list = field(default_factory=list)
     pasos: list = field(default_factory=list)
@@ -344,6 +345,12 @@ class CajaHerramientas:
         if indice is None:
             raise RuntimeError("la búsqueda en documentos no está disponible")
         ctx = _contexto.get()
+        indice = self.m.indice
+        if indice is None:
+            raise RuntimeError("la búsqueda en documentos no está disponible")
+        ctx = _contexto.get()
+        if ctx.laguna_nombre and GR.norm(ctx.laguna_nombre) not in GR.norm(consulta):
+            consulta = f"{ctx.laguna_nombre} {consulta}"
         filtros = {k_: v for k_, v in (("fuente", [fuente] if fuente else None), ("anio_min", anio_min), ("anio_max", anio_max)) if v}
 
         class _Filtrado:
