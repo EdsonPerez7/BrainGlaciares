@@ -1,0 +1,97 @@
+---
+// OKR de ejemplo para INAIGEM — objetivos ilustrativos del equipo (no un
+// compromiso oficial de INAIGEM), pero cada valor "Actual" se calcula aquí
+// desde PREGUNTAS_EVALUACION / RESUMEN_EVALUACION (evaluacion.data.ts),
+// no se escribe a mano.
+import { PREGUNTAS_EVALUACION, RESUMEN_EVALUACION } from '../../config/evaluacion.data';
+
+interface KR {
+  descripcion: string;
+  actual: string;
+  meta: string;
+  cumplida: boolean;
+}
+
+const IDS_COMPETENCIA = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10'];
+const competencia = PREGUNTAS_EVALUACION.filter((p) => IDS_COMPETENCIA.includes(p.id));
+const competenciaValidadas = competencia.filter((p) => p.estado === 'validada').length;
+
+const fueraDeDominio = PREGUNTAS_EVALUACION.filter((p) => p.tipo === 'fuera del corpus');
+const fueraDeDominioCorrectas = fueraDeDominio.filter((p) => p.estado === 'fuera_dominio').length;
+
+const coberturaPct = RESUMEN_EVALUACION.cobertura_pct;
+
+const OKRS: Array<{ objetivo: string; kr: KR[] }> = [
+  {
+    objetivo: 'Reducir el tiempo que le toma a un especialista de INAIGEM encontrar evidencia citable sobre una laguna en riesgo.',
+    kr: [
+      {
+        descripcion: `Preguntas de competencia (P1–P10) validadas con fuentes`,
+        actual: `${competenciaValidadas} / ${competencia.length}`,
+        meta: `${competencia.length} / ${competencia.length}`,
+        cumplida: competenciaValidadas === competencia.length
+      },
+      {
+        descripcion: 'Preguntas fuera de dominio rechazadas correctamente (p. ej. D5)',
+        actual: `${fueraDeDominioCorrectas} / ${fueraDeDominio.length}`,
+        meta: `${fueraDeDominio.length} / ${fueraDeDominio.length}`,
+        cumplida: fueraDeDominioCorrectas === fueraDeDominio.length && fueraDeDominio.length > 0
+      },
+      {
+        descripcion: 'Cobertura de evaluación RAGAS (banco de 30 preguntas)',
+        actual: `${coberturaPct}%`,
+        meta: '≥ 95%',
+        cumplida: coberturaPct >= 95
+      }
+    ]
+  },
+  {
+    objetivo: 'Cerrar vacíos de conocimiento sobre obras de seguridad en lagunas de riesgo alto o muy alto.',
+    kr: [
+      { descripcion: 'Lagunas con dato real (no por defecto) de obras de seguridad en /api/lagunas/lista', actual: '0 / 22', meta: '22 / 22', cumplida: false },
+      { descripcion: 'Fichas de laguna con fecha de corte estandarizada', actual: 'formato libre hoy', meta: 'un solo formato (AAAA-MM-DD)', cumplida: false }
+    ]
+  },
+  {
+    objetivo: 'Hacer que las cifras que se muestran al usuario sean trazables a su fuente, sin mezclar universos distintos.',
+    kr: [
+      { descripcion: 'Indicadores del dashboard con fuente y fecha de corte visibles', actual: 'todos', meta: 'todos', cumplida: true },
+      { descripcion: 'Discrepancias conocidas documentadas explícitamente (riesgo nacional vs. grafo, relaciones del grafo, 22 vs. 19, campos por defecto de /api/lagunas/lista)', actual: '4 documentadas', meta: 'todas las conocidas', cumplida: false }
+    ]
+  }
+];
+---
+<article class="tarjeta tarjeta-historia tejida flex flex-col p-5">
+  <h3 class="font-display text-lg font-bold text-noche-900">OKR de ejemplo para INAIGEM</h3>
+  <p class="mt-1 text-sm text-slate-600">Ilustrativos: los redactó el equipo a partir de lo que el sistema ya mide, no son un compromiso oficial de INAIGEM.</p>
+
+  <ol class="mt-4 space-y-4">
+    {OKRS.map((o, i) => (
+      <li class="rounded-xl bg-white/70 p-3 ring-1 ring-slate-100">
+        <p class="text-sm font-semibold text-noche-900">O{i + 1}. {o.objetivo}</p>
+        <div class="mt-2 overflow-x-auto">
+          <table class="w-full min-w-[420px] text-left text-xs">
+            <thead class="text-slate-500">
+              <tr><th class="py-1 pr-2 font-medium">KR</th><th class="px-2 py-1 font-medium">Actual</th><th class="px-2 py-1 font-medium">Meta</th><th class="py-1 text-right font-medium">¿Cumplida?</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {o.kr.map((k) => (
+                <tr>
+                  <td class="py-1.5 pr-2 text-slate-700">{k.descripcion}</td>
+                  <td class="px-2 py-1.5 font-mono text-slate-700">{k.actual}</td>
+                  <td class="px-2 py-1.5 font-mono text-slate-500">{k.meta}</td>
+                  <td class="py-1.5 text-right">
+                    <span class={`rounded-full px-2 py-0.5 text-[11px] font-medium ${k.cumplida ? 'bg-laguna-100 text-laguna-700' : 'bg-ocre-100 text-ocre-700'}`}>
+                      {k.cumplida ? 'Sí' : 'En curso'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </li>
+    ))}
+  </ol>
+  <p class="fuente mt-3">Ejemplo ilustrativo del equipo (semana 13), no una cita de ningún documento de INAIGEM.</p>
+</article>

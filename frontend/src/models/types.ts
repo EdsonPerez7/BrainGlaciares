@@ -1,6 +1,7 @@
 /**
  * Modelos e Interfaces TypeScript para el Frontend
  */
+import type { PreguntaEvaluacion } from '../config/evaluacion.data';
 
 export interface MetricasPaisResponse {
   hielo_perdido: {
@@ -119,6 +120,47 @@ export interface ComparacionResponse {
     nodos: Array<{ id: string; label: string; tipo: string; grupo: string }>;
     enlaces: Array<{ origen: string; destino: string; rel: string }>;
   };
+}
+
+export interface InfoResponse {
+  estado: string;
+  detalle: string | null;
+  version: string;
+  activo_hace_s: number;
+  preguntas: number;
+  aciertos_cache: number;
+  grafo?: {
+    activo: string;
+    neo4j_configurado: boolean;
+    neo4j_conectado: boolean;
+    ultimo_error: string | null;
+  };
+  texto?: {
+    fragmentos: number;
+    busqueda: string;
+  };
+  modelos?: Array<{ modelo: string; disponible: boolean; usos: number; errores: number }>;
+  herramientas?: Array<{ nombre: string; descripcion: string }>;
+}
+
+export interface RagasResumen {
+  total_banco: number;
+  validadas_evidencia?: number;
+  validadas_exito: number;
+  observadas: number;
+  evaluadas_ragas: number;
+  cobertura_pct: number;
+  faithfulness_avg?: number;
+  answer_relevancy_avg?: number;
+  context_precision_avg?: number;
+  fidelidad_promedio: number;
+  relevancia_promedio: number;
+  precision_contexto_promedio: number;
+}
+
+export interface RagasResponse {
+  resumen: RagasResumen;
+  preguntas: PreguntaEvaluacion[];
 }
 
 export interface ChatPaso {

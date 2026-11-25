@@ -1,7 +1,8 @@
 import { SITE_CONFIG } from '../config/site.config';
 import { acotar } from '../utils/seguridad';
 import { METRICAS_PAIS, DEPARTAMENTOS_RIESGO, LAGUNAS_DESTACADAS } from '../config/metrics.data';
-import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse, CatalogoResponse } from '../models/types';
+import { RESUMEN_EVALUACION, PREGUNTAS_EVALUACION } from '../config/evaluacion.data';
+import type { MetricasPaisResponse, DepartamentoRiesgo, LagunaItem, ComparacionResponse, CordilleraGlaciar, SaludResponse, CatalogoResponse, InfoResponse, RagasResponse } from '../models/types';
 
 let BASE_URL = SITE_CONFIG.apiBaseUrl;
 
@@ -238,6 +239,29 @@ export const ApiService = {
       volumen_hm3: l.volumen_hm3,
       altitud_msnm: l.altitud_msnm
     }));
+  },
+
+  async getInfo(): Promise<InfoResponse | null> {
+    try {
+      const res = await fetch(`${BASE_URL}/api/info`);
+      if (res.ok) return await res.json();
+    } catch {
+      // Sin respaldo: la franja de estado simplemente no muestra detalle extra
+    }
+    return null;
+  },
+
+  async getEvaluacionRagas(): Promise<RagasResponse> {
+    try {
+      const res = await fetch(`${BASE_URL}/api/evaluacion/ragas`);
+      if (res.ok) return await res.json();
+    } catch {
+      // Fallback al snapshot pre-renderizado de la semana 9/12
+    }
+    return {
+      resumen: RESUMEN_EVALUACION,
+      preguntas: PREGUNTAS_EVALUACION
+    };
   },
 
   async getComparacion(l1: string, l2: string): Promise<ComparacionResponse | null> {

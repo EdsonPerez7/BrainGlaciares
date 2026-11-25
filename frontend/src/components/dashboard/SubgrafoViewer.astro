@@ -1,0 +1,40 @@
+---
+// Subgrafo: vistas pyvis/vis.js ya existentes en public/vistas/, en iframe.
+// Siempre subgrafos de decenas/pocos cientos de nodos, nunca los 13 829 completos.
+const VISTAS = [
+  { id: 'vista_graphrag.html', label: 'GraphRAG · recorrido de una respuesta' },
+  { id: 'vista_Palcacocha.html', label: 'Entorno de la laguna Palcacocha' },
+  { id: 'vista_riesgo_Ancash.html', label: 'Lagunas en riesgo · Áncash' }
+];
+---
+<article class="tarjeta tarjeta-noche tejida flex flex-col p-5">
+  <h3 class="font-display text-lg font-bold text-white">Subgrafo de conocimiento</h3>
+  <p class="mt-1 text-sm text-slate-300">Vista pyvis/vis.js de una porción del grafo (decenas de nodos), no el grafo completo.</p>
+
+  <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Elegir vista del subgrafo">
+    {VISTAS.map((v, i) => (
+      <button type="button" data-vista={v.id} class={`dash-vista-btn btn btn-sm ${i === 0 ? 'btn-pri' : 'btn-cristal'}`}>{v.label}</button>
+    ))}
+  </div>
+
+  <div class="mt-3 overflow-hidden rounded-xl bg-white ring-1 ring-white/10">
+    <iframe id="dash-subgrafo-iframe" src={`/vistas/${VISTAS[0].id}`} title="Subgrafo de conocimiento" class="h-[420px] w-full" loading="lazy"></iframe>
+  </div>
+  <p class="fuente mt-3 text-slate-300">frontend/public/vistas/*.html · generadas con Pyvis sobre el grafo de la semana 7</p>
+</article>
+
+<script>
+  const botones = document.querySelectorAll<HTMLButtonElement>('.dash-vista-btn');
+  const iframe = document.getElementById('dash-subgrafo-iframe') as HTMLIFrameElement | null;
+  botones.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const vista = btn.dataset.vista;
+      if (!vista || !iframe) return;
+      iframe.src = `/vistas/${vista}`;
+      botones.forEach((b) => b.classList.remove('btn-pri'));
+      botones.forEach((b) => b.classList.add('btn-cristal'));
+      btn.classList.remove('btn-cristal');
+      btn.classList.add('btn-pri');
+    });
+  });
+</script>

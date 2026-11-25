@@ -1,0 +1,53 @@
+---
+// Franja de estado: agente/grafo en vivo vía /api/salud + /api/info.
+// No es un "indicador de uso" (no mide consultas/latencia/429), solo si el
+// servicio está arriba y qué backend de grafo está activo.
+---
+<div id="dash-estado" class="tarjeta tarjeta-noche flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 text-sm">
+  <span class="flex items-center gap-2">
+    <i id="dash-estado-punto" class="h-2.5 w-2.5 rounded-full bg-slate-400" aria-hidden="true"></i>
+    <span id="dash-estado-texto" class="font-medium">Comprobando el backend local…</span>
+  </span>
+  <span id="dash-estado-grafo" class="text-slate-300"></span>
+  <span id="dash-estado-rag" class="text-slate-300"></span>
+  <span id="dash-estado-modelos" class="text-slate-300"></span>
+</div>
+
+<script>
+  import { ApiService } from '../../services/api';
+  import { esc } from '../../utils/seguridad';
+
+  async function cargar() {
+    const punto = document.getElementById('dash-estado-punto');
+    const texto = document.getElementById('dash-estado-texto');
+    const grafo = document.getElementById('dash-estado-grafo');
+    const rag = document.getElementById('dash-estado-rag');
+    const modelos = document.getElementById('dash-estado-modelos');
+    if (!punto || !texto || !grafo || !rag || !modelos) return;
+
+    const salud = await ApiService.getSalud();
+    if (!salud) {
+      punto.className = 'h-2.5 w-2.5 rounded-full bg-rose-500';
+      texto.textContent = 'Backend no disponible ahora: el dashboard sigue mostrando datos de respaldo.';
+      return;
+    }
+
+    const listo = salud.agente === 'listo';
+    punto.className = `h-2.5 w-2.5 rounded-full ${listo ? 'bg-laguna-500' : 'bg-ocre-400'}`;
+    texto.textContent = `Agente ${esc(salud.agente)} · grafo ${salud.grafo_listo ? 'listo' : 'no listo'} · ${esc(salud.documentos_rag)} documentos en el RAG`;
+
+    const info = await ApiService.getInfo();
+    if (info?.grafo) {
+      grafo.textContent = `· fuente del grafo: ${info.grafo.activo === 'kuzu' ? 'Kùzu (copia local)' : 'Neo4j Aura'}`;
+    }
+    if (info?.texto) {
+      rag.textContent = `· búsqueda: ${esc(info.texto.busqueda)}`;
+    }
+    if (info?.modelos?.length) {
+      const disponibles = info.modelos.filter((m) => m.disponible).length;
+      modelos.textContent = `· ${disponibles}/${info.modelos.length} modelos de LLM disponibles`;
+    }
+  }
+
+  cargar();
+</script>

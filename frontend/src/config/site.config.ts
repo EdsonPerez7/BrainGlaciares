@@ -27,6 +27,7 @@ export const SITE_CONFIG = {
     { label: "Aluvión", href: "/aluvion" },
     { label: "Comparar", href: "/comparar" },
     { label: "Panorama", href: "/panorama" },
+    { label: "Dashboard", href: "/dashboard" },
     { label: "Metodología", href: "/metodologia" }
   ],
 
