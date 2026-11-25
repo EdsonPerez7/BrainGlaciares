@@ -88,18 +88,18 @@
     }
   },
   "citado_de_docs": {
-    "nota": "Lo siguiente no está en nodos.csv ni en relaciones.csv: viene de tripletas_consolidadas.csv (persona 3), un archivo con columnas distintas (predicate/subject_id/object_id/n_docs) que este script no recalcula todavía.",
+    "nota": "Cifras del reporte de PLN (persona 3). El CSV tripletas_consolidadas.csv se actualizó después del reporte, por eso un recálculo hoy da valores cercanos pero no idénticos.",
     "hechos_tripletas": {
       "valor": 13256,
-      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv"
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/reporte_pln.md (línea 11)"
     },
     "entidades_unicas": {
       "valor": 11343,
-      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv"
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/reporte_pln.md (línea 10)"
     },
     "hechos_confirmados_2_o_mas_documentos": {
       "valor": 2502,
-      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/tripletas_consolidadas.csv (columna n_docs)"
+      "fuente": "Semana 6/G8-enterprise-brain-glaciares/data/persona3/reporte_pln.md (línea 12)"
     }
   }
 }
